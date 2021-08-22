@@ -99,9 +99,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.05746293}
+  m_Offset: {x: 0, y: -0.1383537}
   serializedVersion: 2
-  m_Radius: 1.1263256
+  m_Radius: 0.8786553
 --- !u!50 &5153266398256871151
 Rigidbody2D:
   serializedVersion: 4
@@ -135,8 +135,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82224dc0be3517449bffd744476070e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 5
-  playerPrefab: {fileID: 0}
+  movementSpeed: 10
+  transitionName: 
 --- !u!95 &5153266398256871148
 Animator:
   serializedVersion: 3
