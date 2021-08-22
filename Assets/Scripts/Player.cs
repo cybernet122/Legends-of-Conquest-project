@@ -36,6 +36,5 @@ public class Player : MonoBehaviour
             animator.SetFloat("LastY", verticalSpeed);
             animator.SetFloat("LastX", horizontalSpeed);
         }
-        Camera.main.transform.position = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y, -10);
     }
 }
