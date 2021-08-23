@@ -7,10 +7,10 @@ public class Player : MonoBehaviour
     public static Player instance;
     [SerializeField] float movementSpeed = 5;
     public string transitionName;
+    Vector3 bottomLeftEdge, topRightEdge;
     Rigidbody2D playerRigidBody;
     Animator animator;
-    [SerializeField] Tilemap tilemap;
-    Vector3 bottomLeftEdge, topRightEdge;
+
     private void Start()
     {
         if (instance != null && instance != this)
@@ -24,9 +24,10 @@ public class Player : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        bottomLeftEdge = tilemap.localBounds.min + new Vector3(1f, 1f, 0f);
-        topRightEdge = tilemap.localBounds.max + new Vector3(-1f, -1f, 0f); ;
     }
+
+
+
     private void Update()
     {
         float horizontalSpeed = Input.GetAxisRaw("Horizontal");
@@ -43,5 +44,11 @@ public class Player : MonoBehaviour
             Mathf.Clamp(transform.position.x, bottomLeftEdge.x, topRightEdge.x), 
             Mathf.Clamp(transform.position.y, bottomLeftEdge.y, topRightEdge.y), 
             transform.position.z);
+    }
+    
+    public void SetLimit(Vector3 bottomEdge,Vector3 topEdge)
+    {
+        bottomLeftEdge = bottomEdge;
+        topRightEdge = topEdge;
     }
 }
