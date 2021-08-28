@@ -9,7 +9,7 @@ public class DialogController : MonoBehaviour
     [SerializeField] TextMeshProUGUI dialogText, nameText;
     [SerializeField] GameObject dialogBox,nameBox;
     [SerializeField] string[] dialogSentences;
-    int currentSentence;
+    [SerializeField]int currentSentence;
     [Header("Dialogue Timers")]
     [SerializeField] float dialogSkipDelay = 0.5f;
     [SerializeField] float typewriterDelay = 0.1f;
@@ -32,14 +32,18 @@ public class DialogController : MonoBehaviour
         //dialogText.text = dialogSentences[currentSentence];
         if (Input.GetButtonUp("Fire1") && !isTyping)
         {
-            dialogBox.SetActive(true); 
+            dialogBox.SetActive(true);
+            GameManager.instance.dialogBoxOpened = true;
             if (dialogSentences.Length > currentSentence)
             {
+                CheckForName();
                 StartCoroutine(PrintText());
             }
             else
             {
                 dialogBox.SetActive(false);
+                GameManager.instance.dialogBoxOpened = false;
+                currentSentence = 0;
                 dialogText.text = null;
             }
         }
@@ -68,6 +72,11 @@ public class DialogController : MonoBehaviour
     }
     private void Update()
     {
+        CheckForNPC();
+    }
+
+    private void CheckForNPC()
+    {
         if (npcInRange)
         {
             StartCoroutine(ProcessWindowDialog());
@@ -80,8 +89,8 @@ public class DialogController : MonoBehaviour
         else
         {
             dialogBox.SetActive(false);
-            dialogSentences = null;
             currentSentence = 0;
+            //dialogSentences = null;
         }
     }
 
@@ -103,5 +112,18 @@ public class DialogController : MonoBehaviour
     {
         dialogSentences = newSentencesToUse;
         dialogText.text = dialogSentences[currentSentence];
+    }
+
+    void CheckForName()
+    {
+        if (dialogSentences[currentSentence].StartsWith("#"))
+        {
+            nameText.text = dialogSentences[currentSentence].Replace("#", "");
+            currentSentence++;
+        }
+        else
+        {
+            return;
+        }
     }
 }

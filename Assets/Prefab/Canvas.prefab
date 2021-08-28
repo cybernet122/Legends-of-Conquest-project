@@ -554,8 +554,9 @@ MonoBehaviour:
   dialogBox: {fileID: 2021460}
   nameBox: {fileID: 1697746284}
   dialogSentences: []
-  dialogSkipDelay: 0.5
-  typewriterDelay: 0.1
+  currentSentence: 0
+  dialogSkipDelay: 0.4
+  typewriterDelay: 0.04
   npcInRange: 0
 --- !u!1 &4501101888031605083
 GameObject:

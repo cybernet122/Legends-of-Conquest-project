@@ -11,5 +11,7 @@ public class CamController : MonoBehaviour
         player = FindObjectOfType<Player>();
         virtualCamera = GetComponent<CinemachineVirtualCamera>();
         virtualCamera.Follow = player.transform;
+        var virtualCameraConfiner = GetComponent<CinemachineConfiner>();
+        virtualCameraConfiner.m_BoundingShape2D = FindObjectOfType<Grid>().GetComponentInChildren<PolygonCollider2D>();
     }
 }

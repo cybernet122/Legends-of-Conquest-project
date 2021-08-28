@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 5153266398256871145}
   - component: {fileID: 5153266398256871150}
   - component: {fileID: 5153266398256871151}
-  - component: {fileID: 5153266398256871149}
   - component: {fileID: 5153266398256871148}
+  - component: {fileID: 5153266398256871149}
+  - component: {fileID: 1221741892}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -123,20 +124,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &5153266398256871149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5153266398256871146}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82224dc0be3517449bffd744476070e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementSpeed: 10
-  transitionName: 
 --- !u!95 &5153266398256871148
 Animator:
   serializedVersion: 3
@@ -156,3 +143,42 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &5153266398256871149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5153266398256871146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82224dc0be3517449bffd744476070e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementSpeed: 10
+  transitionName: 
+  enableMovement: 1
+--- !u!114 &1221741892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5153266398256871146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc09f18d9fa728b43bf41452211dabaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerName: Jimmy
+  maxLevel: 50
+  playerLevel: 1
+  currentXP: 36
+  xpForNextLevel: 
+  baseLevelXP: 100
+  maxHP: 100
+  currentHP: 0
+  maxMana: 30
+  currentMana: 0
+  dexterity: 10
+  defence: 30
