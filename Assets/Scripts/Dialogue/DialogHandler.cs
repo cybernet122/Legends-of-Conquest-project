@@ -8,7 +8,6 @@ public class DialogHandler : MonoBehaviour
     bool canActivateBox;
     private void OnTriggerEnter2D(Collider2D other)
     {
-        print(other);
         if (other.CompareTag("Player"))
         {
             DialogController.instance.ActivateDialog(sentences);

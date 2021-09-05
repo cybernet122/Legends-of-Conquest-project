@@ -21,6 +21,9 @@ public class GameManager : MonoBehaviour
         }
         DontDestroyOnLoad(gameObject);
         playerStats = FindObjectsOfType<PlayerStats>();
+/*        var temp = playerStats[0];
+        playerStats[0] = playerStats[playerStats.Length - 1];
+        playerStats[playerStats.Length-1] = temp;*/
     }
 
     // Update is called once per frame
@@ -34,5 +37,10 @@ public class GameManager : MonoBehaviour
         {
             Player.instance.enableMovement = true;
         }
+    }
+
+    public PlayerStats[] GetPlayerStats()
+    {
+        return playerStats;
     }
 }

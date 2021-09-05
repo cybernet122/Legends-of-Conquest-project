@@ -1,23 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class PlayerStats : MonoBehaviour
 {
-    [SerializeField] string playerName;
+    public string playerName;
 
-    [SerializeField] int maxLevel = 50;
-    [SerializeField] int playerLevel = 1;
-    [SerializeField] int currentXP;
-    [SerializeField] int[] xpForNextLevel;
+    public Sprite characterImage;
+
+    public int maxLevel = 50;
+    public int playerLevel = 1;
+    public int currentXP;
+    public int[] xpForNextLevel;
     [SerializeField] int baseLevelXP = 100;
 
-    [SerializeField] int maxHP = 100;
-    [SerializeField] int currentHP;
+    public int maxHP = 100;
+    public int currentHP;
 
-    [SerializeField] int maxMana = 30;
-    [SerializeField] int currentMana;
-
+    public int maxMana = 30;
+    public int currentMana;
+    [SerializeField] int addXP;
     [SerializeField] int dexterity;
     [SerializeField] int defence;
     // Start is called before the first frame update
@@ -29,6 +30,8 @@ public class PlayerStats : MonoBehaviour
         {
             xpForNextLevel[i] = (int)(0.02f * i * i * i + 3.06f * i * i + 105.6f * i);
         }
+        currentHP = maxHP;
+        currentMana = maxMana;
     }
 
     // Update is called once per frame
@@ -36,19 +39,45 @@ public class PlayerStats : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.L))
         {
-            AddXP(400);
+            AddXP(addXP);
         }
     }
 
     public void AddXP(int amount)
     {
-        currentXP += amount;
         if (playerLevel >= maxLevel) { return; }
-        if (currentXP > xpForNextLevel[playerLevel])
+        int SumXPToAdd = currentXP + amount;
+        int levelsToAdd = 0;
+        if (SumXPToAdd >= xpForNextLevel[playerLevel]*2)
+        {
+            for (int i = 1; i < 50 && SumXPToAdd >= xpForNextLevel[playerLevel + i]; i++)
+            {
+                print(i);
+                SumXPToAdd -= xpForNextLevel[playerLevel + i-1];
+                print(SumXPToAdd);
+                levelsToAdd = i;
+            }
+            playerLevel += levelsToAdd;
+            currentXP = SumXPToAdd;
+            CheckForLevelUp();
+            MenuManager.instance.UpdateStats();
+        }
+        else
+        {
+            print("Checking for levelup");
+            currentXP += amount;
+            CheckForLevelUp();
+            MenuManager.instance.UpdateStats();
+        }
+    }
+
+    private void CheckForLevelUp()
+    {
+        if (currentXP >= xpForNextLevel[playerLevel])
         {
             currentXP -= xpForNextLevel[playerLevel];
             playerLevel++;
-            if(playerLevel % 2 == 0)
+            if (playerLevel % 2 == 0)
             {
                 dexterity++;
             }
@@ -61,6 +90,5 @@ public class PlayerStats : MonoBehaviour
             maxMana = Mathf.RoundToInt(maxMana * 1.08f);
             currentMana = maxMana;
         }
-        
     }
 }

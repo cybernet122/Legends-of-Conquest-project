@@ -171,6 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerName: Jimmy
+  characterImage: {fileID: -5183574429699489216, guid: c12e3063b238c0a4ca7f9f5a0b539ca4, type: 3}
   maxLevel: 50
   playerLevel: 1
   currentXP: 36
