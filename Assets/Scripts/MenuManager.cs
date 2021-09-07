@@ -15,9 +15,12 @@ public class MenuManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel;
     [SerializeField] Slider xpSlider;
     [SerializeField] Image characterImage;
-    [SerializeField] GameObject characterPanel;
-    [SerializeField] GameObject itemsPanel;
+    [SerializeField] GameObject characterPanel, itemsPanel, itemContainer;
+    [SerializeField] Transform itemSlotContainerParent;
+    [SerializeField] Button useButton,discardButton;
     public static MenuManager instance;
+    public TextMeshProUGUI itemName,itemDescription;
+    public ItemsManager activeItem;
     PlayerStats[] playerStats;
     bool toglMenu,toglItems,toglStats = false;
     int currentlyViewing;
@@ -49,6 +52,8 @@ public class MenuManager : MonoBehaviour
         GameManager.instance.gameMenuOpened = toglMenu;
         itemsPanel.SetActive(false);
         characterPanel.SetActive(false);
+        toglItems = false;
+        toglStats = false;
     }
 
     public void ToggleItems()
@@ -136,8 +141,33 @@ public class MenuManager : MonoBehaviour
         xpText.text = playerSelected.currentXP.ToString() + " / " + playerSelected.xpForNextLevel[playerStats[playerSelectedNumber].playerLevel].ToString();
     }
 
+    public void UpdateItemsInventory()
+    {
+        foreach (Transform itemSlot in itemSlotContainerParent)
+        {
+            Destroy(itemSlot.gameObject);
+        }
+        foreach (ItemsManager item in Inventory.instance.GetItemList())
+        {
+            RectTransform itemSlot = Instantiate(itemContainer, itemSlotContainerParent).GetComponent<RectTransform>();
+            Image image = itemSlot.Find("Items Image").GetComponent<Image>();
+            image.sprite = item.itemImage;
+            TextMeshProUGUI itemAmountText = itemSlot.GetComponentInChildren<TextMeshProUGUI>();
+            if (item.amount > 1)
+            { itemAmountText.text = item.amount.ToString(); }
+            else
+            { itemAmountText.text = ""; }
+            itemSlot.GetComponent<ItemButton>().itemOnButton = item;
+        }
+    }
+
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void DiscardItem()
+    {
+        Inventory.instance.RemoveItem(activeItem);
     }
 }
