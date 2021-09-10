@@ -12,12 +12,14 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Slider[] xpInfoSlider;
     [SerializeField] Image[] characterInfoImage;
     [SerializeField] GameObject[] characterInfoPanel;
-    [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel;
+    [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel, statEquippedWeapon, statEquippedArmor, statWeaponPower, statArmorDefence;
     [SerializeField] Slider xpSlider;
     [SerializeField] Image characterImage;
     [SerializeField] GameObject characterPanel, itemsPanel, itemContainer;
     [SerializeField] Transform itemSlotContainerParent;
     [SerializeField] Button useButton,discardButton;
+    [SerializeField] GameObject characterChoicePanel;
+    [SerializeField] TextMeshProUGUI[] itemsCharacterChoiceNames;
     public static MenuManager instance;
     public TextMeshProUGUI itemName,itemDescription;
     public ItemsManager activeItem;
@@ -29,6 +31,7 @@ public class MenuManager : MonoBehaviour
         instance = this;
         menu.SetActive(false);
         characterPanel.SetActive(false);
+        CloseCharacterChoicePanel();
     }
 
     public void FadeImage()
@@ -139,6 +142,10 @@ public class MenuManager : MonoBehaviour
         }
         xpSlider.maxValue = playerSelected.xpForNextLevel[playerStats[playerSelectedNumber].playerLevel];
         xpText.text = playerSelected.currentXP.ToString() + " / " + playerSelected.xpForNextLevel[playerStats[playerSelectedNumber].playerLevel].ToString();
+        statEquippedWeapon.text = playerSelected.equippedWeaponName;
+        statEquippedArmor.text = playerSelected.equippedArmorName;
+        statWeaponPower.text = "Weapon Power: " + playerSelected.weaponPower.ToString();
+        statArmorDefence.text = "Armor Defence: " + playerSelected.armorDefence.ToString();
     }
 
     public void UpdateItemsInventory()
@@ -169,5 +176,31 @@ public class MenuManager : MonoBehaviour
     public void DiscardItem()
     {
         Inventory.instance.RemoveItem(activeItem);
+    }
+
+    public void UseItem(int characterToUse)
+    {
+        activeItem.UseItem(characterToUse);
+        OpenCharacterChoicePanel();
+        DiscardItem();
+    }
+
+    public void OpenCharacterChoicePanel()
+    {
+        characterChoicePanel.SetActive(true);
+        if (activeItem)
+        {
+            for (int i = 0; i < playerStats.Length; i++)
+            {
+                PlayerStats activePlayer = GameManager.instance.GetPlayerStats()[i];
+                itemsCharacterChoiceNames[i].text = activePlayer.playerName;
+                bool activePlayerAvailable = activePlayer.gameObject.activeInHierarchy;
+                itemsCharacterChoiceNames[i].transform.parent.gameObject.SetActive(activePlayerAvailable);
+            }
+        }
+    }
+    public void CloseCharacterChoicePanel()
+    {
+        characterChoicePanel.SetActive(false);
     }
 }

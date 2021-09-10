@@ -47,4 +47,36 @@ public class ItemsManager : MonoBehaviour
             inRange = false;
         }        
     }
+
+    public void UseItem(int characterToUse)
+    {
+        PlayerStats selectedCharacter = GameManager.instance.GetPlayerStats()[characterToUse];
+        if (itemType == ItemType.Item)
+        {
+            if (affectType == AffectType.HP)
+            {
+                selectedCharacter.AddHP(amountOfEffect);
+            }
+            else if (affectType == AffectType.Mana)
+            {
+                selectedCharacter.AddMana(amountOfEffect);
+            }
+        }
+        else if (itemType == ItemType.Weapon)
+        {
+            if (selectedCharacter.equippedWeaponName != "")
+            {
+                Inventory.instance.AddItems(selectedCharacter.equippedWeapon);
+            }
+            selectedCharacter.EquipWeapon(this);
+        }
+        else if (itemType == ItemType.Armor)
+        {
+            if (selectedCharacter.equippedArmorName != "")
+            {
+                Inventory.instance.AddItems(selectedCharacter.equippedArmor);
+            }
+            selectedCharacter.EquipArmor(this);
+        }
+    }
 }

@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69cacc153c97904ea65a40046ef5bcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: 0
+  itemType: 2
   itemName: Silver Armor
   itemDescription: This armor will somewhat protect you against monsters.
   valueInCoins: 15

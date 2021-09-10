@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69cacc153c97904ea65a40046ef5bcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: 0
+  itemType: 1
   itemName: Silver Axe
   itemDescription: This weapon will offer some way to defend yourself against monsters
   valueInCoins: 10

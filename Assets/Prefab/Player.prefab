@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5153266398256871148}
   - component: {fileID: 5153266398256871149}
   - component: {fileID: 1221741892}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -174,12 +174,20 @@ MonoBehaviour:
   characterImage: {fileID: -5183574429699489216, guid: c12e3063b238c0a4ca7f9f5a0b539ca4, type: 3}
   maxLevel: 50
   playerLevel: 1
-  currentXP: 36
+  currentXP: 0
   xpForNextLevel: 
   baseLevelXP: 100
-  maxHP: 100
-  currentHP: 0
+  hpToAdd: 10
+  maxHP: 65
+  currentHP: 30
   maxMana: 30
-  currentMana: 0
+  currentMana: 30
+  addXP: 1000
   dexterity: 10
   defence: 30
+  equippedWeaponName: 
+  equippedArmorName: 
+  weaponPower: 0
+  armorDefence: 0
+  equippedWeapon: {fileID: 0}
+  equippedArmor: {fileID: 0}

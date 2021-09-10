@@ -4,15 +4,14 @@ using UnityEngine;
 public class PlayerStats : MonoBehaviour
 {
     public string playerName;
-
+    public static PlayerStats instance;
     public Sprite characterImage;
-
     public int maxLevel = 50;
     public int playerLevel = 1;
     public int currentXP;
     public int[] xpForNextLevel;
     [SerializeField] int baseLevelXP = 100;
-
+    public int hpToAdd = 10;
     public int maxHP = 100;
     public int currentHP;
 
@@ -22,9 +21,14 @@ public class PlayerStats : MonoBehaviour
     public int dexterity;
     public int defence;
     int levelsToAdd = 0;
-
+    public string equippedWeaponName;
+    public string equippedArmorName;
+    public int weaponPower;
+    public int armorDefence;
+    public ItemsManager equippedWeapon, equippedArmor;
     void Start()
     {
+        instance = this;
         xpForNextLevel = new int[maxLevel];
         xpForNextLevel[1] = baseLevelXP;
         for(int i=2;i< xpForNextLevel.Length;i++)
@@ -41,6 +45,8 @@ public class PlayerStats : MonoBehaviour
         {
             AddXP(addXP);
         }
+        if (Input.GetKeyDown(KeyCode.K))
+            AddHP(hpToAdd);
     }
 
     public void AddXP(int amount)
@@ -69,6 +75,19 @@ public class PlayerStats : MonoBehaviour
         CheckForLevelUp();
     }
 
+    public void AddHP(int hpToAdd)
+    {
+        currentHP += hpToAdd;
+        if (currentHP > maxHP)
+            currentHP = maxHP;
+    }
+
+    public void AddMana(int ManaToAdd)
+    {
+        currentMana += ManaToAdd;
+        if (currentMana > maxMana)
+            currentMana = maxMana;
+    }
     private void CheckForLevelUp()
     {
         if(playerLevel >= maxLevel) { return; }
@@ -110,5 +129,19 @@ public class PlayerStats : MonoBehaviour
         }
         MenuManager.instance.UpdateStats();
         MenuManager.instance.StatsMenuUpdate(0);
+    }
+
+    public void EquipWeapon(ItemsManager weaponToEquip)
+    {
+        equippedWeapon = weaponToEquip;
+        equippedWeaponName = equippedWeapon.itemName;
+        weaponPower = equippedWeapon.weaponDexterity;
+    }
+
+    public void EquipArmor(ItemsManager armorToEquip)
+    {
+        equippedArmor = armorToEquip;
+        equippedArmorName = equippedArmor.itemName;
+        armorDefence = equippedArmor.armorDefence;
     }
 }
