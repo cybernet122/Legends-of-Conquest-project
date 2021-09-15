@@ -6,7 +6,7 @@ using TMPro;
 public class MenuManager : MonoBehaviour
 {
     [SerializeField] Image image;
-    [SerializeField] GameObject menu;
+    public GameObject menu;
     [SerializeField] GameObject[] statsButtons;
     [SerializeField] TextMeshProUGUI[] nameInfoText, hpInfoText, manaInfoText, xpInfoText, playerInfoLevel, currentXPText;
     [SerializeField] Slider[] xpInfoSlider;
@@ -41,7 +41,7 @@ public class MenuManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape)) //Toggle Menu
+        if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && !GameManager.instance.dialogBoxOpened) //Toggle Menu
         {
             ToggleMenu();
         }
@@ -57,6 +57,7 @@ public class MenuManager : MonoBehaviour
         characterPanel.SetActive(false);
         toglItems = false;
         toglStats = false;
+        DialogController.instance.count = 0;
     }
 
     public void ToggleItems()

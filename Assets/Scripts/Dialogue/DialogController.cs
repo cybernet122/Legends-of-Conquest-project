@@ -19,6 +19,7 @@ public class DialogController : MonoBehaviour
     bool isTyping = false;
     bool checkingSkip = false;
     public bool npcInRange = false;
+    public float count = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -45,6 +46,7 @@ public class DialogController : MonoBehaviour
                 GameManager.instance.dialogBoxOpened = false;
                 currentSentence = 0;
                 dialogText.text = null;
+                count = 0;
             }
         }
         yield return new WaitForEndOfFrame();
@@ -72,7 +74,18 @@ public class DialogController : MonoBehaviour
     }
     private void Update()
     {
-        CheckForNPC();
+        if(count <= 0.7f)
+        StartCoroutine(CountDown());
+        if (!ShopManager.instance.shopMenu.activeInHierarchy && !MenuManager.instance.menu.activeInHierarchy && count >= 0.7f)
+        {
+            CheckForNPC();
+        }
+    }
+
+    IEnumerator CountDown()
+    {
+        count = count + Time.deltaTime;
+        yield return new WaitForEndOfFrame();
     }
 
     private void CheckForNPC()

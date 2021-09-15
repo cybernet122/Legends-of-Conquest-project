@@ -19,21 +19,28 @@ public class Inventory : MonoBehaviour
         
     }
 
-    public void AddItems(ItemsManager item)
+    public void AddItems(ItemsManager item, bool shopItem)
     {
         if (item.isStackable)
         {
             bool itemAlreadyInInventory = false;
             foreach (ItemsManager itemInInventory in itemsList)
             {
-                if (itemInInventory.itemName == item.itemName)
+                if (!item.isStackable) { break; }
+                if (itemInInventory.itemName == item.itemName && !shopItem)
                 {
                     itemInInventory.amount += item.amount;
+                    itemAlreadyInInventory = true;
+                }
+                else if (itemInInventory.itemName == item.itemName && shopItem && item.isStackable)
+                {
+                    itemInInventory.amount ++;
                     itemAlreadyInInventory = true;
                 }
             }
             if (!itemAlreadyInInventory)
             {
+                item.amount = 1;
                 itemsList.Add(item);
             }
         }

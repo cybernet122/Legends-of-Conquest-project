@@ -27,7 +27,7 @@ public class ItemsManager : MonoBehaviour
     {
         if (inRange)
         {
-            Inventory.instance.AddItems(this);
+            Inventory.instance.AddItems(this,false);
             this.gameObject.SetActive(false);
         }
     }
@@ -66,7 +66,7 @@ public class ItemsManager : MonoBehaviour
         {
             if (selectedCharacter.equippedWeaponName != "")
             {
-                Inventory.instance.AddItems(selectedCharacter.equippedWeapon);
+                Inventory.instance.AddItems(selectedCharacter.equippedWeapon,false);
             }
             selectedCharacter.EquipWeapon(this);
         }
@@ -74,7 +74,7 @@ public class ItemsManager : MonoBehaviour
         {
             if (selectedCharacter.equippedArmorName != "")
             {
-                Inventory.instance.AddItems(selectedCharacter.equippedArmor);
+                Inventory.instance.AddItems(selectedCharacter.equippedArmor,false);
             }
             selectedCharacter.EquipArmor(this);
         }
