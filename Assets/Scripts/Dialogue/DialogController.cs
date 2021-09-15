@@ -15,7 +15,9 @@ public class DialogController : MonoBehaviour
     [SerializeField] float typewriterDelay = 0.1f;
     float dialogSkipTimer;
     string currentText;
-    
+    string questToMark;
+    bool markTheQuestComplete;
+    bool shouldMarkQuest;
     bool isTyping = false;
     bool checkingSkip = false;
     public bool npcInRange = false;
@@ -44,6 +46,14 @@ public class DialogController : MonoBehaviour
             {
                 dialogBox.SetActive(false);
                 GameManager.instance.dialogBoxOpened = false;
+                if (shouldMarkQuest)
+                {
+                    shouldMarkQuest = false;
+                    if (markTheQuestComplete)
+                        QuestManager.instance.MarkQuestComplete(questToMark);
+                    else
+                        QuestManager.instance.MarkQuestComplete(questToMark);
+                }
                 currentSentence = 0;
                 dialogText.text = null;
                 count = 0;
@@ -138,5 +148,12 @@ public class DialogController : MonoBehaviour
         {
             return;
         }
+    }
+
+    public void ActivateQuestAtEnd(string questName, bool markComplete)
+    {
+        questToMark = questName;
+        markTheQuestComplete = markComplete;
+        shouldMarkQuest = true;
     }
 }

@@ -5,11 +5,13 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
+    public static QuestManager instance;
     [SerializeField] string[] questNames;
     [SerializeField] bool[] questMarkersCompleted;
     // Start is called before the first frame update
     void Start()
     {
+        instance = this;
         questMarkersCompleted = new bool[questNames.Length];
     }
 
@@ -47,15 +49,29 @@ public class QuestManager : MonoBehaviour
         return false;
     }
 
+    public void UpdateQuestObjects()
+    {
+        var questObjects = FindObjectsOfType<QuestObject>();
+        if (questObjects.Length > 1)
+        {
+            foreach (QuestObject quests in questObjects)
+            {
+                quests.CheckForCompletion();
+            }
+        }
+    }
     public void MarkQuestComplete(string questToMark)
     {
         int questNumberToCheck = GetQuestNumber(questToMark);
         questMarkersCompleted[questNumberToCheck] = true;
+        UpdateQuestObjects();
     }
 
     public void MarkQuestInComplete(string questToMark)
     {
         int questNumberToCheck = GetQuestNumber(questToMark);
         questMarkersCompleted[questNumberToCheck] = false;
+        UpdateQuestObjects();
     }
+
 }

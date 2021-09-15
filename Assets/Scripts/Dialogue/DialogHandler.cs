@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class DialogHandler : MonoBehaviour
 {
+    [SerializeField] bool shouldActivateQuest;
+    [SerializeField] string questToMark;
+    [SerializeField] bool markAsComplete;
     public string[] sentences;
     bool canActivateBox;
     private void OnTriggerEnter2D(Collider2D other)
@@ -28,10 +31,14 @@ public class DialogHandler : MonoBehaviour
         if(canActivateBox)
         {
             DialogController.instance.npcInRange = true;
+            if (shouldActivateQuest)
+                DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);
         }
         else
         { 
             DialogController.instance.npcInRange = false; 
         }
     }
+
+
 }
