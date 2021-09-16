@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 6262681181205387151}
   - component: {fileID: 6262681181205387144}
   - component: {fileID: 6262681181205387145}
+  - component: {fileID: 8915718188896166194}
+  - component: {fileID: 1724019709}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -61,3 +63,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8093e16132fd99f46aba7d98ab9ff9ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8915718188896166194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6262681181205387150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a5d615374b11c438b796443f9bed3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemsAvailable:
+  - {fileID: 7494403157218820678, guid: 9acd585cb0c0d824388733aeca9260ea, type: 3}
+  - {fileID: 6562389228342630432, guid: b8273c27bc6547d4aac3a92ed6d057d3, type: 3}
+  - {fileID: 557758462159751245, guid: be4b0104c30fe59488cc8908c037c6de, type: 3}
+  - {fileID: 557758462159751245, guid: 47c92bdbcea7c0443a56cf8f571462a7, type: 3}
+  - {fileID: 9025688944254745210, guid: 23d88fa5d4b71fb4982db5c7853152f2, type: 3}
+  - {fileID: 9025688944254745210, guid: efde63b31b2f54447922abc26f477381, type: 3}
+  - {fileID: 8595877991382795252, guid: f6a180469d19d3d4f9bd3a33a62a10cb, type: 3}
+  - {fileID: 2914606759385923366, guid: 5f4fa14c4cbf30a40a8ce1f4ed2b59aa, type: 3}
+--- !u!114 &1724019709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6262681181205387150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa41058e5c855774388ed5067c8d93b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questNames:
+  - 
+  - Defeat Dragon
+  - Return to town
+  - Steal the gem
+  - Take monster soul
+  questMarkersCompleted: 

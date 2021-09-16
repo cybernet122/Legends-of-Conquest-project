@@ -28,7 +28,7 @@ public class QuestManager : MonoBehaviour
 
     public int GetQuestNumber(string questToFind)
     {
-        for(int i = 0; i <= questNames.Length; i++)
+        for(int i = 0; i < questNames.Length; i++) // changed i<=
         {
             if (questNames[i] == questToFind)
             {
@@ -74,4 +74,35 @@ public class QuestManager : MonoBehaviour
         UpdateQuestObjects();
     }
 
+    public void SaveQuestData()
+    {
+        for (int i = 0; i < questNames.Length; i++)
+        {
+            if (questMarkersCompleted[i])
+            {
+                PlayerPrefs.SetInt("QuestMarker_" + questNames[i], 1);
+            }
+            else if (!questMarkersCompleted[i])
+            {
+                PlayerPrefs.SetInt("QuestMarker_" + questNames[i], 0);
+            }
+        }
+    }
+
+    public void LoadQuestData()
+    {
+        for (int i = 0; i < questNames.Length; i++)
+        {
+            string keyToUse = "QuestMarker_" + questNames[i];
+            int valueToSet = 0;
+            if (PlayerPrefs.HasKey(keyToUse))
+            {
+                valueToSet = PlayerPrefs.GetInt(keyToUse);
+            }
+            if (valueToSet == 0)
+                questMarkersCompleted[i] = false;
+            else
+                questMarkersCompleted[i] = true;
+        }
+    }
 }

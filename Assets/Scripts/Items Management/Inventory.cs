@@ -79,4 +79,9 @@ public class Inventory : MonoBehaviour
     {
         return itemsList;
     }
+
+    public void PurgeInventoryForLoad()
+    {
+        itemsList.Clear();
+    }
 }
