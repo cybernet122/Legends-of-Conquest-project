@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
@@ -27,13 +27,20 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(dialogBoxOpened || gameMenuOpened || shopMenuOpened)
+        PurgeData();
+
+        if (dialogBoxOpened || gameMenuOpened || shopMenuOpened)
         {
             Player.instance.enableMovement = false;
         }
         else
         {
             Player.instance.enableMovement = true;
+        }
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            SaveData();
+            Debug.Log("Saving Data");
         }
         if (Input.GetKeyDown(KeyCode.F6))
         {
@@ -53,6 +60,7 @@ public class GameManager : MonoBehaviour
         QuestManager.instance.SaveQuestData();
         SavePlayerStats();
         SaveItemInventory();
+        PlayerPrefs.SetString("Current_Scene", SceneManager.GetActiveScene().name);
     }
 
     private static void SaveItemInventory()
@@ -68,7 +76,6 @@ public class GameManager : MonoBehaviour
 
             else
                 PlayerPrefs.SetInt("Items_" + i + "_Amount_", 1);
-
         }
     }
 
@@ -100,14 +107,18 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_WeaponPower", playerStats[i].weaponPower);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_ArmorDefence", playerStats[i].armorDefence);
         }
+        PlayerPrefs.SetInt("Gold_Coins_", currentGoldCoins);
     }
 
     public void LoadData()
     {
-        LoadPlayerPos();
-        QuestManager.instance.LoadQuestData();
-        LoadPlayerStats();
-        LoadItemInventory();
+        if (PlayerPrefs.HasKey("Player_Pos_X"))
+        {
+            LoadPlayerPos();
+            QuestManager.instance.LoadQuestData();
+            LoadPlayerStats();
+            LoadItemInventory();
+        }
     }
 
     private static void LoadItemInventory()
@@ -154,6 +165,7 @@ public class GameManager : MonoBehaviour
             playerStats[i].weaponPower = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_WeaponPower");
             playerStats[i].armorDefence = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_ArmorDefence");
         }
+        GameManager.instance.currentGoldCoins = PlayerPrefs.GetInt("Gold_Coins_");
     }
 
     private static void LoadPlayerPos()
@@ -162,5 +174,14 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.GetFloat("Player_Pos_X"),
             PlayerPrefs.GetFloat("Player_Pos_Y"),
             PlayerPrefs.GetFloat("Player_Pos_Z"));
+    }
+
+    private void PurgeData()
+    {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            PlayerPrefs.DeleteAll();
+            Debug.Log("Purging Data");
+        }
     }
 }

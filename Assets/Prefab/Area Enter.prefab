@@ -43,4 +43,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00de64d839dfa54448af6c5184635209, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  transitionAreaName: Town - 1
+  transitionAreaName: Town 2

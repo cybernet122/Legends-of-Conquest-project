@@ -4,14 +4,23 @@ using UnityEngine;
 using Cinemachine;
 public class CamController : MonoBehaviour
 {
-    Player player;
     CinemachineVirtualCamera virtualCamera;
+    [SerializeField] int muiscToPlay;
+    bool musicAlreadyPlaying;
     private void Start()
     {
-        player = FindObjectOfType<Player>();
         virtualCamera = GetComponent<CinemachineVirtualCamera>();
-        virtualCamera.Follow = player.transform;
+        virtualCamera.Follow = Player.instance.gameObject.transform;
         var virtualCameraConfiner = GetComponent<CinemachineConfiner>();
         virtualCameraConfiner.m_BoundingShape2D = FindObjectOfType<Grid>().GetComponentInChildren<PolygonCollider2D>();
+    }
+
+    private void Update()
+    {
+        if (!musicAlreadyPlaying)
+        {
+            musicAlreadyPlaying = true;
+            AudioManager.instance.PlayBackgroundMusic(muiscToPlay);
+        }
     }
 }

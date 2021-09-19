@@ -36,6 +36,7 @@ public class ItemsManager : MonoBehaviour
     {
         if (collision.CompareTag("Player") )
         {
+            AudioManager.instance.PlaySFX(6);
             inRange = true;
         }
     }

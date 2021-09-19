@@ -32,6 +32,8 @@ public class MenuManager : MonoBehaviour
         menu.SetActive(false);
         characterPanel.SetActive(false);
         CloseCharacterChoicePanel();
+        itemDescription.text = "";
+        itemName.text = "";
     }
 
     public void FadeImage()
@@ -177,13 +179,15 @@ public class MenuManager : MonoBehaviour
     public void DiscardItem()
     {
         Inventory.instance.RemoveItem(activeItem);
+        AudioManager.instance.PlaySFX(4);
     }
 
     public void UseItem(int characterToUse)
     {
         activeItem.UseItem(characterToUse);
         OpenCharacterChoicePanel();
-        DiscardItem();
+        Inventory.instance.RemoveItem(activeItem);
+        AudioManager.instance.PlaySFX(0);
     }
 
     public void OpenCharacterChoicePanel()
