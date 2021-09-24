@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     [SerializeField] PlayerStats[] playerStats;
-    public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened;
+    public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive;
     public int currentGoldCoins;
 
     // Start is called before the first frame update
@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     {
         PurgeData();
 
-        if (dialogBoxOpened || gameMenuOpened || shopMenuOpened)
+        if (dialogBoxOpened || gameMenuOpened || shopMenuOpened || battleIsActive)
         {
             Player.instance.enableMovement = false;
         }
