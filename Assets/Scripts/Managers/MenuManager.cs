@@ -20,6 +20,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Button useButton,discardButton;
     [SerializeField] GameObject characterChoicePanel;
     [SerializeField] TextMeshProUGUI[] itemsCharacterChoiceNames;
+    [SerializeField] Animator savingPanel;
+
     public static MenuManager instance;
     public TextMeshProUGUI itemName,itemDescription;
     public ItemsManager activeItem;
@@ -208,5 +210,10 @@ public class MenuManager : MonoBehaviour
     public void CloseCharacterChoicePanel()
     {
         characterChoicePanel.SetActive(false);
+    }
+
+    public void SaveButton()
+    {
+        GameManager.instance.SaveData();
     }
 }

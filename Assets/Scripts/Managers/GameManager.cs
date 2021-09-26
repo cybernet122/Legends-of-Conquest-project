@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] PlayerStats[] playerStats;
     public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive;
     public int currentGoldCoins;
+    SavingFade savingFade;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +32,7 @@ public class GameManager : MonoBehaviour
                 playerStats[i] = playerstat;
             }
         }
+        savingFade = FindObjectOfType<SavingFade>();
     }
 
     // Update is called once per frame
@@ -49,12 +51,10 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F5))
         {
             SaveData();
-            Debug.Log("Saving Data");
         }
         if (Input.GetKeyDown(KeyCode.F6))
         {
             LoadData();
-            Debug.Log("Loading Data");
         }
     }
 
@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
 
     public void SaveData()
     {
+        savingFade.PlaySaveAnimation();
         SavePlayerPos();
         QuestManager.instance.SaveQuestData();
         SavePlayerStats();
