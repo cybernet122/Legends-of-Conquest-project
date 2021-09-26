@@ -12,6 +12,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] Transform[] playersPositions,enemiesPositions;
     [SerializeField] BattleCharacters[] playerPrefabs, enemiesPrefabs;
     List<BattleCharacters> activeBattleCharacters = new List<BattleCharacters>();
+    [SerializeField] int currentTurn;
+    [SerializeField] bool waitingForTurn;
+    [SerializeField] GameObject UIButtonHolder;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,58 +34,56 @@ public class BattleManager : MonoBehaviour
     public void StartBattle(string[] enemiesToSpawn)
     {
         SettingUpBattle();
-        AddingPlayers();
-        AddingEnemies(enemiesToSpawn);
+        if (isBattleActive)
+        {
+            AddingPlayers();
+            AddingEnemies(enemiesToSpawn);
+        }
     }
 
     private void AddingEnemies(string[] enemiesToSpawn)
     {
-        if (isBattleActive)
+        for (int i = 0; i < enemiesToSpawn.Length; i++)
         {
-            for (int i = 0; i < enemiesToSpawn.Length; i++)
+            if (enemiesToSpawn[i] != null)
             {
-                if (enemiesToSpawn[i] != null)
+                for (int j = 0; j < enemiesPrefabs.Length; j++)
                 {
-                    for (int j = 0; j < enemiesPrefabs.Length; j++)
+                    if (enemiesPrefabs[j].characterName == enemiesToSpawn[i])
                     {
-                        if (enemiesPrefabs[j].characterName == enemiesToSpawn[i]) 
-                        {
-                            BattleCharacters newEnemy = Instantiate(
-                                enemiesPrefabs[j],
-                                enemiesPositions[i].position,
-                                enemiesPositions[i].rotation,
-                                enemiesPositions[i]
-                                );
-                            activeBattleCharacters.Add(newEnemy);
-                        }
+                        BattleCharacters newEnemy = Instantiate(
+                            enemiesPrefabs[j],
+                            enemiesPositions[i].position,
+                            enemiesPositions[i].rotation,
+                            enemiesPositions[i]
+                            );
+                        activeBattleCharacters.Add(newEnemy);
                     }
                 }
             }
         }
+
     }
 
     private void AddingPlayers()
     {
-        if (isBattleActive)
+        PlayerStats[] playerStats = GameManager.instance.GetPlayerStats();
+        for (int i = 0; i < playerStats.Length; i++)
         {
-            PlayerStats[] playerStats = GameManager.instance.GetPlayerStats();
-            for (int i = 0; i < playerStats.Length; i++)
+            if (playerStats[i].gameObject.activeInHierarchy)
             {
-                if (playerStats[i].gameObject.activeInHierarchy)
+                for (int j = 0; j < playerPrefabs.Length; j++)
                 {
-                    for (int j = 0; j < playerPrefabs.Length; j++)
+                    if (playerPrefabs[j].characterName == playerStats[i].playerName)
                     {
-                        if (playerPrefabs[j].characterName == playerStats[i].playerName)
-                        {
-                            BattleCharacters newPlayer = Instantiate(
-                                playerPrefabs[j],
-                                playersPositions[i].position,
-                                playersPositions[i].rotation,
-                                playersPositions[i]
-                                );
-                            activeBattleCharacters.Add(newPlayer);
-                            ImportPlayerStats(playerStats, i);
-                        }
+                        BattleCharacters newPlayer = Instantiate(
+                            playerPrefabs[j],
+                            playersPositions[i].position,
+                            playersPositions[i].rotation,
+                            playersPositions[i]
+                            );
+                        activeBattleCharacters.Add(newPlayer);
+                        ImportPlayerStats(playerStats, i);
                     }
                 }
             }

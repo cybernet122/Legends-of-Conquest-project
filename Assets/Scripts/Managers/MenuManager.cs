@@ -86,6 +86,7 @@ public class MenuManager : MonoBehaviour
         playerStats = GameManager.instance.GetPlayerStats();
         for(int i = 0;i< playerStats.Length; i++)
         {
+            if(characterInfoPanel.Length <= i) { break; }
             //print(i);
             characterInfoPanel[i].SetActive(true);
             nameInfoText[i].text = playerStats[i].playerName;

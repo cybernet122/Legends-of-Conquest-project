@@ -22,6 +22,15 @@ public class GameManager : MonoBehaviour
         }
         DontDestroyOnLoad(gameObject);
         playerStats = FindObjectsOfType<PlayerStats>();
+        for(int i = 0; i < playerStats.Length; i++)
+        {
+            if (playerStats[i].GetComponent<Player>())
+            {
+                var playerstat = playerStats[0];
+                playerStats[0] = playerStats[i];
+                playerStats[i] = playerstat;
+            }
+        }
     }
 
     // Update is called once per frame
