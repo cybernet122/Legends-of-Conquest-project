@@ -11,15 +11,8 @@ public class BattleCharacters : MonoBehaviour
     public int currentHP, maxHP, currentMana, maxMana, dexterity, defence, weaponPower, armorDefence;
     public bool isDead;
 
-    // Start is called before the first frame update
-    void Start()
+    public bool IsPlayer()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        return isPlayer;
     }
 }

@@ -1,4 +1,4 @@
-using System;
+//using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,6 +29,32 @@ public class BattleManager : MonoBehaviour
         {
             StartBattle(new string[] { "Entropy Mage", "Entropy Battlemage", "Entropy Warlock" });
         }
+
+        if (Input.GetKeyDown(KeyCode.KeypadPlus))
+        {
+            NextTurn();
+        }
+
+        CheckPlayerButtonHolder();
+    }
+
+    private void CheckPlayerButtonHolder()
+    {
+        if (isBattleActive)
+        {
+            if (waitingForTurn)
+            {
+                if (activeBattleCharacters[currentTurn].IsPlayer())
+                {
+                    UIButtonHolder.SetActive(true);
+                }
+                else
+                {
+                    UIButtonHolder.SetActive(false);
+                    StartCoroutine(EnemyMoveCoroutine());
+                }
+            }
+        }
     }
 
     public void StartBattle(string[] enemiesToSpawn)
@@ -38,6 +64,8 @@ public class BattleManager : MonoBehaviour
         {
             AddingPlayers();
             AddingEnemies(enemiesToSpawn);
+            waitingForTurn = true;
+            currentTurn = 0;
         }
     }
 
@@ -119,5 +147,65 @@ public class BattleManager : MonoBehaviour
             battleScene.SetActive(false);
             return;
         }
+    }
+
+    private void NextTurn()
+    {
+        currentTurn++;
+        if (currentTurn >= activeBattleCharacters.Count)
+            currentTurn = 0;
+        waitingForTurn = true;
+        UpdateBattle();
+    }
+
+    private void UpdateBattle()
+    {
+        bool allEnemiesAreDead = true;
+        bool allPlayersAreDead = true;
+        for (int i = 0; i < activeBattleCharacters.Count; i++)
+        {
+            if(activeBattleCharacters[i].currentHP < 0)
+                activeBattleCharacters[i].currentHP = 0;
+            if (activeBattleCharacters[i].currentHP == 0) { /* kill character */ }
+            else
+            {
+                if (activeBattleCharacters[i].IsPlayer())
+                    allPlayersAreDead = false;
+                else
+                    allEnemiesAreDead = false;
+            }
+        }
+        if (allEnemiesAreDead || allPlayersAreDead)
+        {
+            if (allEnemiesAreDead)
+                print("Victory");
+            else if (allPlayersAreDead)
+                print("Defeat");
+            battleScene.SetActive(false);
+            GameManager.instance.battleIsActive = false;
+            isBattleActive = false;
+        }
+    }
+
+    IEnumerator EnemyMoveCoroutine()
+    {
+        waitingForTurn = false;
+        yield return new WaitForSeconds(1);
+        EnemyAttack();
+        yield return new WaitForSeconds(1);
+        NextTurn();
+    }
+
+    private void EnemyAttack()
+    {
+        List<int> players = new List<int>();
+        for (int i = 0; i < activeBattleCharacters.Count; i++)
+        {
+            if(activeBattleCharacters[i].IsPlayer() && activeBattleCharacters[i].currentHP > 0 && !activeBattleCharacters[i].isDead)
+            {
+                players.Add(i);
+            }
+        }
+        int selectedPlayerToAttack = players[Random.Range(0, players.Count)];
     }
 }

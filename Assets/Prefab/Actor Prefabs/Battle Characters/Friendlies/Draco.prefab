@@ -95,7 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bed115e3bf200784897cbcff9b2b4276, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPlayer: 0
+  isPlayer: 1
   attacksAvailable: []
   characterName: Draco
   currentHP: 0
