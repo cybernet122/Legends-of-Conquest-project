@@ -8,8 +8,9 @@ public class BattleCharacters : MonoBehaviour
     [SerializeField] string[] attacksAvailable;
 
     public string characterName;
-    public int currentHP, maxHP, currentMana, maxMana, dexterity, defence, weaponPower, armorDefence;
+    public int currentHP, maxHP, currentMana, maxMana, dexterity, defence, weaponPower, armorDefence, speed;
     public bool isDead;
+    public bool hasPlayed;
 
     public bool IsPlayer()
     {

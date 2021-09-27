@@ -106,4 +106,6 @@ MonoBehaviour:
   defence: 10
   weaponPower: 30
   armorDefence: 6
+  speed: 9
   isDead: 0
+  hasPlayed: 0

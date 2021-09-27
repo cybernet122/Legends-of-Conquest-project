@@ -98,12 +98,14 @@ MonoBehaviour:
   isPlayer: 1
   attacksAvailable: []
   characterName: Arthuras
-  currentHP: 0
-  maxHP: 0
+  currentHP: 10
+  maxHP: 10
   currentMana: 0
   maxMana: 0
   dexterity: 0
   defence: 0
   weaponPower: 0
   armorDefence: 0
+  speed: 4
   isDead: 0
+  hasPlayed: 0

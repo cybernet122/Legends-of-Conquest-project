@@ -25,6 +25,7 @@ public class PlayerStats : MonoBehaviour
     public string equippedArmorName;
     public int weaponPower;
     public int armorDefence;
+    public int turnSpeed;
     public ItemsManager equippedWeapon, equippedArmor;
     void Start()
     {

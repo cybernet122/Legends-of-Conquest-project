@@ -116,6 +116,7 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetString("Player_" + playerStats[i].playerName + "_EquippedArmor", playerStats[i].equippedArmorName);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_WeaponPower", playerStats[i].weaponPower);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_ArmorDefence", playerStats[i].armorDefence);
+            PlayerPrefs.SetInt("Player_" + playerStats[i].turnSpeed + "_Speed", playerStats[i].turnSpeed);
         }
         PlayerPrefs.SetInt("Gold_Coins_", currentGoldCoins);
     }
@@ -174,6 +175,7 @@ public class GameManager : MonoBehaviour
             playerStats[i].equippedArmorName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedArmor");
             playerStats[i].weaponPower = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_WeaponPower");
             playerStats[i].armorDefence = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_ArmorDefence");
+            playerStats[i].turnSpeed = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Speed");
         }
         GameManager.instance.currentGoldCoins = PlayerPrefs.GetInt("Gold_Coins_");
     }
