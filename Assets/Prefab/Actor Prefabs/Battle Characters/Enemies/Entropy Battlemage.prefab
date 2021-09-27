@@ -96,7 +96,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 0
-  attacksAvailable: []
+  attacksAvailable:
+  - Blood drain
+  - Fireball
+  - Shadow
+  - Shockwave
+  - Tentacles
   characterName: Entropy Battlemage
   currentHP: 666
   maxHP: 666

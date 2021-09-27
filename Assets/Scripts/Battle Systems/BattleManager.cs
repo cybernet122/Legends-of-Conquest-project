@@ -1,5 +1,4 @@
 //using System;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,17 +11,22 @@ public class BattleManager : MonoBehaviour
     [SerializeField] GameObject battleScene;
     [SerializeField] Transform[] playersPositions,enemiesPositions;
     [SerializeField] BattleCharacters[] playerPrefabs, enemiesPrefabs;
-    [SerializeField] List<BattleCharacters> activeBattleCharacters = new List<BattleCharacters>();
+    [SerializeField] GameObject[] border;
+
+    List<BattleCharacters> activeBattleCharacters = new List<BattleCharacters>();
     //List<BattleCharacters> characterSpeed = new List<BattleCharacters>();
 
     [SerializeField] int currentTurn;
     [SerializeField] bool waitingForTurn;
     [SerializeField] GameObject UIButtonHolder;
+    [SerializeField] BattleMoves[] battleMovesList;
+
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
         DontDestroyOnLoad(gameObject);
+        battleScene.SetActive(false);
     }
 
     // Update is called once per frame
@@ -37,31 +41,23 @@ public class BattleManager : MonoBehaviour
         {
             NextTurn();
         }
-        if (Input.GetKeyDown(KeyCode.KeypadMinus) && waitingForTurn)
+/*        if (Input.GetKeyDown(KeyCode.KeypadMinus) && waitingForTurn)
         {
             print(activeBattleCharacters[0].characterName + " attacking");
             StartCoroutine(PlayerMoveCoroutine(activeBattleCharacters[0]));
-
-        }
+        }*/
         CheckPlayerButtonHolder();
     }
 
     private void CheckPlayerButtonHolder()
     {
-        if (isBattleActive)
+        if (isBattleActive && waitingForTurn)
         {
-            if (waitingForTurn)
-            {
-                if (activeBattleCharacters[0].IsPlayer())
-                {
-                    UIButtonHolder.SetActive(true);
-                }
-                else
-                {
-                    UIButtonHolder.SetActive(false);
-                    StartCoroutine(EnemyMoveCoroutine(activeBattleCharacters[0]));
-                }
-            }
+            UIButtonHolder.SetActive(true);
+        }
+        else
+        {
+            UIButtonHolder.SetActive(false);
         }
     }
 
@@ -73,6 +69,7 @@ public class BattleManager : MonoBehaviour
             AddingPlayers();
             AddingEnemies(enemiesToSpawn);
             currentTurn = 0;
+            SortBySpeed();
             NextTurn();
         }
     }
@@ -168,22 +165,17 @@ public class BattleManager : MonoBehaviour
             }
             currentTurn++;
         }
-        if (activeBattleCharacters.Count != 0)
-            SortBySpeed();
         if (activeBattleCharacters[0].IsPlayer())
         {
             waitingForTurn = true;
+            print("Current player's turn is " + activeBattleCharacters[0]);
         }
         else if (!activeBattleCharacters[0].IsPlayer())
         {
             StartCoroutine(EnemyMoveCoroutine(activeBattleCharacters[0]));
+            print("Current player's turn is " + activeBattleCharacters[0]);
             activeBattleCharacters.RemoveAt(0);
         }
-        foreach (BattleCharacters battleCharacters in activeBattleCharacters)
-        {
-            print(battleCharacters.speed + " " + battleCharacters.characterName);
-        }
-
         // Old turn system
         /*currentTurn++;
         if (currentTurn >= activeBattleCharacters.Count)
@@ -200,6 +192,7 @@ public class BattleManager : MonoBehaviour
         {
             activeBattleCharacters.Add(battleCharacters[i]);
         }
+        SortBySpeed();
     }
 
     public void ProcessSpeed()
@@ -217,7 +210,6 @@ public class BattleManager : MonoBehaviour
                 });
             }
         }
-        SortBySpeed();
         /*characterSpeed.Sort(delegate (BattleCharacters x, BattleCharacters y)
         {
             if (x.speed == null || y.speed == null) return 0;
@@ -267,11 +259,10 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator EnemyMoveCoroutine(BattleCharacters enemyAttacking)
     {
-        print(enemyAttacking.characterName + " attacking");
         waitingForTurn = false;
         yield return new WaitForSeconds(1);
         EnemyAttack(enemyAttacking);
-        activeBattleCharacters.RemoveAt(0);
+        activeBattleCharacters.Remove(enemyAttacking);
         yield return new WaitForSeconds(1);
         NextTurn();
     }
@@ -283,12 +274,34 @@ public class BattleManager : MonoBehaviour
         {
             if (activeBattleCharacters[i].IsPlayer() && activeBattleCharacters[i].currentHP > 0 && !activeBattleCharacters[i].isDead)
             {
-                print("True");
                 players.Add(activeBattleCharacters[i]);
             }
         }
-
+        BattleCharacters selectedPlayerToAttack = players[Random.Range(0, players.Count)];
+        //print(enemyAttacking.characterName + " is attacking " + selectedPlayerToAttack.characterName);
         enemyAttacking.hasPlayed = true;
+        int selectedAttack = Random.Range(0, enemyAttacking.AttackMovesAvailable().Length);
+        for (int i = 0; i < battleMovesList.Length; i++)
+        {
+            if (battleMovesList[i].moveName == enemyAttacking.AttackMovesAvailable()[selectedAttack])
+            {
+                print("Enemy attacking with " + battleMovesList[i].moveName);
+                if(battleMovesList[i].moveName == "Shadow")
+                {
+                    Instantiate(
+                    battleMovesList[i].effectToUse,
+                    new Vector3(enemyAttacking.transform.position.x - 3,enemyAttacking.transform.position.y,transform.position.z),
+                    selectedPlayerToAttack.transform.rotation
+                    );
+                }
+                else
+                Instantiate(
+                    battleMovesList[i].effectToUse,
+                    selectedPlayerToAttack.transform.position,
+                    selectedPlayerToAttack.transform.rotation
+                    );
+            }
+        }
     }
 
     IEnumerator PlayerMoveCoroutine(BattleCharacters playerAttacking)
@@ -296,8 +309,41 @@ public class BattleManager : MonoBehaviour
         print(playerAttacking.characterName + " attacking");
         yield return new WaitForSeconds(1);
         playerAttacking.hasPlayed = true;
-        activeBattleCharacters.RemoveAt(0);
+        activeBattleCharacters.Remove(playerAttacking);
         waitingForTurn = false;
+        yield return new WaitForSeconds(1);
         NextTurn();
     }
+
+    public void AttackEnemySelectionMenu()
+    {
+        print(activeBattleCharacters[0].characterName + " attacking");
+        StartCoroutine(PlayerMoveCoroutine(activeBattleCharacters[0]));
+    }
+
+    /*public void IncreaseSpeed()
+    {
+        BattleCharacters playerSelected = activeBattleCharacters[0];
+        if (currentTurn == currentTurn + 2 && playerSelected.characterName == activeBattleCharacters[0].characterName && buffApplied)
+        {
+            playerSelected.speed -= 5;
+            print("Reseting Speed " + playerSelected);
+            buffApplied = false;
+            return;
+        }
+        else if (!buffApplied)
+        {
+            playerSelected.speed += 5;
+            buffApplied = true;
+            print("Increasing speed of " + playerSelected + " by " + playerSelected.speed);
+            if (!playerSelected.hasPlayed)
+            {
+                SortBySpeed();
+            }
+            buffApplied = true;
+            activeBattleCharacters.Remove(playerSelected);
+            waitingForTurn = false;
+            NextTurn();
+        }
+    }*/
 }
