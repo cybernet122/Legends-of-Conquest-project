@@ -9,7 +9,6 @@ public class GameManager : MonoBehaviour
     public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive;
     public int currentGoldCoins;
     SavingFade savingFade;
-
     // Start is called before the first frame update
     void Start()
     {

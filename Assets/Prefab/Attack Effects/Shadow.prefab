@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectTime: 1
-  SFXNumberToPlay: 0
+  SFXNumberToPlay: 1
 --- !u!95 &5202598249624281982
 Animator:
   serializedVersion: 3

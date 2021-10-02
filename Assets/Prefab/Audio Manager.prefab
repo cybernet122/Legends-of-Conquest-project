@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4009559460633611538
+--- !u!1 &1920105696955585327
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4369067180232852993}
-  - component: {fileID: 3217123600730569541}
+  - component: {fileID: 5516590248654524585}
+  - component: {fileID: 7517612429851225634}
   m_Layer: 0
   m_Name: Blood drain
   m_TagString: Untagged
@@ -17,13 +17,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4369067180232852993
+--- !u!4 &5516590248654524585
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4009559460633611538}
+  m_GameObject: {fileID: 1920105696955585327}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -31,18 +31,18 @@ Transform:
   m_Father: {fileID: 4283567350414112442}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &3217123600730569541
+--- !u!82 &7517612429851225634
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4009559460633611538}
+  m_GameObject: {fileID: 1920105696955585327}
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: ba8621f2ca34c864c919cf6ab0fe7c00, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1472,7 +1472,7 @@ Transform:
   - {fileID: 4283567350284665809}
   - {fileID: 4283567349179074298}
   - {fileID: 3780290584018151593}
-  - {fileID: 4369067180232852993}
+  - {fileID: 5516590248654524585}
   m_Father: {fileID: 4283567350434591907}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1628,7 +1628,7 @@ MonoBehaviour:
   - {fileID: 4283567350284665814}
   - {fileID: 4283567349179074299}
   - {fileID: 1126653086584678178}
-  - {fileID: 3217123600730569541}
+  - {fileID: 7517612429851225634}
   backgroundMusic:
   - {fileID: 4283567351051480964}
   - {fileID: 4283567349194488475}
@@ -2441,7 +2441,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: c8e0c62ee60190f488c513a674676925, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 0.2
   m_Pitch: 1
   Loop: 0

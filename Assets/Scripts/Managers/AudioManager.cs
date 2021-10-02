@@ -30,7 +30,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX(int index)
     {
-        if (index < SFX.Length-1 && index >= 0)
+        if (index <= SFX.Length && index >= 0)
         {
             SFX[index].Play();
         }
