@@ -1,17 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class BattleCharacters : MonoBehaviour
 {
     [SerializeField] bool isPlayer;
     [SerializeField] string[] attacksAvailable;
-    [SerializeField] GameObject facade;
+    [SerializeField] Slider hpSlider;
+    [SerializeField] TextMeshProUGUI nameText,hpValue;
     public string characterName;
     public int currentHP, maxHP, currentMana, maxMana, dexterity, defence, weaponPower, armorDefence, speed;
     public bool isDead;
     public bool hasPlayed;
-    bool takeDamage = false;
+
+    private void Start()
+    {
+        UpdateBattleStats();
+    }
+
     public bool IsPlayer()
     {
         return isPlayer;
@@ -30,19 +38,38 @@ public class BattleCharacters : MonoBehaviour
     {
         currentHP -= damageToRecieve;
         BattleManager.instance.UpdateText();
+        UpdateBattleStats();
         StartCoroutine(PlayDamageRecievedAnimation());
+    }
+
+    private void UpdateBattleStats()
+    {
+        if (!isPlayer)
+        {
+            hpSlider.maxValue = maxHP;
+            hpSlider.value = currentHP;
+            hpValue.text = Mathf.Clamp(currentHP,0,maxHP)+ " / " + maxHP;
+            nameText.text = characterName;
+        }
     }
 
     IEnumerator PlayDamageRecievedAnimation()
     {
         if (currentHP <= 0)
         {
+            isDead = true;
+            if(!isPlayer)
+                hpSlider.value = 0;
             StopCoroutine(PlayDamageRecievedAnimation());
             print(characterName + " has died.");
             yield return new WaitForSeconds(1.5f);
             GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, 0);
             currentHP = 0;
-            isDead = true;
+            if (!isPlayer)
+            {
+                hpSlider.gameObject.SetActive(false);
+                nameText.gameObject.SetActive(false);
+            }
             StopCoroutine(PlayDamageRecievedAnimation());
         }
         yield return new WaitForSeconds(1f);

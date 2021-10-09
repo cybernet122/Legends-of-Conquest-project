@@ -96,7 +96,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 1
-  attacksAvailable: []
+  attacksAvailable:
+  - Fireball
+  - Blood drain
+  - Tentacles
+  - Tentacles
+  hpSlider: {fileID: 0}
+  nameText: {fileID: 0}
+  hpValue: {fileID: 0}
   characterName: Jimmy
   currentHP: 10
   maxHP: 10

@@ -391,6 +391,7 @@ MonoBehaviour:
   equippedArmorName: 
   weaponPower: 0
   armorDefence: 0
+  turnSpeed: 0
   equippedWeapon: {fileID: 0}
   equippedArmor: {fileID: 0}
 --- !u!114 &725276020
