@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     [SerializeField] PlayerStats[] playerStats;
-    public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive;
+    public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive, count;
     public int currentGoldCoins;
     SavingFade savingFade;
     // Start is called before the first frame update
@@ -32,14 +32,26 @@ public class GameManager : MonoBehaviour
             }
         }
         savingFade = FindObjectOfType<SavingFade>();
+        count = true;
     }
 
     // Update is called once per frame
     void Update()
     {
         PurgeData();
-
-        if (dialogBoxOpened || gameMenuOpened || shopMenuOpened || battleIsActive)
+        if (battleIsActive)
+        {
+            Player.instance.enableMovement = false;
+            if (count)
+            {
+                if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+                {
+                    BattleManager.instance.ButtonNavigation((int)Input.GetAxisRaw("Horizontal"), (int)Input.GetAxisRaw("Vertical"));
+                    StartCoroutine(Delay());
+                }
+            }
+        }
+        else if (dialogBoxOpened || gameMenuOpened || shopMenuOpened)
         {
             Player.instance.enableMovement = false;
         }
@@ -55,6 +67,13 @@ public class GameManager : MonoBehaviour
         {
             LoadData();
         }
+    }
+
+    IEnumerator Delay()
+    {
+        count = false;
+        yield return new WaitForSeconds(0.2f);
+        count = true;
     }
 
     public PlayerStats[] GetPlayerStats()

@@ -100,7 +100,6 @@ MonoBehaviour:
   - Fireball
   - Blood drain
   - Tentacles
-  - Tentacles
   hpSlider: {fileID: 0}
   nameText: {fileID: 0}
   hpValue: {fileID: 0}

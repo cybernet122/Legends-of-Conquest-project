@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using TMPro;
 public class ItemButton : MonoBehaviour
 {
     public ItemsManager itemOnButton;
+    public Image itemsImage;
+    public TextMeshProUGUI itemAmountText;
 
     public void Press()
     {
@@ -24,6 +27,10 @@ public class ItemButton : MonoBehaviour
             {
                 ShopManager.instance.SelectedSellItem(itemOnButton);
             }
+        }
+        if (BattleManager.instance.itemPanel.activeInHierarchy)
+        {
+            BattleManager.instance.SelectedItemToUse(itemOnButton);
         }
     }
 

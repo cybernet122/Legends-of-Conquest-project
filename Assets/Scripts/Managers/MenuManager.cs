@@ -45,7 +45,7 @@ public class MenuManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && !GameManager.instance.dialogBoxOpened) //Toggle Menu
+        if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && !GameManager.instance.dialogBoxOpened && !GameManager.instance.battleIsActive) //Toggle Menu
         {
             ToggleMenu();
         }
