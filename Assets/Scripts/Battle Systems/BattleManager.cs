@@ -44,6 +44,9 @@ public class BattleManager : MonoBehaviour
     GameObject menuBorder;
     List<GameObject> magicButtons = new List<GameObject>();
     int buttonBorderIndex;
+    public int xpRewardAmount;
+    public ItemsManager[] itemsReward;
+    public bool isRewardScreenOpen;
 
     // Start is called before the first frame update
     void Start()
@@ -63,28 +66,22 @@ public class BattleManager : MonoBehaviour
             StartBattle(new string[] { "Entropy Mage", "Entropy Battlemage", "Entropy Warlock" });
         }
 
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && isBattleActive)
         {
-            if (UIButtonHolder.activeInHierarchy)
-            {
-                mainPanelButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
-            }
-            else if (magicPanel.activeInHierarchy)
-            {
-                magicButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
-            }
-            else if (enemyTargetPanel.activeInHierarchy)
-            {
-                targetButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
-            }
-            else if (characterChoicePanel.activeInHierarchy)
-            {
-                targetButton[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
-            }
-            else if (itemPanel.activeInHierarchy)
-            {
-                useItemButton.GetComponent<Button>().onClick.Invoke();
-            }            
+            if (!hasActivatedBorder)            
+                hasActivatedBorder = true;            
+            if (UIButtonHolder.activeInHierarchy)            
+                mainPanelButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();            
+            else if (magicPanel.activeInHierarchy)            
+                magicButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();            
+            else if (enemyTargetPanel.activeInHierarchy)            
+                targetButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();            
+            else if (characterChoicePanel.activeInHierarchy)            
+                targetButton[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();            
+            else if (itemPanel.activeInHierarchy)            
+                useItemButton.GetComponent<Button>().onClick.Invoke();            
+            else if (isRewardScreenOpen)            
+                BattleRewardsHandler.instance.CloseRewardScreen();            
         }
         if (Input.GetKeyDown(KeyCode.KeypadMinus))
         {
@@ -294,7 +291,7 @@ public class BattleManager : MonoBehaviour
 
     private void CheckIfAllDead()
     {
-        int friendlies = 0,enemies = 0;
+        int friendlies = 0,Enemies = 0;
         var battleCharacters = FindObjectsOfType<BattleCharacters>();
         for (int i = 0; i < battleCharacters.Length; i++)
         {
@@ -304,15 +301,16 @@ public class BattleManager : MonoBehaviour
             }
             else if(!battleCharacters[i].IsPlayer() && !battleCharacters[i].isDead)
             {
-                enemies++;
+                Enemies++;
             }
         }
-        if (friendlies > 0 && enemies == 0)
+        if (friendlies > 0 && Enemies == 0)
         {
             print("Victory");
             UpdatePlayerStats(battleCharacters,0);
+            BattleRewardsHandler.instance.OpenRewardScreen(xpRewardAmount, itemsReward);
         }
-        else if (friendlies == 0 && enemies > 0)
+        else if (friendlies == 0 && Enemies > 0)
         {
             print("Defeat");
             UpdatePlayerStats(battleCharacters,1);
@@ -324,6 +322,7 @@ public class BattleManager : MonoBehaviour
         battleScene.SetActive(false);
         isBattleActive = false;
         players.Clear();
+        enemies.Clear();
         activeBattleCharacters.Clear();
         for (int i = 0; i < battleCharacters.Length; i++)
         {
@@ -432,7 +431,7 @@ public class BattleManager : MonoBehaviour
     IEnumerator EnemyMoveCoroutine(BattleCharacters enemyAttacking)
     {
         waitingForTurn = false;
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(1.5f);
         EnemyAttack(enemyAttacking);
         yield return new WaitForSeconds(1);
         activeBattleCharacters.Remove(enemyAttacking);
@@ -754,6 +753,11 @@ public class BattleManager : MonoBehaviour
             return activeBattleCharacters[0];
         else
             return null;
+    }
+
+    public List<BattleCharacters> GetPlayers()
+    {
+        return players;
     }
 
     public void FleeBattle()

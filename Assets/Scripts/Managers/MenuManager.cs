@@ -217,4 +217,9 @@ public class MenuManager : MonoBehaviour
     {
         GameManager.instance.SaveData();
     }
+
+    public void FadeOut()
+    {
+        image.GetComponent<Animator>().SetTrigger("EndFade");
+    }
 }

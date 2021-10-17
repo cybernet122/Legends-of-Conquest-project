@@ -15,6 +15,7 @@ public class MainMenuManager : MonoBehaviour
             continueButton.GetComponent<Button>().enabled = false;
             continueButton.GetComponent<Image>().color = new Color(1, 1, 1, 0.6f);
         }
+        AudioManager.instance.PlayBackgroundMusic(4);
     }
 
     public void NewGame()
