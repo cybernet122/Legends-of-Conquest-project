@@ -84,8 +84,8 @@ public class DialogController : MonoBehaviour
     }
     private void Update()
     {
-        if(count <= 0.7f)
-        StartCoroutine(CountDown());
+        if (count <= 0.7f)
+            StartCoroutine(CountDown());
         if (!ShopManager.instance.shopMenu.activeInHierarchy && !MenuManager.instance.menu.activeInHierarchy && count >= 0.7f)
         {
             CheckForNPC();

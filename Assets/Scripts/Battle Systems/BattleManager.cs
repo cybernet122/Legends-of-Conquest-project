@@ -53,7 +53,14 @@ public class BattleManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        instance = this;
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
         DontDestroyOnLoad(gameObject);
         battleScene.SetActive(false);
         enemyTargetPanel.SetActive(false);
@@ -113,7 +120,7 @@ public class BattleManager : MonoBehaviour
     }
 
     public void StartBattle(string[] enemiesToSpawn)
-    {
+    {       
         SettingUpBattle();
         if (isBattleActive)
         {

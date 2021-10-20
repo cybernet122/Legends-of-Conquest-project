@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,16 +22,7 @@ public class GameManager : MonoBehaviour
             instance = this;
         }
         DontDestroyOnLoad(gameObject);
-        playerStats = FindObjectsOfType<PlayerStats>();
-        for(int i = 0; i < playerStats.Length; i++)
-        {
-            if (playerStats[i].GetComponent<Player>())
-            {
-                var playerstat = playerStats[0];
-                playerStats[0] = playerStats[i];
-                playerStats[i] = playerstat;
-            }
-        }
+        FillPlayerStats();
         savingFade = FindObjectOfType<SavingFade>();
         count = true;
     }
@@ -47,7 +39,7 @@ public class GameManager : MonoBehaviour
                 if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
                 {
                     BattleManager.instance.ButtonNavigation((int)Input.GetAxisRaw("Horizontal"), (int)Input.GetAxisRaw("Vertical"));
-                    StartCoroutine(Delay());
+                    StartCoroutine(Delay(0.2f));
                 }
             }
         }
@@ -67,18 +59,44 @@ public class GameManager : MonoBehaviour
         {
             LoadData();
         }
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            FillPlayerStats();
+        }
     }
 
-    IEnumerator Delay()
+    IEnumerator Delay(float amount)
     {
         count = false;
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(amount);
         count = true;
     }
 
     public PlayerStats[] GetPlayerStats()
-    {
+    {        
         return playerStats;
+    }
+
+    public void OnLevelWasLoaded()
+    {
+        playerStats = new PlayerStats[0];
+        Invoke("FillPlayerStats",0.3f);        
+    }
+
+    private void FillPlayerStats()
+    {
+        playerStats = new PlayerStats[0];
+        playerStats = FindObjectsOfType<PlayerStats>();
+        
+        for (int i = 0; i < playerStats.Length; i++)
+        {
+            if (playerStats[i].GetComponent<Player>())
+            {
+                var playerstat = playerStats[0];
+                playerStats[0] = playerStats[i];
+                playerStats[i] = playerstat;
+            }
+        }
     }
 
     public void SaveData()

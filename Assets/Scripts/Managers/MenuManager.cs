@@ -30,8 +30,8 @@ public class MenuManager : MonoBehaviour
     bool toglMenu,toglItems,toglStats = false;
     int currentlyViewing;
     private void Start()
-    {
-        instance = this;
+    {    
+        instance = this;   
         menu.SetActive(false);
         characterPanel.SetActive(false);
         CloseCharacterChoicePanel();
@@ -46,14 +46,16 @@ public class MenuManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && !GameManager.instance.dialogBoxOpened && !GameManager.instance.battleIsActive) //Toggle Menu
-        {
-            ToggleMenu();
-        }
-        if(Input.GetButtonDown("Cancel") && warningPanel.activeInHierarchy)
+        if (Input.GetButtonDown("Cancel") && warningPanel.activeInHierarchy)
         {
             warningPanel.SetActive(false);
+            return;
         }
+        if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && 
+            !GameManager.instance.dialogBoxOpened && !GameManager.instance.battleIsActive) //Toggle Menu
+        {
+            ToggleMenu();            
+        }        
     }
 
     public void ToggleMenu()
@@ -183,6 +185,7 @@ public class MenuManager : MonoBehaviour
     public void ExitToMainMenu()
     {
         warningPanel.SetActive(false);
+        GameManager.instance.gameMenuOpened = false;
         SceneManager.LoadScene(0);
     }
 
