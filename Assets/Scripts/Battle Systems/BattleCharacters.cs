@@ -139,7 +139,7 @@ public class BattleCharacters : MonoBehaviour
         }
     }
 
-    private void AddHP(int amountOfEffect)
+    public void AddHP(int amountOfEffect)
     {
         currentHP += amountOfEffect;
         if (currentHP > maxHP)

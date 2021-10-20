@@ -69,7 +69,6 @@ public class PlayerStats : MonoBehaviour
         }
         else
         {
-            print("Checking for levelup");
             currentXP += amount;
         }
         MenuManager.instance.UpdateStats();

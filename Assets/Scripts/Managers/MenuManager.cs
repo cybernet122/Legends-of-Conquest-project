@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 public class MenuManager : MonoBehaviour
@@ -18,7 +19,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] GameObject characterPanel, itemsPanel, itemContainer;
     [SerializeField] Transform itemSlotContainerParent;
     [SerializeField] Button useButton,discardButton;
-    [SerializeField] GameObject characterChoicePanel;
+    [SerializeField] GameObject characterChoicePanel, warningPanel;
     [SerializeField] TextMeshProUGUI[] itemsCharacterChoiceNames;
     [SerializeField] Animator savingPanel;
 
@@ -48,6 +49,10 @@ public class MenuManager : MonoBehaviour
         if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && !GameManager.instance.dialogBoxOpened && !GameManager.instance.battleIsActive) //Toggle Menu
         {
             ToggleMenu();
+        }
+        if(Input.GetButtonDown("Cancel") && warningPanel.activeInHierarchy)
+        {
+            warningPanel.SetActive(false);
         }
     }
 
@@ -173,6 +178,12 @@ public class MenuManager : MonoBehaviour
             { itemAmountText.text = ""; }
             itemSlot.GetComponent<ItemButton>().itemOnButton = item;
         }
+    }
+
+    public void ExitToMainMenu()
+    {
+        warningPanel.SetActive(false);
+        SceneManager.LoadScene(0);
     }
 
     public void QuitGame()

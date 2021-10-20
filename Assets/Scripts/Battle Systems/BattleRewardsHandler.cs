@@ -10,6 +10,9 @@ public class BattleRewardsHandler : MonoBehaviour
     [SerializeField] GameObject rewardsScreen;
     [SerializeField] ItemsManager[] rewardItems;
     [SerializeField] int xpReward;
+    public bool markQuestComplete;
+    public string questToComplete;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -60,5 +63,9 @@ public class BattleRewardsHandler : MonoBehaviour
         rewardsScreen.SetActive(false);
         GameManager.instance.battleIsActive = false;
         BattleManager.instance.isRewardScreenOpen = false;
+        if (markQuestComplete)
+        {
+            QuestManager.instance.MarkQuestComplete(questToComplete);
+        }
     }
 }
