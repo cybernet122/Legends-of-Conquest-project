@@ -9,13 +9,13 @@ public class ShopKeeper : MonoBehaviour
 
     private void Update()
     {
-        if (canOpenShop && Input.GetButtonDown("Fire2") && Player.instance.enableMovement &&
+        if (canOpenShop && Input.GetButtonDown("Fire1") && Player.instance.enableMovement &&
             !ShopManager.instance.shopMenu.activeInHierarchy)
         {
             ShopManager.instance.OpenShopMenu();
             ShopManager.instance.itemsForSale = shopKeeperItemsForSale;
         }
-        else if(Input.GetButtonDown("Fire2") || Input.GetButtonDown("Cancel") && ShopManager.instance.shopMenu.activeInHierarchy)
+        else if(Input.GetButtonDown("Cancel") && ShopManager.instance.shopMenu.activeInHierarchy)
         {
             ShopManager.instance.CloseShopMenu();
         }
@@ -25,7 +25,11 @@ public class ShopKeeper : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            canOpenShop = true;
+            if(QuestManager.instance.CheckIfComplete("Tell the Innkeeper that you found heroes to help you"))
+            {
+                GetComponent<DialogHandler>().enabled = false;
+                canOpenShop = true;
+            }            
         }
     }
 

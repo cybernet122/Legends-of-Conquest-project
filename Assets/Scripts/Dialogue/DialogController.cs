@@ -13,6 +13,7 @@ public class DialogController : MonoBehaviour
     [Header("Dialogue Timers")]
     [SerializeField] float dialogSkipDelay = 0.5f;
     [SerializeField] float typewriterDelay = 0.1f;
+    [SerializeField] Healer healer;
     float dialogSkipTimer;
     string currentText;
     string questToMark;
@@ -22,6 +23,7 @@ public class DialogController : MonoBehaviour
     bool checkingSkip = false;
     public bool npcInRange = false;
     public float count = 0;
+    private string npcName;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,8 +33,9 @@ public class DialogController : MonoBehaviour
 
     IEnumerator ProcessWindowDialog()
     {
-        
+
         //dialogText.text = dialogSentences[currentSentence];
+
         if (Input.GetButtonUp("Fire1") && !isTyping)
         {
             dialogBox.SetActive(true);
@@ -63,7 +66,7 @@ public class DialogController : MonoBehaviour
     }
 
     IEnumerator PrintText()
-    {
+    {      
         isTyping = true;
         int index = 0;
         for (int i = 0; i <= dialogSentences[currentSentence].Length; i++)
@@ -71,7 +74,6 @@ public class DialogController : MonoBehaviour
             yield return new WaitForSeconds(typewriterDelay);
             if (checkingSkip)
             {
-                print("Breaking");
                 dialogText.text = dialogSentences[currentSentence];
                 checkingSkip = false;
                 break;
@@ -106,6 +108,12 @@ public class DialogController : MonoBehaviour
             if (Input.GetButtonUp("Fire1") && dialogSentences.Length <= currentSentence)
             {
                 currentSentence = 0;
+                var dialogHandlers = GetComponents<DialogHandler>();
+                if (dialogHandlers.Length > 1)
+                {
+                    dialogHandlers[0].enabled = false;
+                    dialogHandlers[1].enabled = true;
+                }
             }
             CheckForSkip();
         }
@@ -113,7 +121,6 @@ public class DialogController : MonoBehaviour
         {
             dialogBox.SetActive(false);
             currentSentence = 0;
-            //dialogSentences = null;
         }
     }
 
@@ -142,8 +149,21 @@ public class DialogController : MonoBehaviour
         if (dialogSentences[currentSentence].StartsWith("#"))
         {
             nameText.text = dialogSentences[currentSentence].Replace("#", "");
+            if (dialogSentences[currentSentence].EndsWith("$"))
+            {
+                print("Test");
+                nameText.text = nameText.text.Remove(nameText.text.Length - 1);
+                var playerStats = GameManager.instance.GetPlayerStats();
+                for (int i = 0; i < playerStats.Length; i++)
+                {
+                    int heal = (int)(playerStats[i].maxHP * 0.33);
+                    if (playerStats[i].currentHP < heal)
+                        playerStats[i].currentHP = heal;
+                }
+            }
             currentSentence++;
         }
+        
         else
         {
             return;

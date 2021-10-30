@@ -50,6 +50,8 @@ MonoBehaviour:
   gameMenuOpened: 0
   dialogBoxOpened: 0
   shopMenuOpened: 0
+  battleIsActive: 0
+  count: 0
   currentGoldCoins: 0
 --- !u!114 &6262681181205387145
 MonoBehaviour:
@@ -97,9 +99,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   questNames:
-  - 
-  - Defeat Dragon
-  - Return to town
-  - Steal the gem
-  - Take monster soul
+  - Speak to the Innkeeper
+  - Kill the monsters in the mountains
+  - Return to the Innkeeper
+  - Ask for assistance in defeating the dragon
+  - Tell the Innkeeper that you found heroes to help you
+  - Find the cave that the dragon resides
+  - Kill the dragon
   questMarkersCompleted: 

@@ -16,7 +16,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel, statEquippedWeapon, statEquippedArmor, statWeaponPower, statArmorDefence, speed;
     [SerializeField] Slider xpSlider;
     [SerializeField] Image characterImage;
-    [SerializeField] GameObject characterPanel, itemsPanel, itemContainer;
+    [SerializeField] GameObject characterPanel, itemsPanel, itemContainer, charInfoList;
     [SerializeField] Transform itemSlotContainerParent;
     [SerializeField] Button useButton,discardButton;
     [SerializeField] GameObject characterChoicePanel, warningPanel;
@@ -66,6 +66,7 @@ public class MenuManager : MonoBehaviour
         GameManager.instance.gameMenuOpened = toglMenu;
         itemsPanel.SetActive(false);
         characterPanel.SetActive(false);
+        charInfoList.SetActive(true);
         toglItems = false;
         toglStats = false;
         DialogController.instance.count = 0;
@@ -76,6 +77,7 @@ public class MenuManager : MonoBehaviour
         toglItems = !toglItems;
         UpdateStats();
         characterPanel.SetActive(false);
+        charInfoList.SetActive(false);
         toglStats = false;
         itemsPanel.SetActive(toglItems);
         GameManager.instance.gameMenuOpened = toglItems;
@@ -85,6 +87,7 @@ public class MenuManager : MonoBehaviour
         toglStats = !toglStats;
         UpdateStats();
         itemsPanel.SetActive(false);
+        charInfoList.SetActive(false);
         toglItems = false;
         characterPanel.SetActive(toglStats);
         GameManager.instance.gameMenuOpened = toglStats;
@@ -96,7 +99,6 @@ public class MenuManager : MonoBehaviour
         for(int i = 0;i< playerStats.Length; i++)
         {
             if(characterInfoPanel.Length <= i) { break; }
-            //print(i);
             characterInfoPanel[i].SetActive(true);
             nameInfoText[i].text = playerStats[i].playerName;
             characterInfoImage[i].sprite = playerStats[i].characterImage;
@@ -106,7 +108,9 @@ public class MenuManager : MonoBehaviour
             playerInfoLevel[i].text = playerStats[i].playerLevel.ToString();
             xpInfoSlider[i].minValue = 0;
             xpInfoSlider[i].value = playerStats[i].currentXP;
-            if(playerStats[i].playerLevel >= playerStats[i].maxLevel) 
+            xpInfoSlider[i].maxValue = playerStats[i].xpForNextLevel[playerStats[i].playerLevel];
+            xpInfoText[i].text = playerStats[i].currentXP.ToString() + " / " + playerStats[i].xpForNextLevel[playerStats[i].playerLevel].ToString();
+            if (playerStats[i].playerLevel >= playerStats[i].maxLevel) 
             {
                 xpInfoSlider[i].minValue = 0;
                 xpInfoSlider[i].value = 1;
@@ -115,8 +119,6 @@ public class MenuManager : MonoBehaviour
                 currentXPText[i].text = "";
                 return; 
             }
-            xpInfoSlider[i].maxValue = playerStats[i].xpForNextLevel[playerStats[i].playerLevel];
-            xpInfoText[i].text = playerStats[i].currentXP.ToString() + " / " + playerStats[i].xpForNextLevel[playerStats[i].playerLevel].ToString();
         }
         StatsMenu();
         StatsMenuUpdate(currentlyViewing);

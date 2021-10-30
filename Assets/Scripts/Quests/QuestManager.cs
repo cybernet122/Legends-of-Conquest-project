@@ -18,12 +18,7 @@ public class QuestManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            print(CheckIfComplete("Defeat Dragon"));
-            MarkQuestComplete("Steal the gem");
-            MarkQuestInComplete("Take monster soul");
-        }
+
     }
 
     public int GetQuestNumber(string questToFind)
@@ -42,7 +37,7 @@ public class QuestManager : MonoBehaviour
     public bool CheckIfComplete(string questToCheck)
     {
         int questNumberToCheck = GetQuestNumber(questToCheck);
-        if (questNumberToCheck != 0)
+        if (questNumberToCheck != 0 || questNumberToCheck == 0)
         {
             return questMarkersCompleted[questNumberToCheck];
         }

@@ -12,10 +12,16 @@ EditorBuildSettings:
     path: Assets/Scenes/Loading Scene.unity
     guid: f2e35a5589db43541bded98ea47419cb
   - enabled: 1
-    path: Assets/Scenes/Town 2.unity
+    path: Assets/Scenes/Bedroom.unity
+    guid: 839a4d4cbac2c9040a2e3f40ee207676
+  - enabled: 1
+    path: Assets/Scenes/Shop.unity
+    guid: fc68c80e7c70fdc4d834cea7a27156d9
+  - enabled: 1
+    path: Assets/Scenes/Town.unity
     guid: 9f55bc423677d244889e594e89971f06
   - enabled: 1
-    path: Assets/Scenes/Mountains 2.unity
+    path: Assets/Scenes/Mountains.unity
     guid: 2e5efe854fcb95448a44ecf2903b3f38
   - enabled: 1
     path: Assets/Scenes/Cave.unity

@@ -102,7 +102,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: -0.1383537}
   serializedVersion: 2
-  m_Radius: 0.8786553
+  m_Radius: 0.6739888
 --- !u!50 &5153266398256871151
 Rigidbody2D:
   serializedVersion: 4
@@ -189,5 +189,6 @@ MonoBehaviour:
   equippedArmorName: 
   weaponPower: 0
   armorDefence: 0
+  turnSpeed: 0
   equippedWeapon: {fileID: 0}
   equippedArmor: {fileID: 0}

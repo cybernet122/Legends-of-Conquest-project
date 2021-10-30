@@ -17,7 +17,7 @@ public class ItemButton : MonoBehaviour
             MenuManager.instance.itemDescription.text = itemOnButton.itemDescription;
             MenuManager.instance.activeItem = itemOnButton;
         }
-        if (ShopManager.instance.shopMenu.activeInHierarchy)
+        else if (ShopManager.instance.shopMenu.activeInHierarchy)
         {
             if (ShopManager.instance.buyPanel.activeInHierarchy)
             {
@@ -28,7 +28,7 @@ public class ItemButton : MonoBehaviour
                 ShopManager.instance.SelectedSellItem(itemOnButton);
             }
         }
-        if (BattleManager.instance.itemPanel.activeInHierarchy)
+        else if (BattleManager.instance.itemPanel.activeInHierarchy)
         {
             BattleManager.instance.SelectedItemToUse(itemOnButton);
         }

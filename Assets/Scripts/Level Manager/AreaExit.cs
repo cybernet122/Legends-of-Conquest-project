@@ -7,16 +7,24 @@ public class AreaExit : MonoBehaviour
     [SerializeField] string sceneToLoad;
     [SerializeField] string transitionName;
     [SerializeField] AreaEnter areaEnter;
+    [SerializeField] string checkIfQuestIsComplete;
 
     private void Start()
     {
-        areaEnter.transitionAreaName = transitionName;  
+        /*areaEnter.transitionAreaName = transitionName;*/
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
+            if (checkIfQuestIsComplete != "")
+            {
+                if (!QuestManager.instance.CheckIfComplete(checkIfQuestIsComplete))
+                {
+                    return;
+                }
+            }
             Player.instance.transitionName = transitionName;
             MenuManager.instance.FadeImage();
             StartCoroutine(LoadScene());
