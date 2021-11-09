@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.J))
         {
-            FillPlayerStats();
+            print(PlayerPrefs.GetInt("Spoke_To_Sara"));
         }
     }
 
@@ -80,7 +80,19 @@ public class GameManager : MonoBehaviour
     public void OnLevelWasLoaded()
     {
         playerStats = new PlayerStats[0];
-        Invoke("FillPlayerStats",0.3f);        
+        Invoke("FillPlayerStats",0.3f);
+        Invoke("CheckForBattleManager", 0.15f);
+        savingFade = FindObjectOfType<SavingFade>();
+        if(SceneManager.GetActiveScene().name == "Mountains")
+        {
+            QuestManager.instance.MountainsQuest();
+        }
+    }
+
+    private void CheckForBattleManager()
+    {
+        if (FindObjectOfType<BattleManager>())
+            BattleManager.instance.CheckForResize();
     }
 
     private void FillPlayerStats()
@@ -165,6 +177,10 @@ public class GameManager : MonoBehaviour
             QuestManager.instance.LoadQuestData();
             LoadPlayerStats();
             LoadItemInventory();
+            /*if (PlayerPrefs.GetInt("Spoken_To_Sara") == 1)
+            {
+                DialogController.instance.SpokeToSara();
+            }*/
         }
     }
 

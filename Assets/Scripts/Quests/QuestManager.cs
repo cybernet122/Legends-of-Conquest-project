@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class QuestManager : MonoBehaviour
 {
     public static QuestManager instance;
@@ -12,18 +12,21 @@ public class QuestManager : MonoBehaviour
     void Start()
     {
         instance = this;
-        questMarkersCompleted = new bool[questNames.Length];
+        if (questMarkersCompleted.Length <= 0)
+        {
+            questMarkersCompleted = new bool[questNames.Length];
+            LoadQuestData();
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnLevelWasLoaded()
     {
-
+        Invoke("LoadQuestData", 0.15f);
     }
 
     public int GetQuestNumber(string questToFind)
     {
-        for(int i = 0; i < questNames.Length; i++) // changed i<=
+        for(int i = 0; i < questNames.Length; i++) 
         {
             if (questNames[i] == questToFind)
             {
@@ -35,11 +38,13 @@ public class QuestManager : MonoBehaviour
     }
 
     public bool CheckIfComplete(string questToCheck)
-    {
+    {        
         int questNumberToCheck = GetQuestNumber(questToCheck);
-        if (questNumberToCheck != 0 || questNumberToCheck == 0)
+        if (questNumberToCheck == 0 && questNumberToCheck <= questNames.Length)
         {
-            return questMarkersCompleted[questNumberToCheck];
+            int value = PlayerPrefs.GetInt("QuestMarker_" + questToCheck);
+            if(value == 1)
+            return true;
         }
         return false;
     }
@@ -59,7 +64,11 @@ public class QuestManager : MonoBehaviour
     {
         int questNumberToCheck = GetQuestNumber(questToMark);
         questMarkersCompleted[questNumberToCheck] = true;
+        PlayerPrefs.SetInt("QuestMarker_" + questToMark , 1);
+        GameManager.instance.SaveData();
+        MenuManager.instance.UpdateQuest(GetCurrentQuest());
         UpdateQuestObjects();
+  
     }
 
     public void MarkQuestInComplete(string questToMark)
@@ -86,6 +95,7 @@ public class QuestManager : MonoBehaviour
 
     public void LoadQuestData()
     {
+        print("loading quest data");
         for (int i = 0; i < questNames.Length; i++)
         {
             string keyToUse = "QuestMarker_" + questNames[i];
@@ -98,6 +108,40 @@ public class QuestManager : MonoBehaviour
                 questMarkersCompleted[i] = false;
             else
                 questMarkersCompleted[i] = true;
+        }
+    }
+
+    public string GetCurrentQuest()
+    {
+        LoadQuestData();
+        for (int i = 0; i < questMarkersCompleted.Length; i++)
+        {
+            if (questMarkersCompleted[i] == false)
+            {
+                print(questNames[i] + " " + questMarkersCompleted[i]);
+                return questNames[i];
+            }
+        }
+        return "";
+    }
+
+    public void MountainsQuest()
+    {
+        if (CheckIfComplete("Kill the monsters in the mountains"))
+        {
+            print("failed");
+            return;
+        }
+        else
+        {
+            var battleInstantiators = FindObjectsOfType<BattleInstantiator>();
+            print("Fights left: " + battleInstantiators.Length);
+
+            if(battleInstantiators.Length <= 0)
+            {
+                print("Quest Completed");
+                MarkQuestComplete("Kill the monsters in the mountains");
+            }
         }
     }
 }

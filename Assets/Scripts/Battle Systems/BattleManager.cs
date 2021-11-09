@@ -11,6 +11,8 @@ public class BattleManager : MonoBehaviour
     bool isBattleActive;
 
     [SerializeField] GameObject battleScene;
+    public SpriteRenderer backgroundBattleImage;
+
     [SerializeField] Transform[] playersPositions,enemiesPositions;
     [SerializeField] BattleCharacters[] playerPrefabs, enemiesPrefabs;
     [SerializeField] TextMeshProUGUI[] playerNames,healthText,manaText;
@@ -18,11 +20,12 @@ public class BattleManager : MonoBehaviour
     [SerializeField] Slider[] sliderHP,sliderMana;
     [SerializeField] CharacterDamageGUI damageGUI;
     [SerializeField] TextMeshProUGUI currentTurnText;
+    [SerializeField] GameObject[] playerCanvas;
 
-    [SerializeField] List<BattleCharacters> activeBattleCharacters = new List<BattleCharacters>();
+    private List<BattleCharacters> activeBattleCharacters = new List<BattleCharacters>();
     private List<BattleCharacters> players = new List<BattleCharacters>();
     private List<BattleCharacters> enemies = new List<BattleCharacters>();
-    [SerializeField] List<Transform> items = new List<Transform>();
+    private List<Transform> items = new List<Transform>();
 
     private int currentTurn = 1;
     [SerializeField] List<BattleCharacters> characterToStun = new List<BattleCharacters>();
@@ -49,7 +52,9 @@ public class BattleManager : MonoBehaviour
     public bool isRewardScreenOpen;
     private bool canFlee;
     private float percentToFlee;
-
+    public BattleInstantiator battleInstantiator;
+    private int screenHeight, screenWidth;
+    [SerializeField] Camera cameraToResize;
     // Start is called before the first frame update
     void Start()
     {
@@ -65,6 +70,12 @@ public class BattleManager : MonoBehaviour
         battleScene.SetActive(false);
         enemyTargetPanel.SetActive(false);
         itemPanel.SetActive(false);
+        returnButton.SetActive(false);
+        ResizeBackground();
+        CheckForCamera();
+       /* screenHeight = Screen.height;
+        screenWidth = Screen.width;*/
+
     }
 
     // Update is called once per frame
@@ -77,20 +88,25 @@ public class BattleManager : MonoBehaviour
 
         if (Input.GetButtonDown("Fire1") && isBattleActive)
         {
-            if (!hasActivatedBorder)            
-                hasActivatedBorder = true;            
-            if (UIButtonHolder.activeInHierarchy)            
-                mainPanelButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();            
-            else if (magicPanel.activeInHierarchy)            
-                magicButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();            
-            else if (enemyTargetPanel.activeInHierarchy)            
-                targetButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();            
-            else if (characterChoicePanel.activeInHierarchy)            
-                targetButton[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();            
-            else if (itemPanel.activeInHierarchy)            
-                useItemButton.GetComponent<Button>().onClick.Invoke();            
-            else if (isRewardScreenOpen)            
-                BattleRewardsHandler.instance.CloseRewardScreen();            
+            if (!hasActivatedBorder)
+                hasActivatedBorder = true;
+            if (UIButtonHolder.activeInHierarchy)
+                mainPanelButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
+            else if (magicPanel.activeInHierarchy)
+                magicButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
+            else if (enemyTargetPanel.activeInHierarchy)
+                targetButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
+            else if (characterChoicePanel.activeInHierarchy)
+                targetButton[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
+            else if (itemPanel.activeInHierarchy)
+                useItemButton.GetComponent<Button>().onClick.Invoke();
+            else if (isRewardScreenOpen)
+                BattleRewardsHandler.instance.CloseRewardScreen();
+        }
+        else if (Input.GetMouseButtonDown(0))
+        {
+            hasActivatedBorder = false;
+            Destroy(menuBorder);
         }
         if (Input.GetKeyDown(KeyCode.KeypadMinus))
         {
@@ -105,6 +121,7 @@ public class BattleManager : MonoBehaviour
             ReturnButton();
         }
         CheckPlayerButtonHolder();
+        CheckForResize();
     }
 
     private void CheckPlayerButtonHolder()
@@ -229,6 +246,13 @@ public class BattleManager : MonoBehaviour
             isBattleActive = true;
             GameManager.instance.battleIsActive = true;
             transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, transform.position.z);
+            //resize sprite renderer to fit camera
+            StartCoroutine(ResizeBackground());
+
+            for (int i = 0; i < players.Count; i++)
+            {
+                playerCanvas[i].SetActive(true);
+            }
             battleScene.SetActive(true);
         }
         else
@@ -237,7 +261,7 @@ public class BattleManager : MonoBehaviour
             for(int i = 0; i < playersPositions.Length; i++)
             {
                 if (playersPositions[i].transform.childCount >= 1)
-                    Destroy(playersPositions[i].GetChild(1).gameObject);
+                    Destroy(playersPositions[i].GetChild(0).gameObject);
             }
             for (int x = 0; x < enemiesPositions.Length; x++)
             {
@@ -255,6 +279,41 @@ public class BattleManager : MonoBehaviour
                 border[i].SetActive(false);
             }
         }
+    }
+
+    public void CheckForResize()
+    {
+        int height = Screen.height;
+        int width = Screen.width;
+        if (height != screenHeight || width != screenWidth)
+        {
+            StartCoroutine(ResizeBackground());
+            screenWidth = width;
+            screenHeight = height;
+        }
+    }
+
+    IEnumerator ResizeBackground()
+    {
+        float worldScreenHeight = Camera.main.orthographicSize * 2;
+        float worldScreenWidth = worldScreenHeight / Screen.height * Screen.width;
+
+        backgroundBattleImage.transform.localScale = new Vector3(
+            worldScreenWidth / backgroundBattleImage.sprite.bounds.size.x,
+            worldScreenHeight / backgroundBattleImage.sprite.bounds.size.y, 1);
+        
+        yield return new WaitForSeconds(0.3f);
+        if (!cameraToResize)
+            CheckForCamera();
+        if (cameraToResize)
+            transform.position = new Vector3(cameraToResize.transform.position.x, cameraToResize.transform.position.y, transform.position.z);
+        else
+            Debug.LogWarning("Couldn't find a camera to resize");
+    }
+
+    private void CheckForCamera()
+    {
+        cameraToResize = FindObjectOfType<Camera>();
     }
 
     private void NextTurn()
@@ -316,8 +375,10 @@ public class BattleManager : MonoBehaviour
         if (friendlies > 0 && Enemies == 0)
         {
             print("Victory");
-            UpdatePlayerStats(battleCharacters,0);
+            UpdatePlayerStats(battleCharacters, 0);
+            DestroyInstantiator();
             BattleRewardsHandler.instance.OpenRewardScreen(xpRewardAmount, itemsReward);
+            QuestManager.instance.MountainsQuest();
         }
         else if (friendlies == 0 && Enemies > 0)
         {
@@ -339,6 +400,12 @@ public class BattleManager : MonoBehaviour
         }
         StopAllCoroutines();
         currentTurn = 1;
+    }
+
+    private void DestroyInstantiator()
+    {
+        if(battleInstantiator != null)
+        Destroy(battleInstantiator.gameObject);
     }
 
     private void UpdatePlayerStats(BattleCharacters[] battleCharacters,int index)
@@ -628,6 +695,7 @@ public class BattleManager : MonoBehaviour
     {
         returnButton.GetComponent<RectTransform>().localPosition = new Vector3(-880f, -238, 0);
         enemyTargetPanel.SetActive(true);
+        ReturnButtonPlacement();
         returnButton.SetActive(true);
         for (int i = 0; i < enemies.Count; i++)
         {
@@ -733,8 +801,8 @@ public class BattleManager : MonoBehaviour
             }
         }
         magicPanel.SetActive(true);
+        ReturnButtonPlacement();
         returnButton.SetActive(true);
-        int count = 0;
         for (int i = 0; i < battleMovesList.Length; i++)
         {          
             for (int x = 0; x < activeBattleCharacters[0].AttackMovesAvailable().Length; x++) 
@@ -755,12 +823,15 @@ public class BattleManager : MonoBehaviour
                 }
             }
         }
-        for (int i = 1; i <= activeBattleCharacters[0].AttackMovesAvailable().Length; i++) 
+        //Resize Magic panel for 4+ spells
+        /*int count = 0;
+
+        for (int i = 1; i <= activeBattleCharacters[0].AttackMovesAvailable().Length; i++)
         {
             if (i % 2 == 1)
                 count++;
         }
-        var magicRect = magicPanel.GetComponent<RectTransform>();
+        
         if (count > 2)
         {
             magicRect.offsetMax = new Vector2(magicRect.sizeDelta.x, -1080);
@@ -769,10 +840,7 @@ public class BattleManager : MonoBehaviour
         else
         {
             magicRect.offsetMax = new Vector2(magicRect.sizeDelta.x, -800);
-        }
-        var button = returnButton.GetComponent<RectTransform>();
-        button.offsetMin = new Vector2(0, magicRect.rect.height - 5);
-        button.offsetMax = new Vector2(-1760, -((-magicRect.sizeDelta.y) - 42));
+        }*/
         DestroyPreviousBorder();
     }
 
@@ -1118,4 +1186,12 @@ public class BattleManager : MonoBehaviour
             menuBorder.transform.SetSiblingIndex(0);
         }
     }
-}    //TODO fix stun for next turn
+    //TODO fix stun for next turn
+
+    private void ReturnButtonPlacement()
+    {
+        var magicRect = magicPanel.GetComponent<RectTransform>();
+        var button = returnButton.GetComponent<RectTransform>();
+        button.transform.position = new Vector2(80, magicRect.rect.height + 24);        
+    }
+}

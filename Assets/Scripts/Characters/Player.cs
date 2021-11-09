@@ -61,4 +61,5 @@ public class Player : MonoBehaviour
         bottomLeftEdge = bottomEdge;
         topRightEdge = topEdge;
     }
+
 }

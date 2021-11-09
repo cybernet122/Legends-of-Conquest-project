@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DialogHandler : MonoBehaviour
 {
-    [SerializeField] bool shouldActivateQuest;
+    [SerializeField] bool shouldTriggerQuest;
     [SerializeField] string questToMark;
     [SerializeField] bool markAsComplete;
     public string[] sentences;
@@ -13,8 +13,10 @@ public class DialogHandler : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            DialogController.instance.ActivateDialog(sentences);
+            DialogController.instance.ActivateDialog(sentences,GetComponents<DialogHandler>());
+
             canActivateBox = true;
+            SpokeToSara();
         }
     }
 
@@ -31,14 +33,28 @@ public class DialogHandler : MonoBehaviour
         if(canActivateBox)
         {
             DialogController.instance.npcInRange = true;
-            if (shouldActivateQuest)
+            if (shouldTriggerQuest)
+            {
                 DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);
+            }
         }
         else
         { 
-            DialogController.instance.npcInRange = false; 
+            DialogController.instance.npcInRange = false;
         }
     }
+    private void Start()
+    {
+        SpokeToSara();
+    }
 
-
+    public void SpokeToSara()
+    {
+        var dialogHandlers = GetComponents<DialogHandler>();
+        if (PlayerPrefs.GetInt("Spoke_To_Sara") == 1 && name == "Sara the Healer" && dialogHandlers.Length > 1)
+        {
+            Destroy(dialogHandlers[1]);
+            print("Spoke to Sara");
+        }
+    }
 }

@@ -21,6 +21,9 @@ public class MainMenuManager : MonoBehaviour
     public void NewGame()
     {
         SceneManager.LoadScene(newGameScene);
+
+        PlayerPrefs.DeleteAll();
+        Debug.Log("Purging Data");
     }
 
     public void QuitGame()

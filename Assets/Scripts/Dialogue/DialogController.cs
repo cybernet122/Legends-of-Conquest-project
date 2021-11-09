@@ -13,17 +13,17 @@ public class DialogController : MonoBehaviour
     [Header("Dialogue Timers")]
     [SerializeField] float dialogSkipDelay = 0.5f;
     [SerializeField] float typewriterDelay = 0.1f;
-    [SerializeField] Healer healer;
+/*    [SerializeField] Healer healer;*/
     float dialogSkipTimer;
     string currentText;
     string questToMark;
-    bool markTheQuestComplete;
-    bool shouldMarkQuest;
+    [SerializeField]bool markTheQuestComplete ,shouldMarkQuest;
     bool isTyping = false;
     bool checkingSkip = false;
     public bool npcInRange = false;
     public float count = 0;
     private string npcName;
+    [SerializeField] DialogHandler[] dialogHandler;
     // Start is called before the first frame update
     void Start()
     {
@@ -51,15 +51,26 @@ public class DialogController : MonoBehaviour
                 GameManager.instance.dialogBoxOpened = false;
                 if (shouldMarkQuest)
                 {
-                    shouldMarkQuest = false;
                     if (markTheQuestComplete)
+                    {                        
                         QuestManager.instance.MarkQuestComplete(questToMark);
+                        print(true);
+                    }
                     else
-                        QuestManager.instance.MarkQuestComplete(questToMark);
+                    {
+                        QuestManager.instance.MarkQuestInComplete(questToMark);
+                        print(false);
+                    }
                 }
                 currentSentence = 0;
                 dialogText.text = null;
                 count = 0;
+                if (dialogHandler.Length > 1)
+                {
+                    Destroy(dialogHandler[1]);
+                    dialogHandler = new DialogHandler[1];
+                    PlayerPrefs.SetInt("Spoke_To_Sara", 1);
+                }
             }
         }
         yield return new WaitForEndOfFrame();
@@ -84,6 +95,7 @@ public class DialogController : MonoBehaviour
         isTyping = false;
         currentSentence++;
     }
+
     private void Update()
     {
         if (count <= 0.7f)
@@ -92,6 +104,21 @@ public class DialogController : MonoBehaviour
         {
             CheckForNPC();
         }
+        if (!npcInRange)
+        {
+            if(markTheQuestComplete == true || questToMark != "" || shouldMarkQuest == true)
+            {
+                markTheQuestComplete = false;
+                questToMark = "";
+                shouldMarkQuest = false;
+                DialogController.instance.dialogHandler = new DialogHandler[1];
+            }
+        }
+        /*if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            Destroy(dialogHandler[0].GetComponent<DialogHandler>());
+
+        }*/
     }
 
     IEnumerator CountDown()
@@ -107,13 +134,7 @@ public class DialogController : MonoBehaviour
             StartCoroutine(ProcessWindowDialog());
             if (Input.GetButtonUp("Fire1") && dialogSentences.Length <= currentSentence)
             {
-                currentSentence = 0;
-                var dialogHandlers = GetComponents<DialogHandler>();
-                if (dialogHandlers.Length > 1)
-                {
-                    dialogHandlers[0].enabled = false;
-                    dialogHandlers[1].enabled = true;
-                }
+                currentSentence = 0;                
             }
             CheckForSkip();
         }
@@ -121,6 +142,7 @@ public class DialogController : MonoBehaviour
         {
             dialogBox.SetActive(false);
             currentSentence = 0;
+            
         }
     }
 
@@ -138,8 +160,9 @@ public class DialogController : MonoBehaviour
         else { dialogSkipTimer = 0; }
     }
 
-    public void ActivateDialog(string[] newSentencesToUse)
+    public void ActivateDialog(string[] newSentencesToUse,DialogHandler[] dialogues)
     {
+        dialogHandler = dialogues;
         dialogSentences = newSentencesToUse;
         dialogText.text = dialogSentences[currentSentence];
     }
@@ -151,7 +174,6 @@ public class DialogController : MonoBehaviour
             nameText.text = dialogSentences[currentSentence].Replace("#", "");
             if (dialogSentences[currentSentence].EndsWith("$"))
             {
-                print("Test");
                 nameText.text = nameText.text.Remove(nameText.text.Length - 1);
                 var playerStats = GameManager.instance.GetPlayerStats();
                 for (int i = 0; i < playerStats.Length; i++)
@@ -171,7 +193,7 @@ public class DialogController : MonoBehaviour
     }
 
     public void ActivateQuestAtEnd(string questName, bool markComplete)
-    {
+    {        
         questToMark = questName;
         markTheQuestComplete = markComplete;
         shouldMarkQuest = true;

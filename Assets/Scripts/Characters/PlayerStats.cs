@@ -59,9 +59,7 @@ public class PlayerStats : MonoBehaviour
         {
             for (int i = 1; i < 50 && SumXPToAdd >= xpForNextLevel[playerLevel + i]; i++)
             {
-                print(i);
                 SumXPToAdd -= xpForNextLevel[playerLevel + i-1];
-                print(SumXPToAdd);
                 levelsToAdd = i;
             }
             //playerLevel += levelsToAdd;

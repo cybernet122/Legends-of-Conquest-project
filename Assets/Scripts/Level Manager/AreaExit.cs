@@ -8,6 +8,7 @@ public class AreaExit : MonoBehaviour
     [SerializeField] string transitionName;
     [SerializeField] AreaEnter areaEnter;
     [SerializeField] string checkIfQuestIsComplete;
+    [SerializeField] AreaEnter teleport;
 
     private void Start()
     {
@@ -22,13 +23,30 @@ public class AreaExit : MonoBehaviour
             {
                 if (!QuestManager.instance.CheckIfComplete(checkIfQuestIsComplete))
                 {
+                    print(!QuestManager.instance.CheckIfComplete(checkIfQuestIsComplete));
                     return;
                 }
             }
-            Player.instance.transitionName = transitionName;
-            MenuManager.instance.FadeImage();
-            StartCoroutine(LoadScene());
+            if (!teleport)
+            {
+                Player.instance.transitionName = transitionName;
+                MenuManager.instance.FadeImage();
+                StartCoroutine(LoadScene());
+            }
+            else if (teleport)
+            {
+                StartCoroutine(Delay());
+            }
         }
+    }
+
+    IEnumerator Delay()
+    {
+        GameManager.instance.gameMenuOpened = true;
+        Player.instance.transform.position = new Vector3(teleport.transform.position.x, teleport.transform.position.y);
+        yield return new WaitForSeconds(0.8f);
+        GameManager.instance.gameMenuOpened = false;
+
     }
 
     IEnumerator LoadScene()

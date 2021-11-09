@@ -72,6 +72,7 @@ public class Inventory : MonoBehaviour
         {
             itemsList.Remove(item);
         }
+        MenuManager.instance.activeItem = null;
         MenuManager.instance.UpdateItemsInventory();
     }
 

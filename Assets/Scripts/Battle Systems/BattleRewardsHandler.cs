@@ -47,13 +47,11 @@ public class BattleRewardsHandler : MonoBehaviour
     public void CloseRewardScreen()
     {
         var playerStats = GameManager.instance.GetPlayerStats();
-        foreach (BattleCharacters player in BattleManager.instance.GetPlayers())
+        foreach (PlayerStats player in GameManager.instance.GetPlayerStats())
         {
+            print(player.playerName);
             for (int i = 0; i < playerStats.Length; i++) {
-                if (player.characterName == playerStats[i].playerName)
-                {
-                    PlayerStats.instance.AddXP(xpReward);
-                }
+                PlayerStats.instance.AddXP(xpReward);                
             }
         }
         foreach (ItemsManager itemRewarded in rewardItems)
@@ -67,5 +65,6 @@ public class BattleRewardsHandler : MonoBehaviour
         {
             QuestManager.instance.MarkQuestComplete(questToComplete);
         }
+        QuestManager.instance.MountainsQuest();
     }
 }

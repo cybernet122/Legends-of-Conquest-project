@@ -13,7 +13,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Slider[] xpInfoSlider;
     [SerializeField] Image[] characterInfoImage;
     [SerializeField] GameObject[] characterInfoPanel;
-    [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel, statEquippedWeapon, statEquippedArmor, statWeaponPower, statArmorDefence, speed;
+    [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel, statEquippedWeapon, statEquippedArmor, statWeaponPower, statArmorDefence, speed, currentQuest;
     [SerializeField] Slider xpSlider;
     [SerializeField] Image characterImage;
     [SerializeField] GameObject characterPanel, itemsPanel, itemContainer, charInfoList;
@@ -21,13 +21,15 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Button useButton,discardButton;
     [SerializeField] GameObject characterChoicePanel, warningPanel;
     [SerializeField] TextMeshProUGUI[] itemsCharacterChoiceNames;
-    [SerializeField] Animator savingPanel;
+    [SerializeField] VerticalLayoutGroup characterButtons;
+    [SerializeField] QuestUpdate questUpdate;
+
 
     public static MenuManager instance;
     public TextMeshProUGUI itemName,itemDescription;
     public ItemsManager activeItem;
     PlayerStats[] playerStats;
-    bool toglMenu,toglItems,toglStats = false;
+    bool toglMenu, toglItems, toglStats, toglWarning = false;
     int currentlyViewing;
     private void Start()
     {    
@@ -69,6 +71,7 @@ public class MenuManager : MonoBehaviour
         charInfoList.SetActive(true);
         toglItems = false;
         toglStats = false;
+        currentQuest.text = "Current Quest: " + QuestManager.instance.GetCurrentQuest();
         DialogController.instance.count = 0;
     }
 
@@ -77,7 +80,7 @@ public class MenuManager : MonoBehaviour
         toglItems = !toglItems;
         UpdateStats();
         characterPanel.SetActive(false);
-        charInfoList.SetActive(false);
+        charInfoList.SetActive(!toglItems);
         toglStats = false;
         itemsPanel.SetActive(toglItems);
         GameManager.instance.gameMenuOpened = toglItems;
@@ -87,8 +90,12 @@ public class MenuManager : MonoBehaviour
         toglStats = !toglStats;
         UpdateStats();
         itemsPanel.SetActive(false);
-        charInfoList.SetActive(false);
+        charInfoList.SetActive(!toglStats);
         toglItems = false;
+        if(GameManager.instance.GetPlayerStats().Length == 1)
+            characterButtons.childControlHeight = false;
+        else
+            characterButtons.childControlHeight = true;
         characterPanel.SetActive(toglStats);
         GameManager.instance.gameMenuOpened = toglStats;
     }
@@ -198,23 +205,32 @@ public class MenuManager : MonoBehaviour
 
     public void DiscardItem()
     {
-        Inventory.instance.RemoveItem(activeItem);
-        AudioManager.instance.PlaySFX(4);
+        if (activeItem)
+        {
+            Inventory.instance.RemoveItem(activeItem);
+            AudioManager.instance.PlaySFX(4);
+        }
     }
 
     public void UseItem(int characterToUse)
     {
-        activeItem.UseItem(characterToUse);
-        OpenCharacterChoicePanel();
-        Inventory.instance.RemoveItem(activeItem);
-        AudioManager.instance.PlaySFX(0);
+        if (activeItem)
+        {
+            activeItem.UseItem(characterToUse);
+            OpenCharacterChoicePanel();
+            Inventory.instance.RemoveItem(activeItem);
+            AudioManager.instance.PlaySFX(0);
+            itemDescription.text = "";
+            itemName.text = "";
+        }
     }
 
     public void OpenCharacterChoicePanel()
     {
-        characterChoicePanel.SetActive(true);
         if (activeItem)
         {
+            characterChoicePanel.SetActive(true);
+
             for (int i = 0; i < playerStats.Length; i++)
             {
                 PlayerStats activePlayer = GameManager.instance.GetPlayerStats()[i];
@@ -237,5 +253,16 @@ public class MenuManager : MonoBehaviour
     public void FadeOut()
     {
         image.GetComponent<Animator>().SetTrigger("EndFade");
+    }
+
+    public void ToggleExitWarning()
+    {
+        toglWarning = !toglWarning;
+        warningPanel.SetActive(toglWarning);
+    }
+
+    public void UpdateQuest(string quest)
+    {
+        questUpdate.PlayUpdateAnimation(quest);
     }
 }
