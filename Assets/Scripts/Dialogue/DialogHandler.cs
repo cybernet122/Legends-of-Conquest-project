@@ -6,7 +6,8 @@ public class DialogHandler : MonoBehaviour
 {
     [SerializeField] bool shouldTriggerQuest;
     [SerializeField] string questToMark;
-    [SerializeField] bool markAsComplete;
+    [SerializeField] bool markAsComplete, destroyOnFinish;
+    [SerializeField] string checkIfComplete;
     public string[] sentences;
     bool canActivateBox;
     private void OnTriggerEnter2D(Collider2D other)
@@ -17,6 +18,7 @@ public class DialogHandler : MonoBehaviour
 
             canActivateBox = true;
             SpokeToSara();
+            ReturnFromMountains();
         }
     }
 
@@ -46,6 +48,7 @@ public class DialogHandler : MonoBehaviour
     private void Start()
     {
         SpokeToSara();
+        Invoke("ReturnFromMountains",0.3f);
     }
 
     public void SpokeToSara()
@@ -55,6 +58,21 @@ public class DialogHandler : MonoBehaviour
         {
             Destroy(dialogHandlers[1]);
             print("Spoke to Sara");
+        }
+    }
+
+    public void DestroyOnFinish()
+    {
+        if(destroyOnFinish)
+            Destroy(this);
+    }
+
+    public void ReturnFromMountains()
+    {
+        var dialogHandlers = GetComponents<DialogHandler>();
+        if (QuestManager.instance.CheckIfComplete(checkIfComplete) && dialogHandlers.Length > 1)
+        {
+            Destroy(dialogHandlers[1]);
         }
     }
 }

@@ -363,10 +363,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 6262681181205387144, guid: 4e32b32dcba03c442b3cb68c3224ef4f, type: 3}
-      propertyPath: currentGoldCoins
-      value: 1000
-      objectReference: {fileID: 0}
     - target: {fileID: 6262681181205387150, guid: 4e32b32dcba03c442b3cb68c3224ef4f, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -4611,9 +4607,93 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5901125954480068744, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[2]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[6]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[10]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[16]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: checkIfComplete
+      value: Kill the monsters in the mountains
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.size
+      value: 26
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[2]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[6]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[10]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[16]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[17]
+      value: Where can I find these adventurers?
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[19]
+      value: From what they told me, they should be at the cave to fight the dragon,
+        right after the mountain pass.
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[20]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[21]
+      value: Very well I will help you once again, I shall find these adventurers
+        first.
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[23]
+      value: 'Well while you were away, I found some stuff that may help you and
+        those adventurers in killing the dragon, buy some for the other heroes as
+        well, I just found this stuff. Make sure to take a look. Oh and good luck. '
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[24]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[25]
+      value: Thanks I will take a look before I head off.
+      objectReference: {fileID: 0}
     - target: {fileID: 8723616088175632913, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: m_Name
       value: ShopKeeper NPC
+      objectReference: {fileID: 0}
+    - target: {fileID: 8723616088175632913, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8723616088175632915, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: m_RootOrder
@@ -4621,11 +4701,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8723616088175632915, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.95
+      value: -7.9
       objectReference: {fileID: 0}
     - target: {fileID: 8723616088175632915, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.67
+      value: 1.63
       objectReference: {fileID: 0}
     - target: {fileID: 8723616088175632915, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: m_LocalPosition.z

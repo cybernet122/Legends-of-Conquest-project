@@ -59,9 +59,9 @@ public class GameManager : MonoBehaviour
         {
             LoadData();
         }
-        if (Input.GetKeyDown(KeyCode.J))
+        if (Input.GetKeyDown(KeyCode.Alpha0))
         {
-            print(PlayerPrefs.GetInt("Spoke_To_Sara"));
+            QuestManager.instance.PurgeQuestData();
         }
     }
 
@@ -73,17 +73,23 @@ public class GameManager : MonoBehaviour
     }
 
     public PlayerStats[] GetPlayerStats()
-    {        
+    {
+        FillPlayerStats();
         return playerStats;
+    }
+
+    public void UpdatePlayerStats()
+    {
+        FillPlayerStats();
     }
 
     public void OnLevelWasLoaded()
     {
         playerStats = new PlayerStats[0];
-        Invoke("FillPlayerStats",0.3f);
+        Invoke("FillPlayerStats", 0.3f);
         Invoke("CheckForBattleManager", 0.15f);
         savingFade = FindObjectOfType<SavingFade>();
-        if(SceneManager.GetActiveScene().name == "Mountains")
+        if (SceneManager.GetActiveScene().name == "Mountains")
         {
             QuestManager.instance.MountainsQuest();
         }
@@ -99,7 +105,7 @@ public class GameManager : MonoBehaviour
     {
         playerStats = new PlayerStats[0];
         playerStats = FindObjectsOfType<PlayerStats>();
-        
+
         for (int i = 0; i < playerStats.Length; i++)
         {
             if (playerStats[i].GetComponent<Player>())
@@ -108,6 +114,14 @@ public class GameManager : MonoBehaviour
                 playerStats[0] = playerStats[i];
                 playerStats[i] = playerstat;
             }
+        }
+        if (QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them"))
+            return;
+        else
+        {
+            var playerStats1 = playerStats[0];
+            playerStats = new PlayerStats[1];
+            playerStats[0] = playerStats1;
         }
     }
 
@@ -199,7 +213,7 @@ public class GameManager : MonoBehaviour
                     itemAmount = PlayerPrefs.GetInt("Items_" + i + "_Amount_");
                 }
                 Inventory.instance.AddItems(itemToAdd, false);
-                if(itemToAdd.isStackable && itemAmount > 1)
+                if (itemToAdd.isStackable && itemAmount > 1)
                 {
                     itemToAdd.amount = itemAmount;
                 }
@@ -246,6 +260,18 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.DeleteAll();
             Debug.Log("Purging Data");
+            QuestManager.instance.PurgeQuestData();
+        }
+    }
+
+    public void UpdateLevels()
+    {
+        if (QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them"))
+        {
+            foreach (PlayerStats player in playerStats)
+            {
+                player.MatchPlayerLevel();
+            }
         }
     }
 }

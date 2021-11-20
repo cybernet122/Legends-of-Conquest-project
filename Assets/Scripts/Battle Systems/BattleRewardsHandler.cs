@@ -22,10 +22,10 @@ public class BattleRewardsHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*if (Input.GetKeyDown(KeyCode.Y))
+        if (Input.GetButtonDown("Submit") && rewardsScreen.activeInHierarchy)
         {
-            OpenRewardScreen(5000, rewardItems);
-        }*/
+            CloseRewardScreen();
+        }
     }
     
     public void OpenRewardScreen(int xpEarned,ItemsManager[] itemsEarned)

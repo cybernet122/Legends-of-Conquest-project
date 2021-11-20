@@ -142,4 +142,14 @@ public class PlayerStats : MonoBehaviour
         equippedArmorName = equippedArmor.itemName;
         armorDefence = equippedArmor.armorDefence;
     }
+
+    public void MatchPlayerLevel()
+    {
+        if (GetComponent<Player>())
+            return;
+        while(Player.instance.GetComponent<PlayerStats>().playerLevel < playerLevel)
+        {
+            AddXP(xpForNextLevel[playerLevel]);
+        }
+    }
 }

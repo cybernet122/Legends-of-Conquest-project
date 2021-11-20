@@ -23,7 +23,6 @@ public class AreaExit : MonoBehaviour
             {
                 if (!QuestManager.instance.CheckIfComplete(checkIfQuestIsComplete))
                 {
-                    print(!QuestManager.instance.CheckIfComplete(checkIfQuestIsComplete));
                     return;
                 }
             }

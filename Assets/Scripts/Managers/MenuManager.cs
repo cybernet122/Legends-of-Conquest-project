@@ -71,6 +71,7 @@ public class MenuManager : MonoBehaviour
         charInfoList.SetActive(true);
         toglItems = false;
         toglStats = false;
+        GameManager.instance.UpdatePlayerStats();
         currentQuest.text = "Current Quest: " + QuestManager.instance.GetCurrentQuest();
         DialogController.instance.count = 0;
     }
@@ -103,7 +104,12 @@ public class MenuManager : MonoBehaviour
     public void UpdateStats()
     {
         playerStats = GameManager.instance.GetPlayerStats();
-        for(int i = 0;i< playerStats.Length; i++)
+        if (!QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them"))
+        {
+            foreach (GameObject characterPanel in characterInfoPanel)
+                characterPanel.SetActive(false);
+        }
+        for (int i = 0;i< playerStats.Length; i++)
         {
             if(characterInfoPanel.Length <= i) { break; }
             characterInfoPanel[i].SetActive(true);
@@ -264,5 +270,6 @@ public class MenuManager : MonoBehaviour
     public void UpdateQuest(string quest)
     {
         questUpdate.PlayUpdateAnimation(quest);
+        GameManager.instance.UpdateLevels();
     }
 }

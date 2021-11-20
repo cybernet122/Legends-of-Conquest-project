@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8723616088175632914}
   - component: {fileID: 6514198108800958512}
   - component: {fileID: 554344756372526760}
+  - component: {fileID: 7024877984999379398}
   - component: {fileID: 5901125954480068747}
   - component: {fileID: 5901125954480068744}
   m_Layer: 0
@@ -138,6 +139,59 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.7923491, y: 1.0217465}
   m_EdgeRadius: 0
+--- !u!114 &7024877984999379398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8723616088175632913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f7afdc634235594285c0d2a9b507789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shouldTriggerQuest: 1
+  questToMark: Return to the Innkeeper
+  markAsComplete: 1
+  destroyOnFinish: 0
+  checkIfComplete: 
+  sentences:
+  - '#Innkeeper'
+  - Hero, you are back!
+  - '#Player'
+  - I killed the monsters in the mountains, they were no match for me.
+  - '#Innkeeper'
+  - Thank you for the help, the village will be safe for now but only for a little
+    while.
+  - '#Player'
+  - Why, what makes you say that?
+  - '#Innkeeper'
+  - A dragon has been terrorizing these lands for years, and with no real help the
+    dragon has been causing serious damages with no one to help us.
+  - '#Player'
+  - Tell me more about this dragon.
+  - '#Innkeeper'
+  - Some brave souls have attempted to slay the dragon but only manage to get themselves
+    killed or severly wounded.
+  - They have told us that the cave the dragon resides in holds unimaginable wealth,
+  - now I can't vouch for that information but the fact remains that the dragon will
+    not leave this area or stop attacking us.
+  - '#Player'
+  - Where is this cave exactly?
+  - '#Innkeeper'
+  - From what they have told us, the cave should be right after the mountain pass.
+  - '#Player'
+  - Well since you are in danger from that dragon and he holds gold inside that cave
+    I could kill him for you.
+  - '#Innkeeper'
+  - Well now that you mention it some other adventurers said that they would attempt
+    to slay the dragon, if you talked to them you might be able to help each other.
+  - '#Player'
+  - Where can I find those adventurers?
+  - '#Innkeeper'
+  - They should be on the first floor if they haven't left already, they stand out
+    I am sure you can't miss them.
 --- !u!114 &5901125954480068747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,6 +207,8 @@ MonoBehaviour:
   shouldTriggerQuest: 1
   questToMark: Speak to the Innkeeper
   markAsComplete: 1
+  destroyOnFinish: 0
+  checkIfComplete: 
   sentences:
   - '#Innkeeper'
   - Oh hey kid, you are awake. How are you feeling?
@@ -187,7 +243,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8723616088175632913}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 609ba4c89db80d64e9e4dbe5d344f30e, type: 3}
   m_Name: 

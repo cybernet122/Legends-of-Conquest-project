@@ -52,24 +52,27 @@ public class DialogController : MonoBehaviour
                 if (shouldMarkQuest)
                 {
                     if (markTheQuestComplete)
-                    {                        
-                        QuestManager.instance.MarkQuestComplete(questToMark);
-                        print(true);
+                    {           
+                        if(!QuestManager.instance.CheckIfComplete(questToMark))
+                            QuestManager.instance.MarkQuestComplete(questToMark);
                     }
                     else
                     {
                         QuestManager.instance.MarkQuestInComplete(questToMark);
-                        print(false);
                     }
                 }
+                dialogHandler[0].DestroyOnFinish();
                 currentSentence = 0;
                 dialogText.text = null;
                 count = 0;
                 if (dialogHandler.Length > 1)
                 {
-                    Destroy(dialogHandler[1]);
-                    dialogHandler = new DialogHandler[1];
-                    PlayerPrefs.SetInt("Spoke_To_Sara", 1);
+                    if(dialogHandler[0].name == "Sara the Healer")
+                    {
+                        PlayerPrefs.SetInt("Spoke_To_Sara", 1);
+                        Destroy(dialogHandler[1]);
+                        dialogHandler = new DialogHandler[1];
+                    }
                 }
             }
         }

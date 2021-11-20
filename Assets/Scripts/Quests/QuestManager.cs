@@ -8,6 +8,7 @@ public class QuestManager : MonoBehaviour
     public static QuestManager instance;
     [SerializeField] string[] questNames;
     [SerializeField] bool[] questMarkersCompleted;
+    public int count = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,6 +18,29 @@ public class QuestManager : MonoBehaviour
             questMarkersCompleted = new bool[questNames.Length];
             LoadQuestData();
         }
+        count = GetQuestNumber(GetCurrentQuest());
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            AdvanceQuest();
+            print("skipping quest");
+        }
+/*        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadQuestData();
+            print("loading quests");
+        }*/
+    }
+
+    private void AdvanceQuest()
+    {
+        MarkQuestComplete(questNames[count]);
+        questMarkersCompleted[count] = !questMarkersCompleted[count];
+        count++;        
+        print(GetCurrentQuest());
     }
 
     private void OnLevelWasLoaded()
@@ -40,7 +64,7 @@ public class QuestManager : MonoBehaviour
     public bool CheckIfComplete(string questToCheck)
     {        
         int questNumberToCheck = GetQuestNumber(questToCheck);
-        if (questNumberToCheck == 0 && questNumberToCheck <= questNames.Length)
+        if (questNumberToCheck >= 0 && questNumberToCheck <= questNames.Length)
         {
             int value = PlayerPrefs.GetInt("QuestMarker_" + questToCheck);
             if(value == 1)
@@ -95,7 +119,6 @@ public class QuestManager : MonoBehaviour
 
     public void LoadQuestData()
     {
-        print("loading quest data");
         for (int i = 0; i < questNames.Length; i++)
         {
             string keyToUse = "QuestMarker_" + questNames[i];
@@ -118,7 +141,6 @@ public class QuestManager : MonoBehaviour
         {
             if (questMarkersCompleted[i] == false)
             {
-                print(questNames[i] + " " + questMarkersCompleted[i]);
                 return questNames[i];
             }
         }
@@ -143,5 +165,17 @@ public class QuestManager : MonoBehaviour
                 MarkQuestComplete("Kill the monsters in the mountains");
             }
         }
+    }
+
+    public void PurgeQuestData()
+    {
+        print("Purging quest data");
+        for (int i = 0; i < questNames.Length; i++)
+        {
+            questMarkersCompleted[i] = false;
+            PlayerPrefs.DeleteKey("QuestMarker_" + questNames[i]);
+        }
+        count = 0;
+
     }
 }

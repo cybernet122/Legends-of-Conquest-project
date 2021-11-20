@@ -102,8 +102,8 @@ MonoBehaviour:
   - Speak to the Innkeeper
   - Kill the monsters in the mountains
   - Return to the Innkeeper
-  - Look for other heroes to help you in defeating the dragon
-  - Tell the Innkeeper that you found heroes to help you
-  - Defeat the Elder Dragon
+  - Look for the heroes located in the cave and join them
+  - Make your way to the dragon
   - Kill the dragon
   questMarkersCompleted: 
+  count: 0
