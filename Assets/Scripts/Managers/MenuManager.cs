@@ -13,7 +13,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Slider[] xpInfoSlider;
     [SerializeField] Image[] characterInfoImage;
     [SerializeField] GameObject[] characterInfoPanel;
-    [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel, statEquippedWeapon, statEquippedArmor, statWeaponPower, statArmorDefence, speed, currentQuest;
+    [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel, statEquippedWeapon, statEquippedArmor, statWeaponPower, statArmorDefence, speed, evasion, currentQuest;
     [SerializeField] Slider xpSlider;
     [SerializeField] Image characterImage;
     [SerializeField] GameObject characterPanel, itemsPanel, itemContainer, charInfoList;
@@ -23,14 +23,15 @@ public class MenuManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI[] itemsCharacterChoiceNames;
     [SerializeField] VerticalLayoutGroup characterButtons;
     [SerializeField] QuestUpdate questUpdate;
-
+    [SerializeField] GameObject optionsPanel;
 
     public static MenuManager instance;
     public TextMeshProUGUI itemName,itemDescription;
     public ItemsManager activeItem;
     PlayerStats[] playerStats;
-    bool toglMenu, toglItems, toglStats, toglWarning = false;
+    bool toglMenu, toglItems, toglStats, toglWarning, toglOptions = false;
     int currentlyViewing;
+    ItemsManager[] itemsCollection;
     private void Start()
     {    
         instance = this;   
@@ -39,6 +40,8 @@ public class MenuManager : MonoBehaviour
         CloseCharacterChoicePanel();
         itemDescription.text = "";
         itemName.text = "";
+        optionsPanel.SetActive(false);
+        itemsCollection = FindObjectsOfType<ItemsManager>();
     }
 
     public void FadeImage()
@@ -53,11 +56,25 @@ public class MenuManager : MonoBehaviour
             warningPanel.SetActive(false);
             return;
         }
-        if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && 
+        else if(Input.GetButtonDown("Cancel") && characterChoicePanel.activeInHierarchy)
+        {
+            CloseCharacterChoicePanel();
+        }
+        else if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && 
             !GameManager.instance.dialogBoxOpened && !GameManager.instance.battleIsActive) //Toggle Menu
         {
             ToggleMenu();            
         }        
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            var itemList = Inventory.instance.GetItemList();
+            string printInv = "Inventory has " + itemList.Count + " items, ";
+            foreach(ItemsManager item in itemList)
+            {
+                printInv += item.itemName + " " + item.amount + ", ";
+            }
+            Debug.Log(printInv);
+        }
     }
 
     public void ToggleMenu()
@@ -69,8 +86,10 @@ public class MenuManager : MonoBehaviour
         itemsPanel.SetActive(false);
         characterPanel.SetActive(false);
         charInfoList.SetActive(true);
+        optionsPanel.SetActive(false);
         toglItems = false;
         toglStats = false;
+        toglOptions = false;
         GameManager.instance.UpdatePlayerStats();
         currentQuest.text = "Current Quest: " + QuestManager.instance.GetCurrentQuest();
         DialogController.instance.count = 0;
@@ -81,8 +100,10 @@ public class MenuManager : MonoBehaviour
         toglItems = !toglItems;
         UpdateStats();
         characterPanel.SetActive(false);
+        optionsPanel.SetActive(false);
         charInfoList.SetActive(!toglItems);
         toglStats = false;
+        toglOptions = false;
         itemsPanel.SetActive(toglItems);
         GameManager.instance.gameMenuOpened = toglItems;
     }
@@ -91,7 +112,9 @@ public class MenuManager : MonoBehaviour
         toglStats = !toglStats;
         UpdateStats();
         itemsPanel.SetActive(false);
+        optionsPanel.SetActive(false);
         charInfoList.SetActive(!toglStats);
+        toglOptions = false;
         toglItems = false;
         if(GameManager.instance.GetPlayerStats().Length == 1)
             characterButtons.childControlHeight = false;
@@ -115,8 +138,8 @@ public class MenuManager : MonoBehaviour
             characterInfoPanel[i].SetActive(true);
             nameInfoText[i].text = playerStats[i].playerName;
             characterInfoImage[i].sprite = playerStats[i].characterImage;
-            hpInfoText[i].text = "HP: " + playerStats[i].currentHP + "/" + playerStats[i].maxHP;
-            manaInfoText[i].text = "Mana: " + playerStats[i].currentMana + "/" + playerStats[i].maxMana;
+            hpInfoText[i].text = "Health: " + playerStats[i].currentHP + "/" + playerStats[i].maxHP;
+            manaInfoText[i].text = "Magic: " + playerStats[i].currentMana + "/" + playerStats[i].maxMana;
             //currentXPText[i].text = "Current XP: " + playerStats[i].currentXP;
             playerInfoLevel[i].text = playerStats[i].playerLevel.ToString();
             xpInfoSlider[i].minValue = 0;
@@ -152,8 +175,8 @@ public class MenuManager : MonoBehaviour
         currentlyViewing = playerSelectedNumber;
         PlayerStats playerSelected = playerStats[playerSelectedNumber];
         nameText.text = playerSelected.playerName;
-        hpText.text = "HP: " + playerSelected.currentHP.ToString() + " / " + playerSelected.maxHP;
-        manaText.text = "Mana: " + playerSelected.currentMana.ToString() + " / " + playerSelected.maxMana;
+        hpText.text = "Health: " + playerSelected.currentHP.ToString() + " / " + playerSelected.maxHP;
+        manaText.text = "Magic: " + playerSelected.currentMana.ToString() + " / " + playerSelected.maxMana;
         statDex.text = "Dexterity: " + playerSelected.dexterity.ToString();
         statDef.text = "Defence: " + playerSelected.defence.ToString();
         characterImage.sprite = playerSelected.characterImage;
@@ -170,11 +193,18 @@ public class MenuManager : MonoBehaviour
         }
         xpSlider.maxValue = playerSelected.xpForNextLevel[playerStats[playerSelectedNumber].playerLevel];
         xpText.text = playerSelected.currentXP.ToString() + " / " + playerSelected.xpForNextLevel[playerStats[playerSelectedNumber].playerLevel].ToString();
-        statEquippedWeapon.text = playerSelected.equippedWeaponName;
-        statEquippedArmor.text = playerSelected.equippedArmorName;
+        if (playerSelected.equippedWeaponName != "")
+            statEquippedWeapon.text = playerSelected.equippedWeaponName;
+        else
+            statEquippedWeapon.text = "(Nothing equipped)";
+        if (playerSelected.equippedArmorName != "")
+            statEquippedArmor.text = playerSelected.equippedArmorName;
+        else
+            statEquippedArmor.text = "(Nothing equipped)";
         statWeaponPower.text = "Weapon Power: " + playerSelected.weaponPower.ToString();
         statArmorDefence.text = "Armor Defence: " + playerSelected.armorDefence.ToString();
         speed.text = "Turn Speed: " + playerSelected.turnSpeed.ToString();
+        evasion.text = "Evasion: " + playerSelected.evasion.ToString() + "%";
     }
 
     public void UpdateItemsInventory()
@@ -220,15 +250,22 @@ public class MenuManager : MonoBehaviour
 
     public void UseItem(int characterToUse)
     {
-        if (activeItem)
-        {
-            activeItem.UseItem(characterToUse);
-            OpenCharacterChoicePanel();
-            Inventory.instance.RemoveItem(activeItem);
-            AudioManager.instance.PlaySFX(0);
-            itemDescription.text = "";
-            itemName.text = "";
-        }
+        PlayerStats player = GameManager.instance.GetPlayerStats()[characterToUse];
+        if (activeItem.itemName == player.equippedWeaponName || activeItem.itemName == player.equippedArmorName) { return; }
+        activeItem.UseItem(characterToUse);
+        OpenCharacterChoicePanel();
+        /*string itemlist = "Inventory before use: ";
+        foreach (ItemsManager item in Inventory.instance.GetItemList())
+            itemlist += " ," + item.itemName + " x" + item.amount;
+        print(itemlist);*/
+        Inventory.instance.RemoveItem(activeItem);
+        /*itemlist = "Inventory after use: ";
+        foreach (ItemsManager item in Inventory.instance.GetItemList())
+            itemlist += " ," + item.itemName + " x" + item.amount;
+        print(itemlist);*/
+        AudioManager.instance.PlaySFX(0);
+        itemDescription.text = "";
+        itemName.text = "";
     }
 
     public void OpenCharacterChoicePanel()
@@ -251,6 +288,65 @@ public class MenuManager : MonoBehaviour
         characterChoicePanel.SetActive(false);
     }
 
+    public void FindItem(ItemsManager itemToFind)
+    {        
+        for (int i = 0; i < itemsCollection.Length; i++)
+        {
+            if(itemsCollection[i].itemType == itemToFind.itemType && itemsCollection[i].itemName == itemToFind.itemName)
+            {                
+                MenuManager.instance.activeItem = itemsCollection[i];
+                return;
+            }
+        }
+        var itemList = Inventory.instance.GetItemList();
+        foreach(ItemsManager itemInInventory in itemList)
+        {
+            if(itemInInventory.itemName == itemToFind.itemName)
+            {
+                GameObject itemGO = new GameObject(itemInInventory.itemName);
+                ItemsManager im = itemGO.AddComponent<ItemsManager>();
+
+                im.itemType = itemInInventory.itemType;
+                im.itemName = itemInInventory.itemName;
+                im.itemDescription = itemInInventory.itemDescription;
+                im.valueInCoins = itemInInventory.valueInCoins;
+                im.itemImage = itemInInventory.itemImage;
+                im.amountOfEffect = itemInInventory.amountOfEffect;
+                im.affectType = itemInInventory.affectType;
+                im.weaponDexterity = itemInInventory.weaponDexterity;
+                im.armorDefence = itemInInventory.armorDefence;
+                im.isStackable = itemInInventory.isStackable;
+                im.amount = 1;
+
+                MenuManager.instance.activeItem = im;
+            }  
+        }
+        
+        /*
+        foreach (ItemsManager item in itemList)
+        {
+            if (ItemsAssets.instance.GetItemsAsset(item.itemName) != null)
+            {
+                item.itemName = itemList[0].itemName;
+                *//*var newItem = Instantiate(item);
+                activeItem = newItem;*//*
+            }
+        }*/
+    }
+
+
+    public void OptionsMenu()
+    {
+        toglOptions = !toglOptions;
+        characterPanel.SetActive(false);
+        charInfoList.SetActive(!toglOptions);
+        itemsPanel.SetActive(false);
+        toglStats = false;
+        toglItems = false;
+        optionsPanel.gameObject.SetActive(toglOptions);
+        /*if(PlayerPrefs.HasKey("Difficulty_"))*/
+    }
+
     public void SaveButton()
     {
         GameManager.instance.SaveData();
@@ -270,6 +366,6 @@ public class MenuManager : MonoBehaviour
     public void UpdateQuest(string quest)
     {
         questUpdate.PlayUpdateAnimation(quest);
-        GameManager.instance.UpdateLevels();
+        GameManager.instance.UpdatePlayerLevels();
     }
 }

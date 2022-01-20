@@ -26,6 +26,8 @@ public class PlayerStats : MonoBehaviour
     public int weaponPower;
     public int armorDefence;
     public int turnSpeed;
+    public float evasion;
+    public bool lifestealWeap;
     public ItemsManager equippedWeapon, equippedArmor;
     void Start()
     {
@@ -134,13 +136,21 @@ public class PlayerStats : MonoBehaviour
         equippedWeapon = weaponToEquip;
         equippedWeaponName = equippedWeapon.itemName;
         weaponPower = equippedWeapon.weaponDexterity;
+        if (equippedWeaponName == "Golden Axe")
+            lifestealWeap = true;
+        else
+            lifestealWeap = false;
     }
 
     public void EquipArmor(ItemsManager armorToEquip)
-    {
+    { 
         equippedArmor = armorToEquip;
         equippedArmorName = equippedArmor.itemName;
         armorDefence = equippedArmor.armorDefence;
+        if (equippedArmorName == "Golden Armor")        
+            evasion = 11.5f;        
+        else
+            evasion = 5f;
     }
 
     public void MatchPlayerLevel()

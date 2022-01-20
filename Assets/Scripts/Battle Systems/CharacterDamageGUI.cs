@@ -21,7 +21,13 @@ public class CharacterDamageGUI : MonoBehaviour
 
     public void SetDamage(int damageAmount,bool isCritical)
     {
-        if (isCritical)
+        if(damageAmount == 0)
+        {
+            damageText.text = "Miss!";
+            float jitterAmount = Random.Range(-textVibration, +textVibration);
+            transform.position += new Vector3(jitterAmount, jitterAmount, 0f);
+        }
+        else if (isCritical)
         {
             damageText.text = "Critical Strike " + damageAmount.ToString() + "!";
             float jitterAmount = Random.Range(-textVibration, +textVibration);

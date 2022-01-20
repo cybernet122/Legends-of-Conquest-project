@@ -8,18 +8,38 @@ public class DialogHandler : MonoBehaviour
     [SerializeField] string questToMark;
     [SerializeField] bool markAsComplete, destroyOnFinish;
     [SerializeField] string checkIfComplete;
+    [SerializeField] bool triggerOnEntry;
+    [SerializeField,TooltipAttribute("Remember if the object has been destroyed before(Useful on scene changes).")] 
+    bool rememberDestruction;
     public string[] sentences;
     bool canActivateBox;
+    DialogueBubble dialogueBubble;
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && other.GetComponent<Player>())
         {
             DialogController.instance.ActivateDialog(sentences,GetComponents<DialogHandler>());
 
             canActivateBox = true;
+            //
+            DialogController.instance.npcInRange = true;
+
+            if (shouldTriggerQuest)
+            {
+                DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);
+            }
+            //
             SpokeToSara();
-            ReturnFromMountains();
+            if (triggerOnEntry)
+            {
+                DialogController.instance.triggerOnEntry = true;                
+            }
         }
+    }
+
+    public string ReturnCheckIfCompleteQuest()
+    {
+        return checkIfComplete;
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -27,14 +47,18 @@ public class DialogHandler : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             canActivateBox = false;
-        }    
+            //
+            DialogController.instance.npcInRange = false;
+            //
+        }
     }
 
     private void Update()
     {
-        if(canActivateBox)
+        /*if(canActivateBox)
         {
             DialogController.instance.npcInRange = true;
+
             if (shouldTriggerQuest)
             {
                 DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);
@@ -43,12 +67,22 @@ public class DialogHandler : MonoBehaviour
         else
         { 
             DialogController.instance.npcInRange = false;
-        }
+        }*/
     }
     private void Start()
     {
-        SpokeToSara();
-        Invoke("ReturnFromMountains",0.3f);
+        dialogueBubble = GetComponent<DialogueBubble>();
+
+        /*          SpokeToSara();*/
+        if (GetComponents<DialogHandler>().Length > 1)
+            return;
+        if (PlayerPrefs.GetInt("Destroy_on_start" + name) == 1)
+        {
+            if (triggerOnEntry)
+                Destroy(gameObject);
+            else
+            Destroy(this);
+        }
     }
 
     public void SpokeToSara()
@@ -63,16 +97,25 @@ public class DialogHandler : MonoBehaviour
 
     public void DestroyOnFinish()
     {
-        if(destroyOnFinish)
-            Destroy(this);
+        if (destroyOnFinish)
+        {
+            DialogController.instance.npcInRange = false;
+            if (rememberDestruction)
+            {
+                PlayerPrefs.SetInt("Destroy_on_start"+ name, 1);
+            }
+            if (triggerOnEntry)
+                Destroy(gameObject, 0.3f);
+            Destroy(this,0.2f);
+        }
+        if (dialogueBubble != null)
+            dialogueBubble.CheckForDialogue();
     }
 
-    public void ReturnFromMountains()
+
+
+    public bool ReturnDestroy()
     {
-        var dialogHandlers = GetComponents<DialogHandler>();
-        if (QuestManager.instance.CheckIfComplete(checkIfComplete) && dialogHandlers.Length > 1)
-        {
-            Destroy(dialogHandlers[1]);
-        }
+        return destroyOnFinish;
     }
 }

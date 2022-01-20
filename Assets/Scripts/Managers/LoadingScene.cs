@@ -19,7 +19,14 @@ public class LoadingScene : MonoBehaviour
     IEnumerator LoadScene()
     {
         yield return new WaitForSeconds(waitToLoadTime);
-        SceneManager.LoadScene(PlayerPrefs.GetString("Current_Scene"));
-        GameManager.instance.LoadData();
+        if (PlayerPrefs.HasKey("Current_Scene"))
+        {
+            SceneManager.LoadScene(PlayerPrefs.GetString("Current_Scene"));
+            GameManager.instance.LoadData();
+        }
+        else
+        {
+            SceneManager.LoadScene("Main Menu");
+        }
     }
 }

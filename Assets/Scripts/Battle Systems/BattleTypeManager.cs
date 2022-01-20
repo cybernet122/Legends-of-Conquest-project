@@ -7,5 +7,6 @@ public class BattleTypeManager
 {
     public string[] enemies;
     public int rewardXP;
+    public int rewardGold;
     public ItemsManager[] rewardItems;
 }

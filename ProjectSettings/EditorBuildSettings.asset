@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Main Menu.unity
     guid: fca23cb08254ad74ebbc636263871edb
   - enabled: 1
+    path: Assets/Scenes/Options.unity
+    guid: 66901eb79a498d4478213c51bfd12794
+  - enabled: 1
     path: Assets/Scenes/Loading Scene.unity
     guid: f2e35a5589db43541bded98ea47419cb
   - enabled: 1
@@ -26,6 +29,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Cave.unity
     guid: 465d1321f65b0094483d0ee37e018bab
+  - enabled: 1
+    path: Assets/Scenes/Treasure.unity
+    guid: cf3fd7f7cc6d516468e01f5c6534200e
   - enabled: 1
     path: Assets/Scenes/GameOverScene.unity
     guid: ddb9500a13201ff45abd2dbc7a8d9050

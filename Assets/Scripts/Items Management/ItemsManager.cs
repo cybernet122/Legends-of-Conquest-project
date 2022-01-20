@@ -16,10 +16,17 @@ public class ItemsManager : MonoBehaviour
     bool inRange = false;
     public bool isStackable;
     public int amount;
+    public bool rememberPickup;
     // Start is called before the first frame update
     void Start()
     {
-
+        if(PlayerPrefs.HasKey("PickedUpItem_" + name))
+        {
+            if(PlayerPrefs.GetInt("PickedUpItem_" + name) == 1)
+            {
+                this.gameObject.SetActive(false);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -38,6 +45,8 @@ public class ItemsManager : MonoBehaviour
         {
             AudioManager.instance.PlaySFX(6);
             inRange = true;
+            GameManager.instance.DataToSave("PickedUpItem_" + name);
+
         }
     }
 
@@ -65,19 +74,25 @@ public class ItemsManager : MonoBehaviour
         }
         else if (itemType == ItemType.Weapon)
         {
-            if (selectedCharacter.equippedWeaponName != "")
+            if (selectedCharacter.equippedWeaponName != this.itemName)
             {
-                Inventory.instance.AddItems(selectedCharacter.equippedWeapon,false);
+                if (selectedCharacter.equippedWeaponName != "")
+                {
+                    Inventory.instance.AddItems(selectedCharacter.equippedWeapon, false);
+                }
+                selectedCharacter.EquipWeapon(this);
             }
-            selectedCharacter.EquipWeapon(this);
         }
         else if (itemType == ItemType.Armor)
         {
-            if (selectedCharacter.equippedArmorName != "")
+            if (selectedCharacter.equippedArmorName != this.itemName)
             {
-                Inventory.instance.AddItems(selectedCharacter.equippedArmor,false);
+                if (selectedCharacter.equippedArmorName != "")
+                {
+                    Inventory.instance.AddItems(selectedCharacter.equippedArmor, false);
+                }
+                selectedCharacter.EquipArmor(this);
             }
-            selectedCharacter.EquipArmor(this);
         }
     }
 }

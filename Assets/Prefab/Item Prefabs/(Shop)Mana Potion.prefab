@@ -98,7 +98,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 0
   itemName: Mana Potion
-  itemDescription: This potion will return some Mana used for magic.
+  itemDescription: This magical potion is said to return mana used for magic back
+    to it's user, used among magicians.
   valueInCoins: 15
   itemImage: {fileID: 21300000, guid: 92d7ce39ede8ff54a8231c75c112d3ba, type: 3}
   amountOfEffect: 20
@@ -107,6 +108,7 @@ MonoBehaviour:
   armorDefence: 0
   isStackable: 1
   amount: 1
+  rememberPickup: 0
 --- !u!58 &9025688944254745221
 CircleCollider2D:
   m_ObjectHideFlags: 0

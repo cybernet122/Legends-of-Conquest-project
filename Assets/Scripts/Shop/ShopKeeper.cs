@@ -25,11 +25,17 @@ public class ShopKeeper : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            if(QuestManager.instance.CheckIfComplete("Tell the Innkeeper that you found heroes to help you"))
-            {
-                GetComponent<DialogHandler>().enabled = false;
-                canOpenShop = true;
-            }            
+            CheckForShop();
+        }
+    }
+
+    public void CheckForShop()
+    {
+        if (QuestManager.instance.CheckIfComplete("Return to the Innkeeper") || !GetComponent<DialogHandler>())
+        {
+            /*                Destroy(GetComponent<DialogHandler>());
+            */
+            canOpenShop = true;
         }
     }
 

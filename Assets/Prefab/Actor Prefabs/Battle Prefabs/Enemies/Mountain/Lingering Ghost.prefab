@@ -59,7 +59,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -496,7 +496,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 6467258716441153207}
   m_HandleRect: {fileID: 0}
@@ -612,15 +612,16 @@ MonoBehaviour:
   nameText: {fileID: 7293443428953632303}
   hpValue: {fileID: 5938399851296307647}
   characterName: Lingering Ghost
-  currentHP: 25
-  maxHP: 25
+  currentHP: 40
+  maxHP: 40
   currentMana: 40
   maxMana: 40
   dexterity: 4
   defence: 3
-  weaponPower: 9
+  weaponPower: 8
   armorDefence: 4
-  speed: 5
+  speed: 7
+  evasion: 5
   isDead: 0
   hasPlayed: 0
 --- !u!1 &7747928067750343091

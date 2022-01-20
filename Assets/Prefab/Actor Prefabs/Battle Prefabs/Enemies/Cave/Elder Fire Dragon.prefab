@@ -244,6 +244,14 @@ PrefabInstance:
       propertyPath: m_SortingLayerID
       value: 1852532055
       objectReference: {fileID: 0}
+    - target: {fileID: 2899970099724031815, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
+      propertyPath: m_Interactable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4093938047710053017, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6251913113523142254, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
       propertyPath: m_text
       value: Elder Fire dragon
@@ -295,6 +303,10 @@ PrefabInstance:
     - target: {fileID: 7529201466450985267, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7994106985285677069, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8923934410558148962, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
       propertyPath: m_AnchorMax.x

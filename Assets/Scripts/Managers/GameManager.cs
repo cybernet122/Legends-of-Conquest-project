@@ -9,7 +9,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] PlayerStats[] playerStats;
     public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive, count;
     public int currentGoldCoins;
-    SavingFade savingFade;
+    [SerializeField]SavingFade savingFade;
+
+    List<string> stringsToSave = new List<string>();
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +27,10 @@ public class GameManager : MonoBehaviour
         FillPlayerStats();
         savingFade = FindObjectOfType<SavingFade>();
         count = true;
+        if (SceneManager.GetActiveScene().name == "Mountains")
+        {
+            QuestManager.instance.MountainsQuest();
+        }
     }
 
     // Update is called once per frame
@@ -63,6 +69,10 @@ public class GameManager : MonoBehaviour
         {
             QuestManager.instance.PurgeQuestData();
         }
+/*        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            savingFade = FindObjectOfType<SavingFade>();
+        }*/
     }
 
     IEnumerator Delay(float amount)
@@ -83,16 +93,34 @@ public class GameManager : MonoBehaviour
         FillPlayerStats();
     }
 
-    public void OnLevelWasLoaded()
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneWasSwitched;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneWasSwitched;
+    }
+
+    private void Awake()
     {
         playerStats = new PlayerStats[0];
         Invoke("FillPlayerStats", 0.3f);
         Invoke("CheckForBattleManager", 0.15f);
+        
+    }
+
+    private void OnSceneWasSwitched(Scene scene, LoadSceneMode mode)
+    {
+        /*playerStats = new PlayerStats[0];
+        Invoke("CheckForBattleManager", 0.15f);*/
+        Invoke("FillPlayerStats", 0.3f);
         savingFade = FindObjectOfType<SavingFade>();
-        if (SceneManager.GetActiveScene().name == "Mountains")
+        /*if (SceneManager.GetActiveScene().name == "Mountains")
         {
             QuestManager.instance.MountainsQuest();
-        }
+        }*/
     }
 
     private void CheckForBattleManager()
@@ -133,6 +161,7 @@ public class GameManager : MonoBehaviour
         SavePlayerStats();
         SaveItemInventory();
         PlayerPrefs.SetString("Current_Scene", SceneManager.GetActiveScene().name);
+        
     }
 
     private static void SaveItemInventory()
@@ -179,6 +208,11 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_WeaponPower", playerStats[i].weaponPower);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_ArmorDefence", playerStats[i].armorDefence);
             PlayerPrefs.SetInt("Player_" + playerStats[i].turnSpeed + "_Speed", playerStats[i].turnSpeed);
+            PlayerPrefs.SetFloat("Player_" + playerStats[i].evasion + "_Evasion", playerStats[i].evasion);
+            if (playerStats[i].lifestealWeap)
+                PlayerPrefs.SetInt("Player_lifesteal_", 1);
+            else
+                PlayerPrefs.SetInt("Player_lifesteal_", 0);
         }
         PlayerPrefs.SetInt("Gold_Coins_", currentGoldCoins);
     }
@@ -191,10 +225,6 @@ public class GameManager : MonoBehaviour
             QuestManager.instance.LoadQuestData();
             LoadPlayerStats();
             LoadItemInventory();
-            /*if (PlayerPrefs.GetInt("Spoken_To_Sara") == 1)
-            {
-                DialogController.instance.SpokeToSara();
-            }*/
         }
     }
 
@@ -242,6 +272,11 @@ public class GameManager : MonoBehaviour
             playerStats[i].weaponPower = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_WeaponPower");
             playerStats[i].armorDefence = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_ArmorDefence");
             playerStats[i].turnSpeed = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Speed");
+            playerStats[i].evasion = PlayerPrefs.GetFloat("Player_" + playerStats[i].playerName + "_Evasion");
+            if (PlayerPrefs.GetInt("Player_lifesteal_") == 1)
+                playerStats[i].lifestealWeap = true;
+            else
+                playerStats[i].lifestealWeap = false;
         }
         GameManager.instance.currentGoldCoins = PlayerPrefs.GetInt("Gold_Coins_");
     }
@@ -264,7 +299,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UpdateLevels()
+    public void UpdatePlayerLevels()
     {
         if (QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them"))
         {
@@ -273,5 +308,38 @@ public class GameManager : MonoBehaviour
                 player.MatchPlayerLevel();
             }
         }
+    }
+
+    public int ReturnScene()
+    {
+        return SceneManager.GetActiveScene().buildIndex;
+    }
+
+    public void GameOver()
+    {
+        StartCoroutine(LoadGameOverScene());
+    }
+
+    IEnumerator LoadGameOverScene()
+    {
+        MenuManager.instance.FadeImage();
+        yield return new WaitForSeconds(1f);
+        SceneManager.LoadScene("GameOverScene");    
+    }
+
+    public void DataToSave(string stringToSave)
+    {
+        stringsToSave.Add(stringToSave);
+    }
+
+    public void SaveSecondaryData()
+    {
+        foreach (string data in stringsToSave)
+        {
+            PlayerPrefs.SetInt(data, 1);
+        }
+        stringsToSave.Clear();
+        SavePlayerStats();
+        SaveItemInventory();
     }
 }

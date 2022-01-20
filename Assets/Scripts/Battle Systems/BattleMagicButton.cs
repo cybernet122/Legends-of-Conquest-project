@@ -16,7 +16,10 @@ public class BattleMagicButton : MonoBehaviour
         if (player.currentMana >= spellCost) 
         {
             BattleManager.instance.magicPanel.SetActive(false);
-            BattleManager.instance.OpenTargetPanel(spellName);
+            if (spellName != "Tentacles")
+                BattleManager.instance.OpenTargetPanel(spellName);
+            else
+                BattleManager.instance.AreaOfEffectAttack();
         }
     }
 }

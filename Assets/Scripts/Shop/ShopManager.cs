@@ -29,7 +29,10 @@ public class ShopManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        /*if (Input.GetKeyDown(KeyCode.I))
+        {
+            UpdateItemsInShop(itemSlotBuyContainerParent, itemsForSale, false);
+        }*/
     }
 
     public void OpenShopMenu()
@@ -37,7 +40,7 @@ public class ShopManager : MonoBehaviour
         shopMenu.SetActive(true);
         GameManager.instance.shopMenuOpened = true;
         currentGoldCoinText.text = "Gold coins: " + GameManager.instance.currentGoldCoins;
-        buyPanel.SetActive(true);
+        Invoke("OpenBuyPanel",.1f);
     }
 
     public void CloseShopMenu()

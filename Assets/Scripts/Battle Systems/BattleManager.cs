@@ -1,5 +1,6 @@
 //using System;
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,11 +44,12 @@ public class BattleManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI[] targetName;
     [SerializeField] Transform itemSlotContainerParent;
     [SerializeField] TextMeshProUGUI itemName, itemDescription;
+    [SerializeField] CanvasGroup battleCanvasGroup;
     bool hasActivatedBorder = false;
     GameObject menuBorder;
     List<GameObject> magicButtons = new List<GameObject>();
     int buttonBorderIndex;
-    public int xpRewardAmount;
+    public int xpRewardAmount, goldRewardAmount;
     public ItemsManager[] itemsReward;
     public bool isRewardScreenOpen;
     private bool canFlee;
@@ -55,6 +57,8 @@ public class BattleManager : MonoBehaviour
     public BattleInstantiator battleInstantiator;
     private int screenHeight, screenWidth;
     [SerializeField] Camera cameraToResize;
+    private int musicIndex;
+    private List<BattleCharacters> queueToStun = new List<BattleCharacters>();
     // Start is called before the first frame update
     void Start()
     {
@@ -73,9 +77,11 @@ public class BattleManager : MonoBehaviour
         returnButton.SetActive(false);
         ResizeBackground();
         CheckForCamera();
-       /* screenHeight = Screen.height;
-        screenWidth = Screen.width;*/
-
+        battleCanvasGroup.alpha = 0;
+        /* screenHeight = Screen.height;
+         screenWidth = Screen.width;*/
+        if (Utilities.ReturnSceneName() != "GameOverScene")
+            musicIndex = FindObjectOfType<CamController>().GetMusicIndex();
     }
 
     // Update is called once per frame
@@ -146,7 +152,19 @@ public class BattleManager : MonoBehaviour
             currentTurn = 1;
             UpdateText();
             SortBySpeed();
+            StartCoroutine(FadeTo(1, 1));
             NextTurn();
+        }
+    }
+
+    IEnumerator FadeTo(float aValue, float aTime)
+    {
+        yield return new WaitForSeconds(0.5f);
+        float alpha = battleCanvasGroup.alpha;
+        for (float t = 0.0f; t < 1.0f; t += Time.deltaTime / aTime)
+        {
+            battleCanvasGroup.alpha = Mathf.Lerp(alpha, aValue, t);
+            yield return null;
         }
     }
 
@@ -161,8 +179,8 @@ public class BattleManager : MonoBehaviour
             sliderMana[i].value = players[i].currentMana;
             healthText[i].text = Mathf.Clamp(players[i].currentHP,0,players[i].maxHP).ToString() + " / " + players[i].maxHP.ToString();
             manaText[i].text = Mathf.Clamp(players[i].currentMana, 0, players[i].maxMana).ToString() + " / " + players[i].maxMana.ToString();
-            currentTurnText.text = "Current Turn: " + currentTurn;
         }
+        currentTurnText.text = "Current Turn: " + currentTurn;
     }
 
     private void AddingEnemies(string[] enemiesToSpawn)
@@ -183,16 +201,46 @@ public class BattleManager : MonoBehaviour
                             );
                         activeBattleCharacters.Add(newEnemy);
                         enemies.Add(newEnemy);
+                        DifficultyModifier(newEnemy);
                     }
                 }
             }
         }
+        /*DifficultyModifier();*/
+    }
 
+    private void DifficultyModifier(BattleCharacters enemy)
+    {
+        if (PlayerPrefs.HasKey("Difficulty_"))
+        {
+            var difficulty = PlayerPrefs.GetInt("Difficulty_");
+            float modifier = 1;
+            switch (difficulty)
+            {
+                case 1:
+                    modifier = 0.8f;
+                    break;
+                case 2:
+                    modifier = 1f;
+                    break;
+                case 3:
+                    modifier = 1.25f;
+                    break;
+                default:
+                    Debug.LogWarning("Error in difficulty modifier");
+                    modifier = 1f;
+                    break;
+            }
+            enemy.maxHP = (int)(enemy.maxHP * modifier);
+            enemy.currentHP = enemy.maxHP;
+            enemy.evasion *= modifier;
+        }
     }
 
     private void AddingPlayers()
     {
         PlayerStats[] playerStats = GameManager.instance.GetPlayerStats();
+        int count = 1;
         for (int i = 0; i < playerStats.Length; i++)
         {
             if (playerStats[i].gameObject.activeInHierarchy)
@@ -213,23 +261,25 @@ public class BattleManager : MonoBehaviour
                     }
                 }
             }
+            count = i;
+        }
+        count = 3 - count;
+        for (int i = 1; i <= count; i++)
+        {
+            playerNames[i].transform.parent.gameObject.SetActive(false);
         }
     }
 
     private void ImportPlayerStats(PlayerStats[] playerStats, int i)
     {
         PlayerStats player = playerStats[i];
-        if (player.currentHP <= (player.maxHP * 0.20f))
-        {
-            player.currentHP =(int)(player.maxHP * 0.20f);
-        }
+        if (player.currentHP <= (player.maxHP * 0.20f))        
+            player.currentHP =(int)(player.maxHP * 0.20f);        
         else
             activeBattleCharacters[i].currentHP = player.currentHP;
         activeBattleCharacters[i].maxHP = player.maxHP;
-        if (player.currentMana <= (player.maxMana * 0.20f))
-        {
-            player.currentMana = (int)(player.maxMana * 0.20f);
-        }
+        if (player.currentMana <= (player.maxMana * 0.20f))        
+            player.currentMana = (int)(player.maxMana * 0.20f);        
         else
             activeBattleCharacters[i].currentMana = player.currentMana;
         activeBattleCharacters[i].maxMana = player.maxMana;
@@ -237,6 +287,9 @@ public class BattleManager : MonoBehaviour
         activeBattleCharacters[i].defence = player.defence;
         activeBattleCharacters[i].weaponPower = player.weaponPower;
         activeBattleCharacters[i].armorDefence = player.armorDefence;
+        activeBattleCharacters[i].speed = player.turnSpeed;
+        activeBattleCharacters[i].evasion = player.evasion;
+        activeBattleCharacters[i].lifestealWeap = player.lifestealWeap;
     }
 
     private void SettingUpBattle()
@@ -244,7 +297,6 @@ public class BattleManager : MonoBehaviour
         if (!isBattleActive)
         {
             isBattleActive = true;
-            GameManager.instance.battleIsActive = true;
             transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, transform.position.z);
             //resize sprite renderer to fit camera
             StartCoroutine(ResizeBackground());
@@ -278,6 +330,7 @@ public class BattleManager : MonoBehaviour
             {
                 border[i].SetActive(false);
             }
+            AudioManager.instance.StopMusic();
         }
     }
 
@@ -323,7 +376,10 @@ public class BattleManager : MonoBehaviour
             FillActiveBattleCharacters();
             foreach (BattleCharacters battleCharacters in activeBattleCharacters)
             {
-                battleCharacters.hasPlayed = false;
+                if (!queueToStun.Contains(battleCharacters))
+                    battleCharacters.hasPlayed = false;
+                else
+                    print(battleCharacters + " lost turn.");
             }
             currentTurn++;
             UpdateText();
@@ -377,19 +433,21 @@ public class BattleManager : MonoBehaviour
             print("Victory");
             UpdatePlayerStats(battleCharacters, 0);
             DestroyInstantiator();
-            BattleRewardsHandler.instance.OpenRewardScreen(xpRewardAmount, itemsReward);
+            BattleRewardsHandler.instance.OpenRewardScreen(xpRewardAmount, itemsReward, goldRewardAmount, true);
             QuestManager.instance.MountainsQuest();
         }
         else if (friendlies == 0 && Enemies > 0)
         {
-            print("Defeat");
-            UpdatePlayerStats(battleCharacters,1);
+            GameManager.instance.GameOver();
+            /*print("Defeat");
+            UpdatePlayerStats(battleCharacters,1);*/
         }
         else
         {
             return;
         }
         battleScene.SetActive(false);
+        battleCanvasGroup.alpha = 0;
         isBattleActive = false;
         players.Clear();
         enemies.Clear();
@@ -400,6 +458,7 @@ public class BattleManager : MonoBehaviour
         }
         StopAllCoroutines();
         currentTurn = 1;
+        //AudioManager.instance.PlayBackgroundMusic(musicIndex);
     }
 
     private void DestroyInstantiator()
@@ -469,8 +528,7 @@ public class BattleManager : MonoBehaviour
     {
         activeBattleCharacters.Sort(delegate (BattleCharacters x, BattleCharacters y)
         {
-            if (x.speed == null || y.speed == null) return 0;
-            else return x.speed.CompareTo(y.speed);
+            return x.speed.CompareTo(y.speed);
         });
         activeBattleCharacters.Reverse();
     }
@@ -529,25 +587,21 @@ public class BattleManager : MonoBehaviour
         enemyAttacking.hasPlayed = true;
         int selectedAttack = Random.Range(0, enemyAttacking.AttackMovesAvailable().Length);
         int movePower = 0;
-        
+        BattleMoves attack;
+        int x = 0;
         for (int i = 0; i < battleMovesList.Length; i++)
         {
             if (battleMovesList[i].moveName == enemyAttacking.AttackMovesAvailable()[selectedAttack])
             {
-                print("Enemy attacking with " + battleMovesList[i].moveName);
-/*                else if (battleMovesList[i].moveName == "Blood drain")
-                {
-                    Instantiate(
-                    battleMovesList[i].effectToUse,
-                    new Vector3(selectedPlayerToAttack.transform.position.x + 2, selectedPlayerToAttack.transform.position.y, transform.position.z),
-                    selectedPlayerToAttack.transform.rotation);
-                    selectedPlayerToAttack.
-                }
-*/              
-                movePower = InstantiatingEffect(selectedPlayerToAttack,enemyAttacking, i);
+                print(enemyAttacking + " attacking with " + battleMovesList[i].moveName);
+                x = i;
+                if (Evade(selectedPlayerToAttack, enemyAttacking))
+                    return;
+                movePower = InstantiatingEffect(selectedPlayerToAttack, enemyAttacking, i);
             }
+
         }
-        var attack = battleMovesList[selectedAttack];
+        attack = battleMovesList[x];
         StartCoroutine(DealDamageToCharacters(selectedPlayerToAttack,enemyAttacking, movePower, attack));
     }
 
@@ -581,22 +635,88 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator DealDamageToCharacters(BattleCharacters selectedCharacterToAttack,BattleCharacters characterAttacking, int movePower, BattleMoves attack)
     {
-        float attackPower = characterAttacking.dexterity + characterAttacking.weaponPower;
-        float defenceAmount = selectedCharacterToAttack.defence + selectedCharacterToAttack.armorDefence;
-        float damageAmount = (attackPower / defenceAmount) * movePower * Random.Range(0.9f, 1.1f);
-        int damageToGive = (int)damageAmount;
-        damageToGive = CriticalStrike(damageToGive, selectedCharacterToAttack.transform);
-        Debug.Log(characterAttacking.characterName + " did " + damageToGive + " damage to " + selectedCharacterToAttack);
-        yield return new WaitForSeconds(0.5f);
-        if (attack.moveName == "Blood drain")
+        float attackPower;
+        if(attack.moveName == "Shockwave")
         {
-            int heal = damageToGive / 2;
-            if (!characterAttacking.IsPlayer())
-                heal /= 2;
-            characterAttacking.AddHP(heal);
-            print("Healed " + characterAttacking + " for " + heal);
+            attackPower = characterAttacking.dexterity * 0.75f + characterAttacking.weaponPower * 0.6f;
         }
-        selectedCharacterToAttack.TakeHpDamage(damageToGive);
+        else
+        {
+            attackPower = characterAttacking.dexterity * 0.8f + characterAttacking.weaponPower;
+        }
+        if (attack.moveName == "Tentacles")
+        {
+            if (characterAttacking.IsPlayer())
+            {
+                foreach (BattleCharacters enemy in enemies)
+                {
+                    int damage = (int)(attackPower / (enemy.defence + enemy.armorDefence) * movePower * Random.Range(0.9f, 1.1f));                    
+                    if(!Evade(enemy,characterAttacking))
+                    {
+                        enemy.TakeHpDamage(damage);
+                        DamageText(damage, false, enemy.transform);
+                        Debug.Log(characterAttacking.characterName + " did " + damage + " damage to " + selectedCharacterToAttack);
+                    }
+                }
+                yield return new WaitForSeconds(0.5f);
+                yield return null;
+            }
+            else if(!characterAttacking.IsPlayer())
+            {
+                foreach (BattleCharacters player in players)
+                {
+                    int damage = (int)(attackPower / (player.defence + player.armorDefence) * movePower * Random.Range(0.9f, 1.1f));
+                    if (!Evade(player,characterAttacking))
+                    {
+                        player.TakeHpDamage(damage);
+                        DamageText(damage, false, player.transform);
+                        Debug.Log(characterAttacking.characterName + " did " + damage + " damage to " + selectedCharacterToAttack);
+                    }
+                }
+                yield return new WaitForSeconds(0.5f);
+                yield return null;
+            }
+        }
+        else
+        {
+            float defenceAmount = selectedCharacterToAttack.defence + selectedCharacterToAttack.armorDefence;
+            float damageAmount = (attackPower / defenceAmount) * movePower * Random.Range(0.9f, 1.1f);
+            int damageToGive = (int)damageAmount;
+            damageToGive = CriticalStrike(damageToGive, selectedCharacterToAttack.transform);
+            Debug.Log(characterAttacking.characterName + " did " + damageToGive + " damage to " + selectedCharacterToAttack);
+            yield return new WaitForSeconds(0.5f);
+            if (attack.moveName == "Shockwave" && characterAttacking.IsPlayer())
+            {
+                if (characterAttacking.lifestealWeap)
+                {
+                    int heal = damageToGive / 2;
+                    characterAttacking.AddHP(heal);
+                    print("Player recieved " + heal + " from lifesteal");
+                } 
+            }
+            if (attack.moveName == "Blood drain")
+            {
+                int heal = damageToGive / 2;
+                characterAttacking.AddHP(heal);
+                print("Healed " + characterAttacking + " for " + heal);
+            }
+            selectedCharacterToAttack.TakeHpDamage(damageToGive);
+        }
+    }
+
+    private bool Evade(BattleCharacters target,BattleCharacters characterAttacking)
+    {
+        float chanceToHit = Random.Range(0f, 1f);        
+        if ((target.evasion / 100) < chanceToHit)
+        {            
+            return false;
+        }
+        else
+        {
+            Debug.Log(characterAttacking.characterName + " Missed!");
+            DamageText(0, false, target.transform);
+            return true;
+        }
     }
 
     private int CriticalStrike(int damage,Transform position)
@@ -634,7 +754,8 @@ public class BattleManager : MonoBehaviour
                 attack = battleMovesList[i];
             }
         }
-        StartCoroutine(DealDamageToCharacters(selectEnemyTarget,playerAttacking, movePower, attack));
+        if (!Evade(selectEnemyTarget, playerAttacking))
+            StartCoroutine(DealDamageToCharacters(selectEnemyTarget,playerAttacking, movePower, attack));
         activeBattleCharacters[0].hasPlayed = true;
         activeBattleCharacters.RemoveAt(0);
         waitingForTurn = false;
@@ -658,7 +779,7 @@ public class BattleManager : MonoBehaviour
                 battleMovesList[i].effectToUse,
                 new Vector3(selectEnemyTarget.transform.position.x + 2, selectEnemyTarget.transform.position.y, transform.position.z),
                 selectEnemyTarget.transform.rotation);
-                battleMove.transform.localScale = new Vector3(-1, 1);
+                battleMove.transform.localScale = new Vector3(1, 1);
             }
             else
             {
@@ -677,7 +798,33 @@ public class BattleManager : MonoBehaviour
             if (rng > 0.5f)
             {
                 print("Succesfully stunned " + selectEnemyTarget.characterName);
-                activeBattleCharacters.Remove(selectEnemyTarget);
+                if (activeBattleCharacters.Contains(selectEnemyTarget))
+                    activeBattleCharacters.Remove(selectEnemyTarget);
+                else
+                    queueToStun.Add(selectEnemyTarget);
+            }
+        }
+        else if(battleMovesList[i].moveName == "Tentacles")
+        {
+            if (characterAttacking.IsPlayer())
+            {
+                foreach (BattleCharacters enemy in enemies)
+                {
+                    Instantiate(
+                    battleMovesList[i].effectToUse,
+                    enemy.transform.position,
+                    enemy.transform.rotation);
+                }
+            }
+            else
+            {
+                foreach (BattleCharacters player in players)
+                {
+                    Instantiate(
+                    battleMovesList[i].effectToUse,
+                    player.transform.position,
+                    player.transform.rotation);
+                }
             }
         }
         else
@@ -691,6 +838,18 @@ public class BattleManager : MonoBehaviour
         return movePower;
     }
 
+    public void AreaOfEffectAttack()
+    {
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            if (!enemies[i].IsPlayer() && enemies[i].isDead)
+            {
+                enemies.RemoveAt(i);
+            }
+        }
+        PlayerAttack("Tentacles", enemies[0]);
+    }
+
     public void OpenTargetPanel(string moveName)
     {
         returnButton.GetComponent<RectTransform>().localPosition = new Vector3(-880f, -238, 0);
@@ -700,8 +859,7 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < enemies.Count; i++)
         {
             if (!enemies[i].IsPlayer() && enemies[i].isDead)
-            {
-                /*targetButtons[i].button.gameObject.SetActive(false);*/
+            {                
                 enemies.RemoveAt(i);
             }
         }
@@ -716,6 +874,8 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
+                targetButtons[i].moveName = "";
+                //targetButtons[i].targetName.text = "";
                 targetButtons[i].activeBattleTarget = null;
                 targetButtons[i].button.gameObject.SetActive(false);
             }
@@ -817,7 +977,7 @@ public class BattleManager : MonoBehaviour
                     magicButton.spellNameText.text = magicButton.spellName;
                     if (activeBattleCharacters[0].currentMana < battleMovesList[i].manaCost)
                     {
-                        magicButton.GetComponent<Image>().color = new Color(1, 1, 1, 0.75f);
+                        magicButton.GetComponentInChildren<Image>().color = new Color(1, 1, 1, 0.75f);
                     }
                     magicButtons.Add(magicButton.gameObject);
                 }
@@ -925,9 +1085,9 @@ public class BattleManager : MonoBehaviour
         itemName.text = item.itemName;
 
         if (selectedItem.itemType == ItemsManager.ItemType.Weapon)
-            itemDescription.text = item.itemDescription + "(Adds: " + selectedItem.weaponDexterity + " weapon power)";
+            itemDescription.text = item.itemDescription;
         else if (selectedItem.itemType == ItemsManager.ItemType.Armor)
-            itemDescription.text = item.itemDescription + "(Adds: " + selectedItem.armorDefence + " armor defence)";
+            itemDescription.text = item.itemDescription;
         else if (selectedItem.affectType == ItemsManager.AffectType.HP || selectedItem.affectType == ItemsManager.AffectType.Mana && selectedItem.itemType == ItemsManager.ItemType.Item)
             itemDescription.text = item.itemDescription + "(Adds: " + selectedItem.amountOfEffect + " " + selectedItem.affectType + ")";
         else itemDescription.text = item.itemDescription;
@@ -936,6 +1096,12 @@ public class BattleManager : MonoBehaviour
     public void UseItem(int index)
     {
         players[index].UseItemInBattle(selectedItem);
+        if (selectedItem.itemName == "Golden Axe")
+            players[index].lifestealWeap = true;
+        else players[index].lifestealWeap = false;
+        if (selectedItem.itemName == "Golden Armor")
+            players[index].evasion = 11.5f;
+        else players[index].evasion = 5f;
         Inventory.instance.RemoveItem(selectedItem);
         UpdateText();
         UseItemEndTurn();
@@ -962,6 +1128,10 @@ public class BattleManager : MonoBehaviour
         if (selectedItem)
         {
             characterChoicePanel.SetActive(true);
+            for (int i = 0; i < targetButton.Length; i++)
+            {
+                targetButton[i].SetActive(false);
+            }
             for (int i = 0; i < players.Count; i++)
             {
                 if (!players[i].isDead)

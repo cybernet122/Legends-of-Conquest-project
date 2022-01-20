@@ -13,12 +13,12 @@ public class QuestManager : MonoBehaviour
     void Start()
     {
         instance = this;
-        if (questMarkersCompleted.Length <= 0)
+/*        if (questMarkersCompleted.Length <= 0)
         {
             questMarkersCompleted = new bool[questNames.Length];
             LoadQuestData();
         }
-        count = GetQuestNumber(GetCurrentQuest());
+        count = GetQuestNumber(GetCurrentQuest());*/
     }
 
     private void Update()
@@ -37,15 +37,37 @@ public class QuestManager : MonoBehaviour
 
     private void AdvanceQuest()
     {
-        MarkQuestComplete(questNames[count]);
-        questMarkersCompleted[count] = !questMarkersCompleted[count];
-        count++;        
-        print(GetCurrentQuest());
+        for (count = 0; count < questMarkersCompleted.Length; count++)
+        {
+            if (questMarkersCompleted[count] == false)
+            {
+                questMarkersCompleted[count] = true;
+                break;
+            }
+
+        }
+        SaveQuestData();
     }
 
-    private void OnLevelWasLoaded()
+    private void OnEnable()
     {
-        Invoke("LoadQuestData", 0.15f);
+        SceneManager.sceneLoaded += OnSceneWasSwitched;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneWasSwitched;
+    }
+
+    private void OnSceneWasSwitched(Scene scene, LoadSceneMode mode)
+    {
+        if (questMarkersCompleted.Length <= 0)
+        {
+            questMarkersCompleted = new bool[questNames.Length];
+            LoadQuestData();
+        }
+        count = GetQuestNumber(GetCurrentQuest());
+
     }
 
     public int GetQuestNumber(string questToFind)
@@ -87,12 +109,14 @@ public class QuestManager : MonoBehaviour
     public void MarkQuestComplete(string questToMark)
     {
         int questNumberToCheck = GetQuestNumber(questToMark);
-        questMarkersCompleted[questNumberToCheck] = true;
+        questMarkersCompleted[questNumberToCheck] = !questMarkersCompleted[questNumberToCheck];
         PlayerPrefs.SetInt("QuestMarker_" + questToMark , 1);
         GameManager.instance.SaveData();
-        MenuManager.instance.UpdateQuest(GetCurrentQuest());
+        if(!questMarkersCompleted[questMarkersCompleted.Length-1])
+            MenuManager.instance.UpdateQuest(GetCurrentQuest());
         UpdateQuestObjects();
-  
+        if(questMarkersCompleted[questMarkersCompleted.Length-1])
+            StartCoroutine(EndGame());
     }
 
     public void MarkQuestInComplete(string questToMark)
@@ -149,33 +173,58 @@ public class QuestManager : MonoBehaviour
 
     public void MountainsQuest()
     {
-        if (CheckIfComplete("Kill the monsters in the mountains"))
-        {
-            print("failed");
-            return;
-        }
-        else
-        {
-            var battleInstantiators = FindObjectsOfType<BattleInstantiator>();
-            print("Fights left: " + battleInstantiators.Length);
 
-            if(battleInstantiators.Length <= 0)
+        if (GameManager.instance.ReturnScene() == 5)
+        {
+            if (CheckIfComplete("Kill the monsters in the mountains"))
             {
-                print("Quest Completed");
-                MarkQuestComplete("Kill the monsters in the mountains");
+                var battleInstantiators = FindObjectsOfType<BattleInstantiator>();
+                for (int i = 0; i < battleInstantiators.Length; i++)
+                {
+                    Destroy(battleInstantiators[i].gameObject);
+                }
+                return;
+            }
+            else
+            {
+                var battleInstantiators = FindObjectsOfType<BattleInstantiator>();
+                print("Fights left: " + battleInstantiators.Length);
+
+                if (battleInstantiators.Length <= 0)
+                {
+                    print("Quest Completed");
+                    MarkQuestComplete("Kill the monsters in the mountains");
+                }
             }
         }
     }
+
+    IEnumerator EndGame()
+    {
+        for(int i = 0; i < questMarkersCompleted.Length; i++)
+        {
+            if (questMarkersCompleted[i] == false)
+            {
+                yield return null;
+            }
+        }
+        print("test");
+        MenuManager.instance.FadeImage();
+        yield return new WaitForSeconds(1);
+        SceneManager.LoadScene("Treasure");
+    }
+
+    [ContextMenu("Purge Save Data")]
 
     public void PurgeQuestData()
     {
         print("Purging quest data");
         for (int i = 0; i < questNames.Length; i++)
         {
-            questMarkersCompleted[i] = false;
+            questMarkersCompleted = new bool[questNames.Length]; 
             PlayerPrefs.DeleteKey("QuestMarker_" + questNames[i]);
         }
         count = 0;
-
+        SaveQuestData();
     }
 }

@@ -78,7 +78,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 5096552857344850612}
   m_HandleRect: {fileID: 0}
@@ -149,7 +149,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -269,15 +269,16 @@ MonoBehaviour:
   nameText: {fileID: 7755753918123578808}
   hpValue: {fileID: 1746939623038942347}
   characterName: Spying Eyeball
-  currentHP: 40
-  maxHP: 40
+  currentHP: 50
+  maxHP: 50
   currentMana: 20
   maxMana: 20
   dexterity: 5
   defence: 2
   weaponPower: 10
   armorDefence: 2
-  speed: 5
+  speed: 7
+  evasion: 5
   isDead: 0
   hasPlayed: 0
 --- !u!1 &7027322883580976834
@@ -744,7 +745,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

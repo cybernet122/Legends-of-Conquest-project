@@ -98,7 +98,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemType: 0
   itemName: HP Potion
-  itemDescription: This potion will return some Health that was lost.
+  itemDescription: This magical potion returns Health to the user, healing his or
+    hers wounds.
   valueInCoins: 7
   itemImage: {fileID: 21300000, guid: 8f09f7d370e20aa4fb77ada599db50b0, type: 3}
   amountOfEffect: 50
@@ -107,6 +108,7 @@ MonoBehaviour:
   armorDefence: 0
   isStackable: 1
   amount: 1
+  rememberPickup: 0
 --- !u!58 &557758462159751240
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -20,25 +20,29 @@ public class DialogController : MonoBehaviour
     [SerializeField]bool markTheQuestComplete ,shouldMarkQuest;
     bool isTyping = false;
     bool checkingSkip = false;
+    public bool triggerOnEntry = false;
     public bool npcInRange = false;
     public float count = 0;
     private string npcName;
     [SerializeField] DialogHandler[] dialogHandler;
+    bool advance;
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
         dialogBox.SetActive(false);
+        Invoke("ReturnFromMountains",0.3f);
     }
 
     IEnumerator ProcessWindowDialog()
     {
-
         //dialogText.text = dialogSentences[currentSentence];
 
-        if (Input.GetButtonUp("Fire1") && !isTyping)
+        advance = Input.GetButtonUp("Fire1") || Input.GetButtonUp("Fire2");
+        if (advance && !isTyping || triggerOnEntry)
         {
             dialogBox.SetActive(true);
+            triggerOnEntry = false;
             GameManager.instance.dialogBoxOpened = true;
             if (dialogSentences.Length > currentSentence)
             {
@@ -52,8 +56,8 @@ public class DialogController : MonoBehaviour
                 if (shouldMarkQuest)
                 {
                     if (markTheQuestComplete)
-                    {           
-                        if(!QuestManager.instance.CheckIfComplete(questToMark))
+                    {
+                        if (!QuestManager.instance.CheckIfComplete(questToMark))
                             QuestManager.instance.MarkQuestComplete(questToMark);
                     }
                     else
@@ -61,22 +65,76 @@ public class DialogController : MonoBehaviour
                         QuestManager.instance.MarkQuestInComplete(questToMark);
                     }
                 }
-                dialogHandler[0].DestroyOnFinish();
+                /*if(dialogHandler.Length > 1)*/
+                dialogHandler[dialogHandler.Length - 1].DestroyOnFinish();
+/*                string[] dialogSentences = new string[0];*/
+                AdvanceDialogue();
+                MultipleDialogues();
+                ReturnFromMountains();
                 currentSentence = 0;
                 dialogText.text = null;
                 count = 0;
-                if (dialogHandler.Length > 1)
-                {
-                    if(dialogHandler[0].name == "Sara the Healer")
-                    {
-                        PlayerPrefs.SetInt("Spoke_To_Sara", 1);
-                        Destroy(dialogHandler[1]);
-                        dialogHandler = new DialogHandler[1];
-                    }
-                }
             }
         }
         yield return new WaitForEndOfFrame();
+    }
+
+    private void MultipleDialogues()
+    {
+        if (dialogHandler.Length > 1)
+        {
+            dialogHandler[1].DestroyOnFinish();            
+            if (dialogHandler[0].name == "Sara the Healer")
+            {
+                PlayerPrefs.SetInt("Spoke_To_Sara", 1);
+            }
+        }
+    }
+
+    private void ReturnFromMountains()
+    {
+        if (GameManager.instance.ReturnScene() == 3)
+        {
+            var shopkeeper = FindObjectOfType<ShopKeeper>();
+            if (Utilities.ReturnSceneName() != "Shop")
+                return;
+            var dialogHandlers = shopkeeper.GetComponents<DialogHandler>();
+            /*if (QuestManager.instance.CheckIfComplete("Speak to the Innkeeper") && dialogHandlers.Length > 1)
+            {
+                Destroy(dialogHandlers[1]);
+                dialogHandler = new DialogHandler[1];
+                dialogHandlers[0].enabled = true;
+            }*/            
+            if (QuestManager.instance.CheckIfComplete("Kill the monsters in the mountains") && dialogHandlers.Length >= 1)
+            {
+                if (dialogHandlers.Length > 1)
+                {
+                    Destroy(dialogHandlers[1]);
+                    dialogHandlers[0].enabled = true;
+                }
+            }
+            if(QuestManager.instance.CheckIfComplete("Return to the Innkeeper"))
+            {
+                foreach(DialogHandler dialog in dialogHandlers)
+                {
+                    Destroy(dialog);
+                }
+                dialogSentences = new string[0];
+                shopkeeper.CheckForShop();
+            }
+        }
+    }
+
+    private void AdvanceDialogue()
+    {
+        if (dialogHandler.Length > 1)
+        {
+            if(dialogHandler[0].name == "ShopKeeper NPC") { return; }
+            var dialogue = dialogHandler[0];
+            dialogHandler = new DialogHandler[1] { dialogHandler[0] = dialogue };
+            dialogSentences = dialogHandler[0].sentences;
+        }
+
     }
 
     IEnumerator PrintText()
@@ -109,19 +167,15 @@ public class DialogController : MonoBehaviour
         }
         if (!npcInRange)
         {
-            if(markTheQuestComplete == true || questToMark != "" || shouldMarkQuest == true)
+            if (markTheQuestComplete == true || questToMark != "" || shouldMarkQuest == true || triggerOnEntry == true)
             {
                 markTheQuestComplete = false;
                 questToMark = "";
                 shouldMarkQuest = false;
-                DialogController.instance.dialogHandler = new DialogHandler[1];
+                triggerOnEntry = false;
+                dialogHandler = new DialogHandler[0];
             }
         }
-        /*if (Input.GetKeyDown(KeyCode.Delete))
-        {
-            Destroy(dialogHandler[0].GetComponent<DialogHandler>());
-
-        }*/
     }
 
     IEnumerator CountDown()
@@ -135,7 +189,7 @@ public class DialogController : MonoBehaviour
         if (npcInRange)
         {
             StartCoroutine(ProcessWindowDialog());
-            if (Input.GetButtonUp("Fire1") && dialogSentences.Length <= currentSentence)
+            if (advance && dialogSentences.Length <= currentSentence)
             {
                 currentSentence = 0;                
             }
@@ -154,7 +208,7 @@ public class DialogController : MonoBehaviour
         if (isTyping)
         {
             dialogSkipTimer += Time.deltaTime;
-            if (Input.GetButtonUp("Fire1") && dialogSkipTimer > dialogSkipDelay)
+            if (advance && dialogSkipTimer > dialogSkipDelay)
             {
                 checkingSkip = true;
                 dialogSkipTimer = 0;
@@ -187,11 +241,6 @@ public class DialogController : MonoBehaviour
                 }
             }
             currentSentence++;
-        }
-        
-        else
-        {
-            return;
         }
     }
 

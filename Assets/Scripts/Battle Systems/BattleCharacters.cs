@@ -12,6 +12,8 @@ public class BattleCharacters : MonoBehaviour
     [SerializeField] TextMeshProUGUI nameText,hpValue;
     public string characterName;
     public int currentHP, maxHP, currentMana, maxMana, dexterity, defence, weaponPower, armorDefence, speed;
+    public float evasion;
+    public bool lifestealWeap;
     public bool isDead;
     public bool hasPlayed;
     bool fadeOut = false;

@@ -116,6 +116,7 @@ MonoBehaviour:
   weaponPower: 45
   armorDefence: 30
   speed: 7
+  evasion: 5
   isDead: 0
   hasPlayed: 0
 --- !u!1001 &3031550060038364047
@@ -252,6 +253,10 @@ PrefabInstance:
     - target: {fileID: 2869029283390794465, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
       propertyPath: m_SortingLayerID
       value: 1852532055
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899970099724031815, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
+      propertyPath: m_Interactable
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6251913113523142254, guid: 1a4aec2f3d144be4c926e42272d7f0a5, type: 3}
       propertyPath: m_fontSize

@@ -189,16 +189,18 @@ MonoBehaviour:
   baseLevelXP: 100
   hpToAdd: 10
   maxHP: 65
-  currentHP: 30
-  maxMana: 30
-  currentMana: 30
+  currentHP: 65
+  maxMana: 40
+  currentMana: 40
   addXP: 1000
   dexterity: 10
-  defence: 30
+  defence: 20
   equippedWeaponName: 
   equippedArmorName: 
   weaponPower: 0
   armorDefence: 0
-  turnSpeed: 0
+  turnSpeed: 9
+  evasion: 5
+  lifestealWeap: 0
   equippedWeapon: {fileID: 0}
   equippedArmor: {fileID: 0}

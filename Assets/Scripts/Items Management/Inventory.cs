@@ -63,7 +63,7 @@ public class Inventory : MonoBehaviour
                     invetoryItem = itemInInventory;
                 }
             }
-            if (invetoryItem != null && invetoryItem.amount <= 0)
+            if (/*invetoryItem != null &&*/ invetoryItem.amount <= 0) //may break
             {
                 itemsList.Remove(invetoryItem);
             }

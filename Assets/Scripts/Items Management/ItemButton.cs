@@ -15,7 +15,10 @@ public class ItemButton : MonoBehaviour
         {
             MenuManager.instance.itemName.text = itemOnButton.itemName;
             MenuManager.instance.itemDescription.text = itemOnButton.itemDescription;
-            MenuManager.instance.activeItem = itemOnButton;
+            if (itemOnButton != null)
+                MenuManager.instance.activeItem = itemOnButton;
+            else
+                MenuManager.instance.FindItem(itemOnButton);
         }
         else if (ShopManager.instance.shopMenu.activeInHierarchy)
         {

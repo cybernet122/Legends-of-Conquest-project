@@ -428,7 +428,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -547,15 +547,16 @@ MonoBehaviour:
   nameText: {fileID: 5839568925908128311}
   hpValue: {fileID: 5413733803808265694}
   characterName: Devouring Slime
-  currentHP: 40
+  currentHP: 60
   maxHP: 40
   currentMana: 15
   maxMana: 15
   dexterity: 4
   defence: 4
-  weaponPower: 8
+  weaponPower: 7
   armorDefence: 4
-  speed: 4
+  speed: 5
+  evasion: 5
   isDead: 0
   hasPlayed: 0
 --- !u!1 &8069982998579370648
@@ -653,7 +654,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -747,7 +748,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 1639692997823179717}
   m_HandleRect: {fileID: 0}
