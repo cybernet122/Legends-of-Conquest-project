@@ -6,7 +6,7 @@ public class AttackEffect : MonoBehaviour
 {
     [SerializeField] float effectTime;
     [SerializeField] int SFXNumberToPlay;
-
+    public string abilityInfo;
     // Start is called before the first frame update
     void Start()
     {

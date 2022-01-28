@@ -22,8 +22,11 @@ public class MenuManager : MonoBehaviour
     [SerializeField] GameObject characterChoicePanel, warningPanel;
     [SerializeField] TextMeshProUGUI[] itemsCharacterChoiceNames;
     [SerializeField] VerticalLayoutGroup characterButtons;
+    [SerializeField] HorizontalLayoutGroup abilities;
+    [SerializeField] Image[] abilitiesIcons; 
     [SerializeField] QuestUpdate questUpdate;
     [SerializeField] GameObject optionsPanel;
+    [SerializeField] AbilityInfoManager abilityInfoManager;
 
     public static MenuManager instance;
     public TextMeshProUGUI itemName,itemDescription;
@@ -99,6 +102,8 @@ public class MenuManager : MonoBehaviour
     {
         toglItems = !toglItems;
         UpdateStats();
+        if (characterChoicePanel.activeInHierarchy)
+            characterChoicePanel.SetActive(false);
         characterPanel.SetActive(false);
         optionsPanel.SetActive(false);
         charInfoList.SetActive(!toglItems);
@@ -110,16 +115,22 @@ public class MenuManager : MonoBehaviour
     public void ToggleStats()
     {
         toglStats = !toglStats;
-        UpdateStats();
+
+        if (characterChoicePanel.activeInHierarchy)
+            characterChoicePanel.SetActive(false);
         itemsPanel.SetActive(false);
         optionsPanel.SetActive(false);
         charInfoList.SetActive(!toglStats);
         toglOptions = false;
         toglItems = false;
-        if(GameManager.instance.GetPlayerStats().Length == 1)
-            characterButtons.childControlHeight = false;
-        else
-            characterButtons.childControlHeight = true;
+        if (toglStats)
+        {
+            UpdateStats();
+            if (GameManager.instance.GetPlayerStats().Length == 1)
+                characterButtons.childControlHeight = false;
+            else
+                characterButtons.childControlHeight = true;
+        }
         characterPanel.SetActive(toglStats);
         GameManager.instance.gameMenuOpened = toglStats;
     }
@@ -132,9 +143,9 @@ public class MenuManager : MonoBehaviour
             foreach (GameObject characterPanel in characterInfoPanel)
                 characterPanel.SetActive(false);
         }
-        for (int i = 0;i< playerStats.Length; i++)
+        for (int i = 0; i < playerStats.Length; i++)
         {
-            if(characterInfoPanel.Length <= i) { break; }
+            if (characterInfoPanel.Length <= i) { break; }
             characterInfoPanel[i].SetActive(true);
             nameInfoText[i].text = playerStats[i].playerName;
             characterInfoImage[i].sprite = playerStats[i].characterImage;
@@ -146,14 +157,14 @@ public class MenuManager : MonoBehaviour
             xpInfoSlider[i].value = playerStats[i].currentXP;
             xpInfoSlider[i].maxValue = playerStats[i].xpForNextLevel[playerStats[i].playerLevel];
             xpInfoText[i].text = playerStats[i].currentXP.ToString() + " / " + playerStats[i].xpForNextLevel[playerStats[i].playerLevel].ToString();
-            if (playerStats[i].playerLevel >= playerStats[i].maxLevel) 
+            if (playerStats[i].playerLevel >= playerStats[i].maxLevel)
             {
                 xpInfoSlider[i].minValue = 0;
                 xpInfoSlider[i].value = 1;
                 xpInfoSlider[i].maxValue = 1;
                 xpInfoText[i].text = "0 / 0";
                 currentXPText[i].text = "";
-                return; 
+                return;
             }
         }
         StatsMenu();
@@ -162,7 +173,7 @@ public class MenuManager : MonoBehaviour
 
     public void StatsMenu()
     {
-        for(int i=0; i < playerStats.Length; i++)
+        for (int i = 0; i < playerStats.Length; i++)
         {
             statsButtons[i].SetActive(true);
             statsButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = playerStats[i].playerName;
@@ -205,6 +216,7 @@ public class MenuManager : MonoBehaviour
         statArmorDefence.text = "Armor Defence: " + playerSelected.armorDefence.ToString();
         speed.text = "Turn Speed: " + playerSelected.turnSpeed.ToString();
         evasion.text = "Evasion: " + playerSelected.evasion.ToString() + "%";
+        abilityInfoManager.SetAbilitiesOfCharacter(playerSelected);
     }
 
     public void UpdateItemsInventory()
@@ -254,15 +266,7 @@ public class MenuManager : MonoBehaviour
         if (activeItem.itemName == player.equippedWeaponName || activeItem.itemName == player.equippedArmorName) { return; }
         activeItem.UseItem(characterToUse);
         OpenCharacterChoicePanel();
-        /*string itemlist = "Inventory before use: ";
-        foreach (ItemsManager item in Inventory.instance.GetItemList())
-            itemlist += " ," + item.itemName + " x" + item.amount;
-        print(itemlist);*/
         Inventory.instance.RemoveItem(activeItem);
-        /*itemlist = "Inventory after use: ";
-        foreach (ItemsManager item in Inventory.instance.GetItemList())
-            itemlist += " ," + item.itemName + " x" + item.amount;
-        print(itemlist);*/
         AudioManager.instance.PlaySFX(0);
         itemDescription.text = "";
         itemName.text = "";
@@ -340,6 +344,8 @@ public class MenuManager : MonoBehaviour
         toglOptions = !toglOptions;
         characterPanel.SetActive(false);
         charInfoList.SetActive(!toglOptions);
+        if (characterChoicePanel.activeInHierarchy)
+            characterChoicePanel.SetActive(false);
         itemsPanel.SetActive(false);
         toglStats = false;
         toglItems = false;
@@ -367,5 +373,18 @@ public class MenuManager : MonoBehaviour
     {
         questUpdate.PlayUpdateAnimation(quest);
         GameManager.instance.UpdatePlayerLevels();
+    }
+
+    public void UpdateAbilitiesInfo(int characterToUse)
+    {
+        BattleCharacters[] playerPrefabs = BattleManager.instance.ReturnPlayerPrefabs();
+        PlayerStats[] players = GameManager.instance.GetPlayerStats();
+        if (playerPrefabs[characterToUse].characterName == players[characterToUse].playerName) 
+        {
+            if (playerPrefabs[characterToUse].AttackMovesAvailable().Length < 4)
+                abilities.childControlWidth = false;
+            else
+                abilities.childControlWidth = true;
+        }
     }
 }

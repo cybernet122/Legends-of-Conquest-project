@@ -98,6 +98,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectTime: 0.6
   SFXNumberToPlay: 5
+  abilityInfo: Send a powerful blue fireball to ignite a single target causing a
+    lot of damage.
 --- !u!95 &4648402895607487518
 Animator:
   serializedVersion: 3

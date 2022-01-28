@@ -117,3 +117,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectTime: 1
   SFXNumberToPlay: 9
+  abilityInfo: A physical attack targeting one enemy. Damage depends on the character's
+    dexterity, weapon power and weapon type.

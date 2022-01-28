@@ -117,3 +117,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectTime: 0.7
   SFXNumberToPlay: 10
+  abilityInfo: Drain the health of an enemy, damaging him and healing yourself in
+    the process.

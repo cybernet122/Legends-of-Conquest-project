@@ -98,6 +98,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectTime: 1
   SFXNumberToPlay: 1
+  abilityInfo: Send forward a shadow to freeze a single enemy for one turn causing
+    him to miss his turn.
 --- !u!95 &5202598249624281982
 Animator:
   serializedVersion: 3

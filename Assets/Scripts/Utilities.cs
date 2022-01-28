@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public static class Utilities
 {
+
     public static void PurgeSaveData()
     {
         PlayerPrefs.DeleteAll();

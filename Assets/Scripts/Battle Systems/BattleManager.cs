@@ -206,11 +206,15 @@ public class BattleManager : MonoBehaviour
                 }
             }
         }
-        /*DifficultyModifier();*/
+        foreach(BattleCharacters enemy in enemies)
+            DifficultyModifier(enemy);
     }
 
     private void DifficultyModifier(BattleCharacters enemy)
     {
+
+        enemy.maxHP += (int)(enemy.maxHP * 0.05) * Player.instance.ReturnPlayerStats().playerLevel;
+        enemy.currentHP = enemy.maxHP;
         if (PlayerPrefs.HasKey("Difficulty_"))
         {
             var difficulty = PlayerPrefs.GetInt("Difficulty_");
@@ -221,20 +225,16 @@ public class BattleManager : MonoBehaviour
                     modifier = 0.8f;
                     break;
                 case 2:
-                    modifier = 1f;
-                    break;
+                    return;                    
                 case 3:
-                    modifier = 1.25f;
-                    break;
-                default:
-                    Debug.LogWarning("Error in difficulty modifier");
-                    modifier = 1f;
+                    modifier = 1.2f;
                     break;
             }
             enemy.maxHP = (int)(enemy.maxHP * modifier);
             enemy.currentHP = enemy.maxHP;
             enemy.evasion *= modifier;
         }
+        print(PlayerPrefs.GetInt("Difficulty_"));
     }
 
     private void AddingPlayers()
@@ -642,7 +642,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            attackPower = characterAttacking.dexterity * 0.8f + characterAttacking.weaponPower;
+            attackPower = characterAttacking.dexterity * 0.6f + characterAttacking.weaponPower * 0.8f;
         }
         if (attack.moveName == "Tentacles")
         {
@@ -1363,5 +1363,10 @@ public class BattleManager : MonoBehaviour
         var magicRect = magicPanel.GetComponent<RectTransform>();
         var button = returnButton.GetComponent<RectTransform>();
         button.transform.position = new Vector2(80, magicRect.rect.height + 24);        
+    }
+
+    public BattleCharacters[] ReturnPlayerPrefabs()
+    {
+        return playerPrefabs;
     }
 }

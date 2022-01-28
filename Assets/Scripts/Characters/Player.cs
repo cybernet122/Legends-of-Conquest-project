@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     Rigidbody2D playerRigidBody;
     Animator animator;
     public bool enableMovement = true;
+    PlayerStats player;
 
     private void Start()
     {
@@ -25,6 +26,7 @@ public class Player : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        player = GetComponent<PlayerStats>();
     }
 
 
@@ -55,11 +57,16 @@ public class Player : MonoBehaviour
             animator.SetFloat("movementY", 0);
         }
     }
-    
-    public void SetLimit(Vector3 bottomEdge,Vector3 topEdge)
+
+    public void SetLimit(Vector3 bottomEdge, Vector3 topEdge)
     {
         bottomLeftEdge = bottomEdge;
         topRightEdge = topEdge;
     }
 
+
+    public PlayerStats ReturnPlayerStats()
+    {
+        return player;
+    }
 }

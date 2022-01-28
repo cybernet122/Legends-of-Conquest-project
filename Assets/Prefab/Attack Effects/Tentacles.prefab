@@ -98,6 +98,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectTime: 1.5
   SFXNumberToPlay: 8
+  abilityInfo: Raise tentacles from the ground attacking all enemies on the field,
+    causes moderate damage.
 --- !u!95 &5789123765153328105
 Animator:
   serializedVersion: 3

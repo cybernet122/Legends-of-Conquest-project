@@ -157,8 +157,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 149.72777, y: 0.000045776}
-  m_SizeDelta: {x: 202.8179, y: 63.868}
+  m_AnchoredPosition: {x: 150.7104, y: 0.000045776}
+  m_SizeDelta: {x: 204.7832, y: 81.7525}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1657568
 MonoBehaviour:
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Menu, items, player stats, save, options
+  m_text: Return, Menu (items, player stats, save, options)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a1fabacdc37ca904c85798fd58b18239, type: 2}
   m_sharedMaterial: {fileID: 5447570534603817214, guid: a1fabacdc37ca904c85798fd58b18239, type: 2}
