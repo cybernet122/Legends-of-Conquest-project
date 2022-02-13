@@ -362,6 +362,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2914606759385923384, guid: 5f4fa14c4cbf30a40a8ce1f4ed2b59aa, type: 3}
   m_PrefabInstance: {fileID: 336771015}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &344325379
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_RootOrder
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154147, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_Name
+      value: Battle Manager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f1ab1c94f603bc44985912e072934011, type: 3}
 --- !u!1 &369842697
 GameObject:
   m_ObjectHideFlags: 0
@@ -19829,8 +19886,8 @@ MonoBehaviour:
   rememberDestruction: 0
   sentences:
   - '#Jimmy'
-  - Hello, my name is Jimmy, is there anything you can tell me about your clashes
-    with the monsters in the mountains?
+  - Hello, my name is %, is there anything you can tell me about your clashes with
+    the monsters in the mountains?
   - '#Villager'
   - Wait a second I remember you, you must be the one that was injured, your friend
     brought you here, how are you feeling?
@@ -19902,8 +19959,8 @@ MonoBehaviour:
   - '#Jimmy'
   - Hey Sara I have been wounded in battle, can you heal me?
   - '#Sara the Healer'
-  - Hello Jimmy, good to see you are still alive, of course I can heal you, this
-    is all I can do for now, so try to be more careful please.
+  - Hello %, good to see you are still alive, of course I can heal you, this is all
+    I can do for now, so try to be more careful please.
   - '#Jimmy$'
   - Thank you, I will be on my way then.
 --- !u!114 &725276020
@@ -19929,7 +19986,7 @@ MonoBehaviour:
   - '#Healer'
   - Hello hero, I see you seek adventure. I am Sara .What's your name?
   - '#Jimmy'
-  - My name is Jimmy I woke up here with after being wounded in battle. I am to fight
+  - My name is %, I woke up here with after being wounded in battle. I am to fight
     the monsters in the mountains that are giving this town problems.
   - '#Sara the Healer'
   - Oh I see, luckily for you I am the healer of this town.
@@ -37974,10 +38031,9 @@ MonoBehaviour:
   - '#Villager'
   - Hello there, haven't seen you around here before, what is your name?
   - '#Jimmy'
-  - My name is Jimmy, I had to repay the innkeeper for saving me with killing your
-    monsters.
+  - My name is %, I had to repay the innkeeper for saving me with killing your monsters.
   - '#Villager'
-  - Ah then we are forever grateful hero.
+  - Ah then we are forever grateful %.
   - '#Jimmy'
   - You don't have to thank me, I am merely repaying my debt.
   - '#Villager'
@@ -38118,6 +38174,130 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2021460, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 899182424, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 899182424, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 899182424, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 264.99918
+      objectReference: {fileID: 0}
+    - target: {fileID: 899182424, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 992.49713
+      objectReference: {fileID: 0}
+    - target: {fileID: 899182424, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -72.6156
+      objectReference: {fileID: 0}
+    - target: {fileID: 920470874, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 920470874, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 920470874, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 264.99918
+      objectReference: {fileID: 0}
+    - target: {fileID: 920470874, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 137.49959
+      objectReference: {fileID: 0}
+    - target: {fileID: 920470874, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -72.6156
+      objectReference: {fileID: 0}
+    - target: {fileID: 973875046, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 973875046, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 973875046, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 264.99918
+      objectReference: {fileID: 0}
+    - target: {fileID: 973875046, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 1562.4955
+      objectReference: {fileID: 0}
+    - target: {fileID: 973875046, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -72.6156
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521396096, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521396096, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521396096, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 264.99918
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521396096, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 422.49878
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521396096, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -72.6156
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872150997, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872150997, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872150997, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 264.99918
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872150997, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 1277.4963
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872150997, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -72.6156
+      objectReference: {fileID: 0}
+    - target: {fileID: 2826744684476308215, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2826744684476308215, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2826744684476308215, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 264.99918
+      objectReference: {fileID: 0}
+    - target: {fileID: 2826744684476308215, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 707.4979
+      objectReference: {fileID: 0}
+    - target: {fileID: 2826744684476308215, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -72.6156
+      objectReference: {fileID: 0}
     - target: {fileID: 4501101887874264299, guid: d0c3efc0322b8164bad0e6bcb6e736f7, type: 3}
       propertyPath: m_Name
       value: Menu

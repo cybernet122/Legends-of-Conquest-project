@@ -1,7 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using System.Text.RegularExpressions;
 using TMPro;
 public class DialogController : MonoBehaviour
 {
@@ -229,6 +228,8 @@ public class DialogController : MonoBehaviour
         if (dialogSentences[currentSentence].StartsWith("#"))
         {
             nameText.text = dialogSentences[currentSentence].Replace("#", "");
+            if(nameText.text == Player.instance.playersName)
+                nameText.text = PlayerPrefs.GetString("Players_name_");
             if (dialogSentences[currentSentence].EndsWith("$"))
             {
                 nameText.text = nameText.text.Remove(nameText.text.Length - 1);
@@ -241,6 +242,12 @@ public class DialogController : MonoBehaviour
                 }
             }
             currentSentence++;
+        }
+        if (dialogSentences[currentSentence].Contains("%"))
+        {
+            string name = PlayerPrefs.GetString("Players_name_");
+            string stringInput = dialogSentences[currentSentence];
+            dialogSentences[currentSentence] = Regex.Replace(stringInput,"%", name);
         }
     }
 

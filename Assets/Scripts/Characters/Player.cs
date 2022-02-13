@@ -12,7 +12,8 @@ public class Player : MonoBehaviour
     Animator animator;
     public bool enableMovement = true;
     PlayerStats player;
-
+    public readonly string playersName = "Jimmy";
+    
     private void Start()
     {
         if (instance != null && instance != this)
@@ -27,8 +28,18 @@ public class Player : MonoBehaviour
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         player = GetComponent<PlayerStats>();
+        Invoke("RenamePlayer", 0.2f);
     }
 
+    private void RenamePlayer()
+    {
+        if (PlayerPrefs.HasKey("Players_name_"))
+        {
+            string name = PlayerPrefs.GetString("Players_name_");
+            gameObject.name = name;
+            player.playerName = name;
+        }
+    }
 
 
     private void Update()

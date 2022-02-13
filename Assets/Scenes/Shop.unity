@@ -714,6 +714,63 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1666054209
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_RootOrder
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154145, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134737231269154147, guid: f1ab1c94f603bc44985912e072934011, type: 3}
+      propertyPath: m_Name
+      value: Battle Manager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f1ab1c94f603bc44985912e072934011, type: 3}
 --- !u!1001 &2022656249
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5000,12 +5057,18 @@ PrefabInstance:
       value: How long have I been unconcious for?
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[9]
+      value: For about a week give or take, your wounds were quite serious but you
+        healed faster than expected, I didn't catch your name though.
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[10]
       value: '#Jimmy'
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[11]
-      value: How can I repay your kindness? I don't have any coins with me.
+      value: Oh, my name is %, how can I repay your kindness? I don't have any coins
+        with me.
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[13]
@@ -5035,6 +5098,10 @@ PrefabInstance:
     - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.size
       value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[1]
+      value: '%, you are back!'
       objectReference: {fileID: 0}
     - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[2]

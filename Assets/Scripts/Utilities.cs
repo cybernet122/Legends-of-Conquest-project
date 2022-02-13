@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public static class Utilities
 {
-
     public static void PurgeSaveData()
     {
         PlayerPrefs.DeleteAll();
@@ -31,5 +30,10 @@ public static class Utilities
     public static string ReturnSceneName()
     {
         return SceneManager.GetActiveScene().name;
+    }
+
+    public static string ReturnPlayersName()
+    {
+        return PlayerPrefs.GetString("Players_Name_");
     }
 }

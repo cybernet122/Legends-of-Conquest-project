@@ -75,11 +75,8 @@ public class BattleManager : MonoBehaviour
         enemyTargetPanel.SetActive(false);
         itemPanel.SetActive(false);
         returnButton.SetActive(false);
-        ResizeBackground();
         CheckForCamera();
         battleCanvasGroup.alpha = 0;
-        /* screenHeight = Screen.height;
-         screenWidth = Screen.width;*/
         if (Utilities.ReturnSceneName() != "GameOverScene")
             musicIndex = FindObjectOfType<CamController>().GetMusicIndex();
     }
@@ -87,10 +84,10 @@ public class BattleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.B))
+        /*if (Input.GetKeyDown(KeyCode.B))
         {
             StartBattle(new string[] { "Entropy Mage", "Entropy Battlemage", "Entropy Warlock" });
-        }
+        }*/
 
         if (Input.GetButtonDown("Fire1") && isBattleActive)
         {
@@ -114,14 +111,14 @@ public class BattleManager : MonoBehaviour
             hasActivatedBorder = false;
             Destroy(menuBorder);
         }
-        if (Input.GetKeyDown(KeyCode.KeypadMinus))
+        /*if (Input.GetKeyDown(KeyCode.KeypadMinus))
         {
             foreach(BattleCharacters player in players)
             {
                 if(!player.isDead)
                 player.currentHP = 20;
             }
-        }
+        }*/
         if (Input.GetButtonDown("Cancel"))
         {
             ReturnButton();
@@ -284,9 +281,9 @@ public class BattleManager : MonoBehaviour
             activeBattleCharacters[i].currentMana = player.currentMana;
         activeBattleCharacters[i].maxMana = player.maxMana;
         activeBattleCharacters[i].dexterity = player.dexterity;
-        activeBattleCharacters[i].defence = player.defence;
+        activeBattleCharacters[i].defense = player.defense;
         activeBattleCharacters[i].weaponPower = player.weaponPower;
-        activeBattleCharacters[i].armorDefence = player.armorDefence;
+        activeBattleCharacters[i].armorDefense = player.armorDefense;
         activeBattleCharacters[i].speed = player.turnSpeed;
         activeBattleCharacters[i].evasion = player.evasion;
         activeBattleCharacters[i].lifestealWeap = player.lifestealWeap;
@@ -348,6 +345,7 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator ResizeBackground()
     {
+        if (!isBattleActive) { yield break; }
         float worldScreenHeight = Camera.main.orthographicSize * 2;
         float worldScreenWidth = worldScreenHeight / Screen.height * Screen.width;
 
@@ -650,7 +648,7 @@ public class BattleManager : MonoBehaviour
             {
                 foreach (BattleCharacters enemy in enemies)
                 {
-                    int damage = (int)(attackPower / (enemy.defence + enemy.armorDefence) * movePower * Random.Range(0.9f, 1.1f));                    
+                    int damage = (int)(attackPower / (enemy.defense + enemy.armorDefense) * movePower * Random.Range(0.9f, 1.1f));                    
                     if(!Evade(enemy,characterAttacking))
                     {
                         enemy.TakeHpDamage(damage);
@@ -665,7 +663,7 @@ public class BattleManager : MonoBehaviour
             {
                 foreach (BattleCharacters player in players)
                 {
-                    int damage = (int)(attackPower / (player.defence + player.armorDefence) * movePower * Random.Range(0.9f, 1.1f));
+                    int damage = (int)(attackPower / (player.defense + player.armorDefense) * movePower * Random.Range(0.9f, 1.1f));
                     if (!Evade(player,characterAttacking))
                     {
                         player.TakeHpDamage(damage);
@@ -679,8 +677,8 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            float defenceAmount = selectedCharacterToAttack.defence + selectedCharacterToAttack.armorDefence;
-            float damageAmount = (attackPower / defenceAmount) * movePower * Random.Range(0.9f, 1.1f);
+            float defenseAmount = selectedCharacterToAttack.defense + selectedCharacterToAttack.armorDefense;
+            float damageAmount = (attackPower / defenseAmount) * movePower * Random.Range(0.9f, 1.1f);
             int damageToGive = (int)damageAmount;
             damageToGive = CriticalStrike(damageToGive, selectedCharacterToAttack.transform);
             Debug.Log(characterAttacking.characterName + " did " + damageToGive + " damage to " + selectedCharacterToAttack);
@@ -1368,5 +1366,17 @@ public class BattleManager : MonoBehaviour
     public BattleCharacters[] ReturnPlayerPrefabs()
     {
         return playerPrefabs;
+    }
+
+    public int GetAbilityCost(string ability)
+    {
+        foreach(BattleMoves battleMoves in battleMovesList)
+        {
+            if(battleMoves.moveName == ability)
+            {
+                return battleMoves.manaCost;
+            }
+        }
+        return 0;
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
@@ -10,7 +11,7 @@ public class GameManager : MonoBehaviour
     public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive, count;
     public int currentGoldCoins;
     [SerializeField]SavingFade savingFade;
-
+    string[] playerAssets;
     List<string> stringsToSave = new List<string>();
     // Start is called before the first frame update
     void Start()
@@ -31,7 +32,22 @@ public class GameManager : MonoBehaviour
         {
             QuestManager.instance.MountainsQuest();
         }
+        /*if (PlayerPrefs.HasKey("Players_name_"))
+        {
+            string name = PlayerPrefs.GetString("Players_name_");
+            playerAssets = AssetDatabase.FindAssets("Jimmy");
+            RenameAsset(playerAssets, name);
+        }*/
     }
+
+    /*private void RenameAsset(string[] guidToFind, string nameToReplace)
+    {
+        for (int i = 0; i < guidToFind.Length; i++)
+        {
+            var path = AssetDatabase.GUIDToAssetPath(guidToFind[i]);
+            AssetDatabase.RenameAsset(path, nameToReplace);
+        }
+    }*/
 
     // Update is called once per frame
     void Update()
@@ -69,10 +85,10 @@ public class GameManager : MonoBehaviour
         {
             QuestManager.instance.PurgeQuestData();
         }
-/*        if (Input.GetKeyDown(KeyCode.Alpha9))
+        if (Input.GetKeyDown(KeyCode.Alpha9))
         {
-            savingFade = FindObjectOfType<SavingFade>();
-        }*/
+            
+        }
     }
 
     IEnumerator Delay(float amount)
@@ -92,7 +108,6 @@ public class GameManager : MonoBehaviour
     {
         FillPlayerStats();
     }
-
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneWasSwitched;
@@ -113,14 +128,7 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneWasSwitched(Scene scene, LoadSceneMode mode)
     {
-        /*playerStats = new PlayerStats[0];
-        Invoke("CheckForBattleManager", 0.15f);*/
-        Invoke("FillPlayerStats", 0.3f);
         savingFade = FindObjectOfType<SavingFade>();
-        /*if (SceneManager.GetActiveScene().name == "Mountains")
-        {
-            QuestManager.instance.MountainsQuest();
-        }*/
     }
 
     private void CheckForBattleManager()
@@ -138,7 +146,7 @@ public class GameManager : MonoBehaviour
         {
             if (playerStats[i].GetComponent<Player>())
             {
-                var playerstat = playerStats[0];
+                var playerstat = playerStats[0];                
                 playerStats[0] = playerStats[i];
                 playerStats[i] = playerstat;
             }
@@ -202,13 +210,13 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_CurrentMana", playerStats[i].currentMana);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_MaxMana", playerStats[i].maxMana);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_Dexterity", playerStats[i].dexterity);
-            PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_Defence", playerStats[i].defence);
+            PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_Defense", playerStats[i].defense);
             PlayerPrefs.SetString("Player_" + playerStats[i].playerName + "_EquippedWeapon", playerStats[i].equippedWeaponName);
             PlayerPrefs.SetString("Player_" + playerStats[i].playerName + "_EquippedArmor", playerStats[i].equippedArmorName);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_WeaponPower", playerStats[i].weaponPower);
-            PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_ArmorDefence", playerStats[i].armorDefence);
-            PlayerPrefs.SetInt("Player_" + playerStats[i].turnSpeed + "_Speed", playerStats[i].turnSpeed);
-            PlayerPrefs.SetFloat("Player_" + playerStats[i].evasion + "_Evasion", playerStats[i].evasion);
+            PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_ArmorDefense", playerStats[i].armorDefense);
+            PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_Speed", playerStats[i].turnSpeed);
+            PlayerPrefs.SetFloat("Player_" + playerStats[i].playerName + "_Evasion", playerStats[i].evasion);
             if (playerStats[i].lifestealWeap)
                 PlayerPrefs.SetInt("Player_lifesteal_", 1);
             else
@@ -266,11 +274,11 @@ public class GameManager : MonoBehaviour
             playerStats[i].currentMana = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_CurrentMana");
             playerStats[i].maxMana = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_MaxMana");
             playerStats[i].dexterity = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Dexterity");
-            playerStats[i].defence = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Defence");
+            playerStats[i].defense = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Defense");
             playerStats[i].equippedWeaponName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedWeapon");
             playerStats[i].equippedArmorName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedArmor");
             playerStats[i].weaponPower = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_WeaponPower");
-            playerStats[i].armorDefence = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_ArmorDefence");
+            playerStats[i].armorDefense = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_ArmorDefense");
             playerStats[i].turnSpeed = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Speed");
             playerStats[i].evasion = PlayerPrefs.GetFloat("Player_" + playerStats[i].playerName + "_Evasion");
             if (PlayerPrefs.GetInt("Player_lifesteal_") == 1)

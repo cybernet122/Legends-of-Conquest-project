@@ -12,7 +12,7 @@ public class ItemsManager : MonoBehaviour
     public enum AffectType { HP,Mana}
     public int amountOfEffect;
     public AffectType affectType;
-    public int weaponDexterity, armorDefence;
+    public int weaponDexterity, armorDefense;
     bool inRange = false;
     public bool isStackable;
     public int amount;

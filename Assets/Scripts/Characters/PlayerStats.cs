@@ -19,12 +19,12 @@ public class PlayerStats : MonoBehaviour
     public int currentMana;
     [SerializeField] int addXP;
     public int dexterity;
-    public int defence;
+    public int defense;
     int levelsToAdd = 0;
     public string equippedWeaponName;
     public string equippedArmorName;
     public int weaponPower;
-    public int armorDefence;
+    public int armorDefense;
     public int turnSpeed;
     public float evasion;
     public bool lifestealWeap;
@@ -40,6 +40,18 @@ public class PlayerStats : MonoBehaviour
         }
         currentHP = maxHP;
         currentMana = maxMana;
+    }
+
+    private void Awake()
+    {
+        if (GetComponent<Player>())
+            playerName = PlayerPrefs.GetString("Players_name_");
+    }
+
+    private void OnDisable()
+    {
+        if (GetComponent<Player>())
+            playerName = Player.instance.playersName;
     }
 
     void Update()
@@ -102,7 +114,7 @@ public class PlayerStats : MonoBehaviour
                 }
                 else
                 {
-                    defence++;
+                    defense++;
                 }
                 maxHP = Mathf.RoundToInt(maxHP * 1.11f);
                 currentHP = maxHP;
@@ -120,7 +132,7 @@ public class PlayerStats : MonoBehaviour
             }
             else
             {
-                defence++;
+                defense++;
             }
             maxHP = Mathf.RoundToInt(maxHP * 1.11f);
             currentHP = maxHP;
@@ -146,7 +158,7 @@ public class PlayerStats : MonoBehaviour
     { 
         equippedArmor = armorToEquip;
         equippedArmorName = equippedArmor.itemName;
-        armorDefence = equippedArmor.armorDefence;
+        armorDefense = equippedArmor.armorDefense;
         if (equippedArmorName == "Golden Armor")        
             evasion = 11.5f;        
         else

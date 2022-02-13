@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,20 +10,26 @@ public class AbilityInfoManager : MonoBehaviour
     [SerializeField] GameObject[] abilitiesInfoPanel;
     [SerializeField] BattleCharacters[] playerPrefabs;
     [SerializeField] HorizontalLayoutGroup layoutGroup;
-    // Start is called before the first frame update
+
     void Start()
     {
-
+        Invoke("RenameAsset", 0.7f);
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
 
+    public void RenameAsset()
+    {
+        string name = PlayerPrefs.GetString("Players_name_");
+        playerPrefabs[0].characterName = name;
+    }
+
     public void SetAbilitiesOfCharacter(PlayerStats playerSelected)
     {
+        RenameAsset();
         ClearAbilitiesSlots();
         FillFirstSlot();
         BattleCharacters battleChar = null;
@@ -42,7 +49,7 @@ public class AbilityInfoManager : MonoBehaviour
                 if (charAvailableAbilities[o] == abilitiesAvailable[i].name)
                 {
                     abilitiesInfoPanel[o + 1].SetActive(true);
-                    abilitiesInfoPanel[o + 1].GetComponent<TooltipTrigger>().header = abilitiesAvailable[i].name;
+                    abilitiesInfoPanel[o + 1].GetComponent<TooltipTrigger>().header = abilitiesAvailable[i].name + "   /   Magic cost: " + BattleManager.instance.GetAbilityCost(abilitiesAvailable[i].name);
                     abilitiesInfoPanel[o + 1].GetComponent<TooltipTrigger>().content = abilitiesAvailable[i].abilityInfo;
                     var image = abilitiesInfoPanel[o + 1].transform.GetChild(0).GetComponentInChildren<Image>();
                     image.gameObject.SetActive(true);

@@ -11,7 +11,7 @@ public class BattleCharacters : MonoBehaviour
     [SerializeField] Slider hpSlider;
     [SerializeField] TextMeshProUGUI nameText,hpValue;
     public string characterName;
-    public int currentHP, maxHP, currentMana, maxMana, dexterity, defence, weaponPower, armorDefence, speed;
+    public int currentHP, maxHP, currentMana, maxMana, dexterity, defense, weaponPower, armorDefense, speed;
     public float evasion;
     public bool lifestealWeap;
     public bool isDead;
@@ -116,7 +116,7 @@ public class BattleCharacters : MonoBehaviour
                 weaponPower = item.weaponDexterity;
             else if (item.itemType == ItemsManager.ItemType.Armor)
             {
-                armorDefence = item.armorDefence;
+                armorDefense = item.armorDefense;
                 type = 1;
             }
             var playerStats = GameManager.instance.GetPlayerStats();
@@ -133,7 +133,7 @@ public class BattleCharacters : MonoBehaviour
                     else if(type == 1)
                     {
                         playerStats[i].equippedArmor = item;
-                        playerStats[i].armorDefence = item.armorDefence;
+                        playerStats[i].armorDefense = item.armorDefense;
                         playerStats[i].equippedArmorName = item.itemName;
                     }
                 }

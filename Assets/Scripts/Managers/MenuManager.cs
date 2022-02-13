@@ -13,7 +13,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Slider[] xpInfoSlider;
     [SerializeField] Image[] characterInfoImage;
     [SerializeField] GameObject[] characterInfoPanel;
-    [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel, statEquippedWeapon, statEquippedArmor, statWeaponPower, statArmorDefence, speed, evasion, currentQuest;
+    [SerializeField] TextMeshProUGUI nameText, hpText, manaText, statDex, statDef, xpText, playerLevel, statEquippedWeapon, statEquippedArmor, statWeaponPower, statArmorDefense, speed, evasion, currentQuest;
     [SerializeField] Slider xpSlider;
     [SerializeField] Image characterImage;
     [SerializeField] GameObject characterPanel, itemsPanel, itemContainer, charInfoList;
@@ -189,7 +189,7 @@ public class MenuManager : MonoBehaviour
         hpText.text = "Health: " + playerSelected.currentHP.ToString() + " / " + playerSelected.maxHP;
         manaText.text = "Magic: " + playerSelected.currentMana.ToString() + " / " + playerSelected.maxMana;
         statDex.text = "Dexterity: " + playerSelected.dexterity.ToString();
-        statDef.text = "Defence: " + playerSelected.defence.ToString();
+        statDef.text = "Defense: " + playerSelected.defense.ToString();
         characterImage.sprite = playerSelected.characterImage;
         playerLevel.text = playerSelected.playerLevel.ToString();
         xpSlider.minValue = 0;
@@ -213,7 +213,7 @@ public class MenuManager : MonoBehaviour
         else
             statEquippedArmor.text = "(Nothing equipped)";
         statWeaponPower.text = "Weapon Power: " + playerSelected.weaponPower.ToString();
-        statArmorDefence.text = "Armor Defence: " + playerSelected.armorDefence.ToString();
+        statArmorDefense.text = "Armor Defense: " + playerSelected.armorDefense.ToString();
         speed.text = "Turn Speed: " + playerSelected.turnSpeed.ToString();
         evasion.text = "Evasion: " + playerSelected.evasion.ToString() + "%";
         abilityInfoManager.SetAbilitiesOfCharacter(playerSelected);
@@ -318,7 +318,7 @@ public class MenuManager : MonoBehaviour
                 im.amountOfEffect = itemInInventory.amountOfEffect;
                 im.affectType = itemInInventory.affectType;
                 im.weaponDexterity = itemInInventory.weaponDexterity;
-                im.armorDefence = itemInInventory.armorDefence;
+                im.armorDefense = itemInInventory.armorDefense;
                 im.isStackable = itemInInventory.isStackable;
                 im.amount = 1;
 
