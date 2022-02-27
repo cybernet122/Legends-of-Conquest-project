@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Background
+  - Item_Border
+  - Button_Border
   layers:
   - Default
   - TransparentFX

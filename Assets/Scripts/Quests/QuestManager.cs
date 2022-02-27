@@ -13,12 +13,10 @@ public class QuestManager : MonoBehaviour
     void Start()
     {
         instance = this;
-/*        if (questMarkersCompleted.Length <= 0)
+        if (SceneManager.GetActiveScene().name == "Mountains")
         {
-            questMarkersCompleted = new bool[questNames.Length];
-            LoadQuestData();
+            MountainsQuest();
         }
-        count = GetQuestNumber(GetCurrentQuest());*/
     }
 
     private void Update()
@@ -173,8 +171,7 @@ public class QuestManager : MonoBehaviour
 
     public void MountainsQuest()
     {
-
-        if (GameManager.instance.ReturnScene() == 5)
+        if (Utilities.ReturnSceneName() == "Mountains")
         {
             if (CheckIfComplete("Kill the monsters in the mountains"))
             {

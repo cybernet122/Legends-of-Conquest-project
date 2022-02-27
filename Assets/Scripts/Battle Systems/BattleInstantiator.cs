@@ -1,7 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BattleInstantiator : MonoBehaviour
 {
@@ -10,25 +8,8 @@ public class BattleInstantiator : MonoBehaviour
     [SerializeField] bool activateOnEnter;
     [SerializeField] float timeBetweenBattles, chanceToFlee;
     [SerializeField] int battleMusic;
-    private float battleCounter;
-    private bool inArea;
     [SerializeField] bool destroyOnVictory,canFlee, shouldCompleteQuest;
     public string questToComplete;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.M) && inArea && Player.instance.enableMovement)
-        {
-            StartCoroutine(StartTheBattle());
-        }
-    }
 
     IEnumerator StartTheBattle()
     {
@@ -62,10 +43,10 @@ public class BattleInstantiator : MonoBehaviour
             {
                 StartCoroutine(StartTheBattle());
             }
-            else
+            /*else
             {
                 inArea = true;
-            }
+            }*/
         }
 
     }

@@ -25,34 +25,15 @@ public class GameManager : MonoBehaviour
             instance = this;
         }
         DontDestroyOnLoad(gameObject);
-        FillPlayerStats();
         savingFade = FindObjectOfType<SavingFade>();
         count = true;
-        if (SceneManager.GetActiveScene().name == "Mountains")
-        {
-            QuestManager.instance.MountainsQuest();
-        }
-        /*if (PlayerPrefs.HasKey("Players_name_"))
-        {
-            string name = PlayerPrefs.GetString("Players_name_");
-            playerAssets = AssetDatabase.FindAssets("Jimmy");
-            RenameAsset(playerAssets, name);
-        }*/
+        SortPlayerStats();
+        UpdatePlayerLevels();
     }
 
-    /*private void RenameAsset(string[] guidToFind, string nameToReplace)
-    {
-        for (int i = 0; i < guidToFind.Length; i++)
-        {
-            var path = AssetDatabase.GUIDToAssetPath(guidToFind[i]);
-            AssetDatabase.RenameAsset(path, nameToReplace);
-        }
-    }*/
-
-    // Update is called once per frame
     void Update()
     {
-        PurgeData();
+        // Old battle Navigation
         if (battleIsActive)
         {
             Player.instance.enableMovement = false;
@@ -61,11 +42,11 @@ public class GameManager : MonoBehaviour
                 if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
                 {
                     BattleManager.instance.ButtonNavigation((int)Input.GetAxisRaw("Horizontal"), (int)Input.GetAxisRaw("Vertical"));
-                    StartCoroutine(Delay(0.2f));
                 }
             }
         }
-        else if (dialogBoxOpened || gameMenuOpened || shopMenuOpened)
+        PurgeData();
+        if (dialogBoxOpened || gameMenuOpened || shopMenuOpened)
         {
             Player.instance.enableMovement = false;
         }
@@ -87,26 +68,19 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
-            
+            UpdatePlayerLevels();
         }
-    }
-
-    IEnumerator Delay(float amount)
-    {
-        count = false;
-        yield return new WaitForSeconds(amount);
-        count = true;
     }
 
     public PlayerStats[] GetPlayerStats()
     {
-        FillPlayerStats();
+        SortPlayerStats();
         return playerStats;
     }
 
     public void UpdatePlayerStats()
     {
-        FillPlayerStats();
+        SortPlayerStats();
     }
     private void OnEnable()
     {
@@ -120,8 +94,6 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        playerStats = new PlayerStats[0];
-        Invoke("FillPlayerStats", 0.3f);
         Invoke("CheckForBattleManager", 0.15f);
         
     }
@@ -129,6 +101,8 @@ public class GameManager : MonoBehaviour
     private void OnSceneWasSwitched(Scene scene, LoadSceneMode mode)
     {
         savingFade = FindObjectOfType<SavingFade>();
+        Invoke("SortPlayerStats", 0.1f);
+        Invoke("UpdatePlayerLevels", 0.5f);
     }
 
     private void CheckForBattleManager()
@@ -137,18 +111,17 @@ public class GameManager : MonoBehaviour
             BattleManager.instance.CheckForResize();
     }
 
-    private void FillPlayerStats()
+    private void SortPlayerStats()
     {
-        playerStats = new PlayerStats[0];
-        playerStats = FindObjectsOfType<PlayerStats>();
-
+        FillPlayerStats();
         for (int i = 0; i < playerStats.Length; i++)
         {
             if (playerStats[i].GetComponent<Player>())
             {
-                var playerstat = playerStats[0];                
+                var playerstat = playerStats[0];
                 playerStats[0] = playerStats[i];
                 playerStats[i] = playerstat;
+                playerStats[0].playerName = PlayerPrefs.GetString("Players_name_");
             }
         }
         if (QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them"))
@@ -159,6 +132,19 @@ public class GameManager : MonoBehaviour
             playerStats = new PlayerStats[1];
             playerStats[0] = playerStats1;
         }
+    }
+
+    private void FillPlayerStats()
+    {
+        playerStats = new PlayerStats[0];
+        playerStats = FindObjectsOfType<PlayerStats>();
+    }
+
+    public void EmptyPlayerStats()
+    {
+        var playerStats1 = playerStats[0];
+        playerStats = new PlayerStats[1];
+        playerStats[0] = playerStats1;
     }
 
     public void SaveData()
@@ -276,7 +262,9 @@ public class GameManager : MonoBehaviour
             playerStats[i].dexterity = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Dexterity");
             playerStats[i].defense = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Defense");
             playerStats[i].equippedWeaponName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedWeapon");
+            playerStats[i].equippedWeapon = ItemsAssets.instance.GetItemsAsset(playerStats[i].equippedWeaponName);
             playerStats[i].equippedArmorName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedArmor");
+            playerStats[i].equippedArmor = ItemsAssets.instance.GetItemsAsset(playerStats[i].equippedArmorName);
             playerStats[i].weaponPower = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_WeaponPower");
             playerStats[i].armorDefense = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_ArmorDefense");
             playerStats[i].turnSpeed = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Speed");
@@ -309,7 +297,8 @@ public class GameManager : MonoBehaviour
 
     public void UpdatePlayerLevels()
     {
-        if (QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them"))
+        bool condition = QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them");
+        if (condition)
         {
             foreach (PlayerStats player in playerStats)
             {
@@ -318,10 +307,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public int ReturnScene()
+/*    public string ReturnScene()
     {
-        return SceneManager.GetActiveScene().buildIndex;
-    }
+        return SceneManager.GetActiveScene().name;
+    }*/
 
     public void GameOver()
     {

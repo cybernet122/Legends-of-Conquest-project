@@ -242,14 +242,15 @@ MonoBehaviour:
   characterName: Man-eating Plant
   currentHP: 60
   maxHP: 60
-  currentMana: 0
-  maxMana: 0
+  currentMana: 20
+  maxMana: 20
   dexterity: 6
-  defence: 5
+  defense: 7
   weaponPower: 12
-  armorDefence: 4
+  armorDefense: 0
   speed: 6
   evasion: 5
+  lifestealWeap: 0
   isDead: 0
   hasPlayed: 0
 --- !u!1 &4772383066826639051

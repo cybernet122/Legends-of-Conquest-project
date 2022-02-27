@@ -46,7 +46,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI itemName, itemDescription;
     [SerializeField] CanvasGroup battleCanvasGroup;
     bool hasActivatedBorder = false;
-    GameObject menuBorder;
+    [SerializeField]GameObject menuBorder;
     List<GameObject> magicButtons = new List<GameObject>();
     int buttonBorderIndex;
     public int xpRewardAmount, goldRewardAmount;
@@ -77,54 +77,85 @@ public class BattleManager : MonoBehaviour
         returnButton.SetActive(false);
         CheckForCamera();
         battleCanvasGroup.alpha = 0;
+        if (PlayerPrefs.HasKey("Players_name_"))
+            for (int i = 0; i < playerPrefabs.Length; i++)
+            {
+                if (playerPrefabs[i].characterName == Player.instance.playersName)
+                    playerPrefabs[i].characterName = PlayerPrefs.GetString("Players_name_");
+            }
         if (Utilities.ReturnSceneName() != "GameOverScene")
             musicIndex = FindObjectOfType<CamController>().GetMusicIndex();
+    }
+
+    private void OnDisable()
+    {
+        if (PlayerPrefs.HasKey("Players_name_"))
+            for (int i = 0; i < playerPrefabs.Length; i++)
+            {
+                if (playerPrefabs[i].characterName == PlayerPrefs.GetString("Players_name_"))
+                    playerPrefabs[i].characterName = Player.instance.playersName;
+            }
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*if (Input.GetKeyDown(KeyCode.B))
-        {
-            StartBattle(new string[] { "Entropy Mage", "Entropy Battlemage", "Entropy Warlock" });
-        }*/
+        MenuBorderControl();
+        CheckPlayerButtonHolder();
+        CheckForResize();
+    }
 
+    private void MenuBorderControl()
+    {
         if (Input.GetButtonDown("Fire1") && isBattleActive)
         {
             if (!hasActivatedBorder)
+            {
                 hasActivatedBorder = true;
-            if (UIButtonHolder.activeInHierarchy)
+                List<GameObject> menus = new List<GameObject>() { UIButtonHolder, magicPanel, enemyTargetPanel, characterChoicePanel };
+                for (int i = 0; i < menus.Count; i++)
+                {
+                    if (menus[i].activeInHierarchy)
+                    {
+                        CreateFirstButton(menus[i].transform.GetChild(0));
+                    }
+                }
+            }
+            else if (UIButtonHolder.activeInHierarchy)
+            {
+                //print(mainPanelButtons[buttonBorderIndex].name + " " + buttonBorderIndex);
                 mainPanelButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
+            }
             else if (magicPanel.activeInHierarchy)
+            {
                 magicButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
+                //print(magicButtons[buttonBorderIndex].name);
+            }
             else if (enemyTargetPanel.activeInHierarchy)
+            {
                 targetButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
+                //print(targetButtons[buttonBorderIndex].name);
+            }
             else if (characterChoicePanel.activeInHierarchy)
+            {
                 targetButton[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
+                //print(targetButton[buttonBorderIndex].name);
+            }
             else if (itemPanel.activeInHierarchy)
                 useItemButton.GetComponent<Button>().onClick.Invoke();
             else if (isRewardScreenOpen)
                 BattleRewardsHandler.instance.CloseRewardScreen();
         }
-        else if (Input.GetMouseButtonDown(0))
+        else if (Input.GetMouseButtonDown(0) && isBattleActive && hasActivatedBorder)
         {
             hasActivatedBorder = false;
-            Destroy(menuBorder);
+            menuBorder.SetActive(false);
+            buttonBorderIndex = 0;
         }
-        /*if (Input.GetKeyDown(KeyCode.KeypadMinus))
-        {
-            foreach(BattleCharacters player in players)
-            {
-                if(!player.isDead)
-                player.currentHP = 20;
-            }
-        }*/
-        if (Input.GetButtonDown("Cancel"))
+        if (Input.GetButtonDown("Cancel") && isBattleActive)
         {
             ReturnButton();
         }
-        CheckPlayerButtonHolder();
-        CheckForResize();
     }
 
     private void CheckPlayerButtonHolder()
@@ -203,15 +234,18 @@ public class BattleManager : MonoBehaviour
                 }
             }
         }
-        foreach(BattleCharacters enemy in enemies)
-            DifficultyModifier(enemy);
+/*        foreach(BattleCharacters enemy in enemies)
+            DifficultyModifier(enemy);*/
     }
 
     private void DifficultyModifier(BattleCharacters enemy)
     {
-
-        enemy.maxHP += (int)(enemy.maxHP * 0.05) * Player.instance.ReturnPlayerStats().playerLevel;
+        int playerLevel = Player.instance.ReturnPlayerStats().playerLevel;
+        enemy.maxHP += (int)(enemy.maxHP * 0.05) * playerLevel;
         enemy.currentHP = enemy.maxHP;
+        enemy.dexterity += (int)(playerLevel * 0.5);
+        enemy.weaponPower += (int)(playerLevel * 0.3);
+        enemy.defense += (int)(playerLevel * 0.4);
         if (PlayerPrefs.HasKey("Difficulty_"))
         {
             var difficulty = PlayerPrefs.GetInt("Difficulty_");
@@ -231,7 +265,6 @@ public class BattleManager : MonoBehaviour
             enemy.currentHP = enemy.maxHP;
             enemy.evasion *= modifier;
         }
-        print(PlayerPrefs.GetInt("Difficulty_"));
     }
 
     private void AddingPlayers()
@@ -386,6 +419,7 @@ public class BattleManager : MonoBehaviour
         {
             waitingForTurn = true;
             ReturnButton();
+            print("Retruning");
             UpdateText();
             for (int i = 0; i < players.Count; i++)
             {
@@ -408,7 +442,8 @@ public class BattleManager : MonoBehaviour
             activeBattleCharacters.RemoveAt(0);
             NextTurn();
         }
-        CheckIfAllDead();
+        if(currentTurn > 1)
+            CheckIfAllDead();
     }
 
     private void CheckIfAllDead()
@@ -633,7 +668,8 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator DealDamageToCharacters(BattleCharacters selectedCharacterToAttack,BattleCharacters characterAttacking, int movePower, BattleMoves attack)
     {
-        float attackPower;
+        print(characterAttacking + " " + characterAttacking.characterName);
+        float attackPower = 0;
         if(attack.moveName == "Shockwave")
         {
             attackPower = characterAttacking.dexterity * 0.75f + characterAttacking.weaponPower * 0.6f;
@@ -759,6 +795,7 @@ public class BattleManager : MonoBehaviour
         waitingForTurn = false;
         border[currentPlayerIndex].SetActive(false);
         enemyTargetPanel.SetActive(false);
+        print("Returning");
         ReturnButton();
         Invoke("NextTurn",1f);
     }
@@ -872,52 +909,41 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                targetButtons[i].moveName = "";
-                //targetButtons[i].targetName.text = "";
+                /*targetButtons[i].moveName = string.Empty;
+                targetButtons[i].targetName.text = string.Empty;*/
                 targetButtons[i].activeBattleTarget = null;
                 targetButtons[i].button.gameObject.SetActive(false);
             }
         }
-        DestroyPreviousBorder();
+        CreateFirstButton(targetButtons[0].transform);
     }
 
-    private void DestroyPreviousBorder()
+    private void ReturnToMainPanel()
     {
-        if (hasActivatedBorder && enemyTargetPanel.activeInHierarchy)
+        if (hasActivatedBorder)
         {
-            Destroy(menuBorder);
-            menuBorder = Instantiate(buttonBorderPrefab, targetButtons[0].transform);
+            print("test");
+            menuBorder.SetActive(false);
+            menuBorder.transform.parent = mainPanelButtons[0].transform;
             menuBorder.transform.SetSiblingIndex(0);
+            menuBorder.transform.position = mainPanelButtons[0].transform.position;
+            menuBorder.SetActive(true);
             buttonBorderIndex = 0;
-        }
-        else if (hasActivatedBorder && characterChoicePanel.activeInHierarchy)
+        }        
+    }
+
+    private void CreateFirstButton(Transform button)
+    {
+        if (hasActivatedBorder)
         {
-            Destroy(menuBorder);
-            menuBorder = Instantiate(characterChoiceButtonPrefab, targetButton[0].transform);
-            menuBorder.transform.SetSiblingIndex(0);
+            if (!menuBorder)
+                menuBorder = Instantiate(buttonBorderPrefab);
             buttonBorderIndex = 0;
-        }
-        else if (hasActivatedBorder && itemPanel.activeInHierarchy && items.Count > 0)
-        {
-            Destroy(menuBorder);
-            menuBorder = Instantiate(itemBorderPrefab, items[0].transform);
+            menuBorder.transform.parent = button;
             menuBorder.transform.SetSiblingIndex(0);
-            buttonBorderIndex = 0;
-            SelectedItemToUse(items[0].GetComponentInChildren<ItemButton>().itemOnButton);
-        }
-        else if (hasActivatedBorder && magicPanel.activeInHierarchy)
-        {
-            Destroy(menuBorder);
-            menuBorder = Instantiate(buttonBorderPrefab, magicButtons[0].transform);
-            menuBorder.transform.SetSiblingIndex(0);
-            buttonBorderIndex = 0;
-        }
-        else if (hasActivatedBorder)
-        {
-            Destroy(menuBorder);
-            menuBorder = Instantiate(buttonBorderPrefab, mainPanelButtons[0].transform);
-            menuBorder.transform.SetSiblingIndex(0);
-            buttonBorderIndex = 0;
+            menuBorder.transform.position = button.position;
+            menuBorder.SetActive(true);
+            print(menuBorder.transform.parent.name);
         }
     }
 
@@ -929,22 +955,13 @@ public class BattleManager : MonoBehaviour
         if (enemyTargetPanel.activeInHierarchy)
             enemyTargetPanel.SetActive(false);
         if (magicPanel.activeInHierarchy)
-        {
             magicPanel.SetActive(false);
-            var buttons = magicPanel.GetComponentsInChildren<Button>();
-            if (buttons.Length >= 1)
-            {
-                for (int i = 0; i < buttons.Length; i++)
-                {
-                    Destroy(buttons[i].gameObject); // Destroy previous buttons
-                }
-            }
-        }
         if (characterChoicePanel.activeInHierarchy)
             characterChoicePanel.SetActive(false);
         if (itemPanel.activeInHierarchy)
             itemPanel.SetActive(false);
-        DestroyPreviousBorder();
+        ReturnToMainPanel();
+        print("Return to main panel.");
     }
 
     public void OpenMagicPanel()
@@ -981,6 +998,7 @@ public class BattleManager : MonoBehaviour
                 }
             }
         }
+        CreateFirstButton(magicButtons[0].transform);
         //Resize Magic panel for 4+ spells
         /*int count = 0;
 
@@ -999,7 +1017,7 @@ public class BattleManager : MonoBehaviour
         {
             magicRect.offsetMax = new Vector2(magicRect.sizeDelta.x, -800);
         }*/
-        DestroyPreviousBorder();
+        
     }
 
     public BattleCharacters GetPlayer()
@@ -1028,7 +1046,7 @@ public class BattleManager : MonoBehaviour
             if (Random.value >= percentToFlee)
             {
                 UpdatePlayerStats(players.ToArray(), 0);
-                SettingUpBattle();
+                StartCoroutine(FadeAndExitBattle());
             }
             else
             {
@@ -1053,6 +1071,16 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    IEnumerator FadeAndExitBattle()
+    {
+        FadeTo(0,1);
+        MenuManager.instance.FadeImage();
+        yield return new WaitForSeconds(1f);
+        SettingUpBattle();
+        yield return new WaitForSeconds(0.7f);
+        MenuManager.instance.FadeOut();
+    }
+
     private void UpdateItemsInInventory()
     {
         foreach (Transform itemSlot in itemSlotContainerParent)
@@ -1074,7 +1102,6 @@ public class BattleManager : MonoBehaviour
             itemButton.itemOnButton = item;
             items.Add(itemSlot.transform);
         }
-        DestroyPreviousBorder();
     }
 
     public void SelectedItemToUse(ItemsManager item)
@@ -1126,6 +1153,13 @@ public class BattleManager : MonoBehaviour
         if (selectedItem)
         {
             characterChoicePanel.SetActive(true);
+            if (hasActivatedBorder && menuBorder.CompareTag("Item_Border"))
+            {
+                Destroy(menuBorder);
+                menuBorder = Instantiate(buttonBorderPrefab, targetButton[0].transform);
+                menuBorder.transform.SetSiblingIndex(0);
+                menuBorder.transform.position = targetButton[0].transform.position;
+            }
             for (int i = 0; i < targetButton.Length; i++)
             {
                 targetButton[i].SetActive(false);
@@ -1141,7 +1175,7 @@ public class BattleManager : MonoBehaviour
                     targetButton[i].transform.parent.gameObject.SetActive(activePlayherInHierarchy);
                 }
             }
-            DestroyPreviousBorder();
+            CreateFirstButton(targetButton[0].transform);
         }
     }
 
@@ -1153,23 +1187,26 @@ public class BattleManager : MonoBehaviour
 
     public void ButtonNavigation(int horizontal, int vertical)
     {
-        Destroy(menuBorder);
+        if (menuBorder != null)
+        {
+            if(!itemPanel.activeInHierarchy && menuBorder.CompareTag("Item_Border"))
+            Destroy(menuBorder);
+        }
+        if (!menuBorder)
+        {
+            menuBorder = Instantiate(buttonBorderPrefab);
+        }
+        menuBorder.SetActive(false);
         if (vertical != 0)
             vertical *= -2;
         if (UIButtonHolder.activeInHierarchy)
         {
-            if (buttonBorderIndex + horizontal < 0)
-            {
-                buttonBorderIndex = mainPanelButtons.Length - 1;
-            }
-            else if (buttonBorderIndex + horizontal >= mainPanelButtons.Length)
-            {
-                buttonBorderIndex = 0;
-            }
-            else
-            {
-                buttonBorderIndex += horizontal;
-            }
+            if (buttonBorderIndex + horizontal < 0)            
+                buttonBorderIndex = mainPanelButtons.Length - 1;            
+            else if (buttonBorderIndex + horizontal >= mainPanelButtons.Length)            
+                buttonBorderIndex = 0;            
+            else            
+                buttonBorderIndex += horizontal;            
             if (buttonBorderIndex + vertical < 0)
             {
                 if (buttonBorderIndex % 2 == 0)
@@ -1184,32 +1221,26 @@ public class BattleManager : MonoBehaviour
                 else
                     buttonBorderIndex = 1;
             }
-            else
-            {
-                buttonBorderIndex += vertical;
-            }
+            else            
+                buttonBorderIndex += vertical;            
             if (!hasActivatedBorder)
             {
                 buttonBorderIndex = 0;
                 hasActivatedBorder = true;
             }
-            menuBorder = Instantiate(buttonBorderPrefab, mainPanelButtons[buttonBorderIndex].transform);
+            menuBorder.transform.parent = mainPanelButtons[buttonBorderIndex].transform;
             menuBorder.transform.SetSiblingIndex(0);
+            menuBorder.transform.position = mainPanelButtons[buttonBorderIndex].transform.position;
+
         }
         else if (magicPanel.activeInHierarchy)
         {
-            if (buttonBorderIndex + horizontal < 0)
-            {
-                buttonBorderIndex = magicButtons.Count - 1;
-            }
-            else if (buttonBorderIndex + horizontal >= magicButtons.Count)
-            {
-                buttonBorderIndex = 0;
-            }
-            else
-            {
-                buttonBorderIndex += horizontal;
-            }
+            if (buttonBorderIndex + horizontal < 0)            
+                buttonBorderIndex = magicButtons.Count - 1;            
+            else if (buttonBorderIndex + horizontal >= magicButtons.Count)            
+                buttonBorderIndex = 0;            
+            else            
+                buttonBorderIndex += horizontal;            
             if (buttonBorderIndex + vertical < 0)
             {
                 if (buttonBorderIndex == 0 && magicButtons.Count % 2 == 0)
@@ -1224,40 +1255,31 @@ public class BattleManager : MonoBehaviour
                 else
                     buttonBorderIndex = 1;
             }
-            else
-            {
-                buttonBorderIndex += vertical;
-            }
+            else            
+                buttonBorderIndex += vertical;            
             if (!hasActivatedBorder)
             {
                 buttonBorderIndex = 0;
                 hasActivatedBorder = true;
             }
-            menuBorder = Instantiate(buttonBorderPrefab, magicButtons[buttonBorderIndex].transform);
+            menuBorder.transform.parent = magicButtons[buttonBorderIndex].transform;
             menuBorder.transform.SetSiblingIndex(0);
+            menuBorder.transform.position = magicButtons[buttonBorderIndex].transform.position;
         }
         else if (enemyTargetPanel.activeInHierarchy)
         {
-            if (buttonBorderIndex + horizontal < 0)
-            {
-                buttonBorderIndex = targetButtons.Length - 1;
-            }
+            if (buttonBorderIndex + horizontal < 0)            
+                buttonBorderIndex = targetButtons.Length - 1;            
             /*else if (buttonBorderIndex + horizontal >= targetButtons.Length) //backup for below condition
             {
                 buttonBorderIndex = 0;
             }*/
-            else if (!targetButtons[buttonBorderIndex + horizontal].activeBattleTarget)
-            {
-                buttonBorderIndex = 0;
-            }
-            else
-            {
-                buttonBorderIndex += horizontal;
-            }
-            if (buttonBorderIndex + vertical < 0)
-            {
-                buttonBorderIndex = targetButtons.Length - 1;
-            }
+            else if (!targetButtons[buttonBorderIndex + horizontal].activeBattleTarget)            
+                buttonBorderIndex = 0;            
+            else            
+                buttonBorderIndex += horizontal;            
+            if (buttonBorderIndex + vertical < 0)            
+                buttonBorderIndex = targetButtons.Length - 1;            
             else if (buttonBorderIndex + vertical >= targetButtons.Length)
             {
                 if (targetButtons.Length % 2 == 0)
@@ -1265,10 +1287,8 @@ public class BattleManager : MonoBehaviour
                 else
                     buttonBorderIndex = 1;
             }
-            else
-            {
-                buttonBorderIndex += vertical;
-            }
+            else            
+                buttonBorderIndex += vertical;            
             if (!hasActivatedBorder)
             {
                 buttonBorderIndex = 0;
@@ -1285,23 +1305,18 @@ public class BattleManager : MonoBehaviour
                     }
                 }
             }
-            menuBorder = Instantiate(buttonBorderPrefab, targetButtons[buttonBorderIndex].transform);
+            menuBorder.transform.parent = targetButtons[buttonBorderIndex].transform;
             menuBorder.transform.SetSiblingIndex(0);
+            menuBorder.transform.position = targetButtons[buttonBorderIndex].transform.position;
         }
         else if (itemPanel.activeInHierarchy && !characterChoicePanel.activeInHierarchy && items.Count > 0)
-        {
-            if (buttonBorderIndex + horizontal < 0)
-            {
-                buttonBorderIndex = items.Count - 1;
-            }
-            else if (buttonBorderIndex + horizontal >= items.Count)
-            {
-                buttonBorderIndex = 0;
-            }
-            else
-            {
-                buttonBorderIndex += horizontal;
-            }
+        {           
+            if (buttonBorderIndex + horizontal < 0)            
+                buttonBorderIndex = items.Count - 1;            
+            else if (buttonBorderIndex + horizontal >= items.Count)            
+                buttonBorderIndex = 0;            
+            else            
+                buttonBorderIndex += horizontal;            
             if (buttonBorderIndex + vertical < 0)
             {
                 if (buttonBorderIndex == 0 && items.Count % 2 == 0)
@@ -1316,10 +1331,8 @@ public class BattleManager : MonoBehaviour
                 else
                     buttonBorderIndex = 1;
             }
-            else
-            {
-                buttonBorderIndex += vertical;
-            }
+            else            
+                buttonBorderIndex += vertical;            
             if (!hasActivatedBorder)
             {
                 buttonBorderIndex = 0;
@@ -1327,32 +1340,41 @@ public class BattleManager : MonoBehaviour
             }
             if(items[buttonBorderIndex].GetComponentInChildren<ItemButton>().itemOnButton != null)
                 SelectedItemToUse(items[buttonBorderIndex].GetComponentInChildren<ItemButton>().itemOnButton);
-            menuBorder = Instantiate(itemBorderPrefab, items[buttonBorderIndex].transform);
-            menuBorder.transform.SetSiblingIndex(0);            
+            if (menuBorder.name != itemBorderPrefab.name)
+            {
+                Destroy(menuBorder);
+                menuBorder = Instantiate(itemBorderPrefab, items[buttonBorderIndex].transform);
+            }
+            menuBorder.transform.SetSiblingIndex(0);
+            //menuBorder.transform.position = items[buttonBorderIndex].transform.position;
         }
         else if (characterChoicePanel.activeInHierarchy)
         {
             if (buttonBorderIndex + horizontal < 0)
             {
-                buttonBorderIndex = targetButton.Length - 1;
+                var target = targetButton.Length - 1;
+                if(targetButton[target].activeInHierarchy)
+                    buttonBorderIndex = targetButton.Length - 1;
             }
-            else if (buttonBorderIndex + horizontal >= targetButton.Length)
-            {
-                buttonBorderIndex = 0;
-            }
+            else if (buttonBorderIndex + horizontal >= targetButton.Length)            
+                buttonBorderIndex = 0;            
             else
             {
-                buttonBorderIndex += horizontal;
+                var target = buttonBorderIndex + horizontal;
+                if (targetButton[target].activeInHierarchy)
+                    buttonBorderIndex += horizontal;
             }
             if (!hasActivatedBorder)
             {
                 buttonBorderIndex = 0;
                 hasActivatedBorder = true;
             }
-            print(buttonBorderIndex);
-            menuBorder = Instantiate(characterChoiceButtonPrefab, targetButton[buttonBorderIndex].transform);
+            menuBorder.transform.parent = targetButton[buttonBorderIndex].transform;
             menuBorder.transform.SetSiblingIndex(0);
+            menuBorder.transform.position = targetButton[buttonBorderIndex].transform.position;
         }
+        menuBorder.SetActive(true);
+        print(buttonBorderIndex + " " + menuBorder.transform.parent.name);
     }
     //TODO fix stun for next turn
 

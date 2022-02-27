@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
+
 public class MenuManager : MonoBehaviour
 {
     [SerializeField] Image image;
@@ -27,14 +30,18 @@ public class MenuManager : MonoBehaviour
     [SerializeField] QuestUpdate questUpdate;
     [SerializeField] GameObject optionsPanel;
     [SerializeField] AbilityInfoManager abilityInfoManager;
+    [SerializeField] GameObject[] mainMenuButtons;
 
     public static MenuManager instance;
     public TextMeshProUGUI itemName,itemDescription;
     public ItemsManager activeItem;
+    private GameObject activeItemGameObject;
     PlayerStats[] playerStats;
     bool toglMenu, toglItems, toglStats, toglWarning, toglOptions = false;
     int currentlyViewing;
     ItemsManager[] itemsCollection;
+    private MenuState menuState = MenuState.mainPanels;
+
     private void Start()
     {    
         instance = this;   
@@ -63,21 +70,14 @@ public class MenuManager : MonoBehaviour
         {
             CloseCharacterChoicePanel();
         }
-        else if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && 
-            !GameManager.instance.dialogBoxOpened && !GameManager.instance.battleIsActive) //Toggle Menu
-        {
-            ToggleMenu();            
-        }        
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            var itemList = Inventory.instance.GetItemList();
-            string printInv = "Inventory has " + itemList.Count + " items, ";
-            foreach(ItemsManager item in itemList)
-            {
-                printInv += item.itemName + " " + item.amount + ", ";
-            }
-            Debug.Log(printInv);
-        }
+        /*        else if (Input.GetButtonDown("Cancel") && !ShopManager.instance.shopMenu.activeInHierarchy && 
+                    !GameManager.instance.dialogBoxOpened && !GameManager.instance.battleIsActive) //Toggle Menu
+                {
+                    ToggleMenu();            
+                }   */
+        if(Input.GetKeyDown(KeyCode.I))
+        mainMenuButtons[0].GetComponent<Button>().OnSelect(null);
+
     }
 
     public void ToggleMenu()
@@ -96,6 +96,7 @@ public class MenuManager : MonoBehaviour
         GameManager.instance.UpdatePlayerStats();
         currentQuest.text = "Current Quest: " + QuestManager.instance.GetCurrentQuest();
         DialogController.instance.count = 0;
+        EventSystem.current.currentSelectedGameObject.GetComponent<Button>().OnSelect(null);
     }
 
     public void ToggleItems()
@@ -110,7 +111,6 @@ public class MenuManager : MonoBehaviour
         toglStats = false;
         toglOptions = false;
         itemsPanel.SetActive(toglItems);
-        GameManager.instance.gameMenuOpened = toglItems;
     }
     public void ToggleStats()
     {
@@ -132,7 +132,6 @@ public class MenuManager : MonoBehaviour
                 characterButtons.childControlHeight = true;
         }
         characterPanel.SetActive(toglStats);
-        GameManager.instance.gameMenuOpened = toglStats;
     }
 
     public void UpdateStats()
@@ -236,7 +235,9 @@ public class MenuManager : MonoBehaviour
             else
             { itemAmountText.text = ""; }
             itemSlot.GetComponent<ItemButton>().itemOnButton = item;
+            
         }
+        Invoke("ChangeFocusToItems",0.1f);
     }
 
     public void ExitToMainMenu()
@@ -244,11 +245,7 @@ public class MenuManager : MonoBehaviour
         warningPanel.SetActive(false);
         GameManager.instance.gameMenuOpened = false;
         SceneManager.LoadScene(0);
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit();
+        GameManager.instance.EmptyPlayerStats();
     }
 
     public void DiscardItem()
@@ -268,8 +265,8 @@ public class MenuManager : MonoBehaviour
         OpenCharacterChoicePanel();
         Inventory.instance.RemoveItem(activeItem);
         AudioManager.instance.PlaySFX(0);
-        itemDescription.text = "";
-        itemName.text = "";
+        itemDescription.text = string.Empty;
+        itemName.text = string.Empty;
     }
 
     public void OpenCharacterChoicePanel()
@@ -350,12 +347,17 @@ public class MenuManager : MonoBehaviour
         toglStats = false;
         toglItems = false;
         optionsPanel.gameObject.SetActive(toglOptions);
-        /*if(PlayerPrefs.HasKey("Difficulty_"))*/
+        /*if (PlayerPrefs.HasKey("Difficulty_"))*/ //Check if slider works
     }
 
     public void SaveButton()
     {
         GameManager.instance.SaveData();
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 
     public void FadeOut()
@@ -367,6 +369,8 @@ public class MenuManager : MonoBehaviour
     {
         toglWarning = !toglWarning;
         warningPanel.SetActive(toglWarning);
+        if(toglWarning)
+            mainMenuButtons[5].GetComponent<Button>().OnSelect(null);
     }
 
     public void UpdateQuest(string quest)
@@ -385,6 +389,227 @@ public class MenuManager : MonoBehaviour
                 abilities.childControlWidth = false;
             else
                 abilities.childControlWidth = true;
+        }
+    }
+
+    // Controls
+
+    public enum MenuState
+    {
+        mainPanels,
+        itemPanel,
+        itemUsePanel,
+        itemCharacterChoicePanel,
+        statPanel,
+        optionsPanel,
+        exitPanel
+    }
+
+    private void EnableMainButtons(int index)
+    {
+        foreach (GameObject menu in mainMenuButtons)
+        {
+            var menuButton = menu.GetComponent<Button>();
+            var navigation = menuButton.navigation;
+            navigation.mode = Navigation.Mode.Automatic;
+            menuButton.navigation = navigation;
+        }
+        EventSystem.current.SetSelectedGameObject(mainMenuButtons[index]);
+    }
+
+    private void DisableMainButtons(int index)
+    {
+        foreach (GameObject menu in mainMenuButtons)
+        {
+            var menuButton = menu.GetComponent<Button>();
+            var navigation = menuButton.navigation;
+            navigation.mode = Navigation.Mode.None;
+            menuButton.navigation = navigation;
+        }
+        HighlightButton(index);
+    }
+
+    public void HighlightButton(int index)
+    {
+        foreach (GameObject button in mainMenuButtons)
+            button.GetComponent<Button>().OnDeselect(null);
+        mainMenuButtons[index].GetComponent<Button>().OnSelect(null);
+    }
+
+    public void ChangeFocusToItems()
+    {
+        menuState = MenuState.itemPanel;
+        DisableMainButtons(0);
+        if (itemSlotContainerParent.childCount > 0)
+        {
+            var item = itemSlotContainerParent.GetChild(0).gameObject;
+            EventSystem.current.SetSelectedGameObject(item);
+            item.GetComponent<ItemButton>().Press();
+        }
+    }
+    
+    public void ChangeFocusToItemChoicePanel()
+    {
+        menuState = MenuState.itemCharacterChoicePanel;
+        DisableItemNavigation();
+        EventSystem.current.SetSelectedGameObject(itemsCharacterChoiceNames[0].transform.parent.gameObject);
+        Button[] buttons = new Button[] { useButton, discardButton };
+        foreach (Button button in buttons)
+        {
+            var navigation = button.navigation;
+            navigation.mode = Navigation.Mode.None;
+            button.navigation = navigation;
+        }
+    }
+    
+    public void ChangeFocusToStats()
+    {
+        menuState = MenuState.statPanel;
+        DisableMainButtons(1);
+        var statButton = statsButtons[0];
+        EventSystem.current.SetSelectedGameObject(statButton);
+        statButton.GetComponent<Button>().onClick.Invoke();
+    }
+    
+    public void ChangeFocusToOptions()
+    {
+        menuState = MenuState.optionsPanel;
+        DisableMainButtons(2);
+        EventSystem.current.SetSelectedGameObject(optionsPanel.transform.GetChild(1).gameObject);
+    }
+    
+    public void ChangeFocusToExit()
+    {
+        menuState = MenuState.exitPanel;
+        DisableMainButtons(5);
+        EventSystem.current.SetSelectedGameObject(warningPanel.transform.GetComponentInChildren<Button>().gameObject);
+    }
+
+    public void NavigateItems(InputAction.CallbackContext context)
+    {
+        if (context.canceled)
+        {
+            var button = EventSystem.current.currentSelectedGameObject.GetComponent<ItemButton>();
+            if (button)
+            {
+                button.Press();
+            }
+        }
+    }
+
+    public void NavigateStats(InputAction.CallbackContext context)
+    {
+        if (menuState != MenuState.statPanel) { return; }
+        if (context.canceled)
+        {
+            var button = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
+            if (button)
+            {
+                button.onClick.Invoke();
+            }
+        }
+    }
+
+    public void NavigateToUse(InputAction.CallbackContext context)
+    {
+        if (menuState == MenuState.itemPanel && context.performed) {
+            if (activeItem)
+            {
+                print("test");
+                Invoke("SwitchToUsePanel",0.1f);
+            }
+        }
+    }
+
+    private void SwitchToUsePanel()
+    {
+        menuState = MenuState.itemUsePanel;
+        activeItemGameObject = EventSystem.current.currentSelectedGameObject;
+        DisableItemNavigation();
+        EventSystem.current.SetSelectedGameObject(useButton.gameObject);
+    }
+
+    private void OpenItemCharaterChoice()
+    {
+        OpenCharacterChoicePanel();
+        ChangeFocusToItemChoicePanel();
+    }
+
+    public void DisableItemNavigation()
+    {
+        foreach (Transform item in itemSlotContainerParent)
+        {
+            var itemButton = item.GetComponent<Button>();
+            var navigation = itemButton.navigation;
+            navigation.mode = Navigation.Mode.None;
+            itemButton.navigation = navigation;
+        }
+        Button[] buttons = new Button[] { useButton, discardButton };
+        foreach (Button button in buttons)
+        {
+            var navigation = button.navigation;
+            navigation.mode = Navigation.Mode.Vertical;
+            button.navigation = navigation;
+        }
+    }
+    
+    public void UnlockItemToNavigate()
+    {
+        foreach (Transform item in itemSlotContainerParent)
+        {
+            var itemButton = item.GetComponent<Button>();
+            var navigation = itemButton.navigation;
+            navigation.mode = Navigation.Mode.Automatic;
+            itemButton.navigation = navigation;
+        }
+        EventSystem.current.SetSelectedGameObject(activeItemGameObject);
+        Button[] buttons = new Button[] { useButton, discardButton };
+        foreach (Button button in buttons)
+        {
+            var navigation = button.navigation;
+            navigation.mode = Navigation.Mode.None;
+            button.navigation = navigation;
+        }
+    }
+
+    public void ReturnToPrevious(InputAction.CallbackContext context)
+    {
+        if (context.canceled)
+        {
+            switch (menuState)
+            {
+                case MenuState.itemPanel:
+                    menuState = MenuState.mainPanels;
+                    ToggleItems();
+                    EnableMainButtons(0);
+                    break;
+                case MenuState.itemUsePanel:
+                    menuState = MenuState.itemPanel;
+                    UnlockItemToNavigate();
+                    break;
+                case MenuState.itemCharacterChoicePanel:
+                    menuState = MenuState.itemUsePanel;
+                    EventSystem.current.SetSelectedGameObject(useButton.gameObject);
+                    DisableItemNavigation();
+                    break;
+                case MenuState.statPanel:
+                    menuState = MenuState.mainPanels;
+                    ToggleStats();
+                    EnableMainButtons(1);
+                    break;
+                case MenuState.optionsPanel:
+                    menuState = MenuState.mainPanels;
+                    OptionsMenu();
+                    EnableMainButtons(2);
+                    break;
+                case MenuState.exitPanel:
+                    menuState = MenuState.mainPanels;
+                    EnableMainButtons(5);
+                    break;
+                case MenuState.mainPanels:
+                    ToggleMenu();
+                    break;
+            }
         }
     }
 }

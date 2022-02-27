@@ -109,11 +109,12 @@ MonoBehaviour:
   currentMana: 15
   maxMana: 15
   dexterity: 5
-  defence: 3
+  defense: 5
   weaponPower: 11
-  armorDefence: 3
+  armorDefense: 0
   speed: 7
   evasion: 5
+  lifestealWeap: 0
   isDead: 0
   hasPlayed: 0
 --- !u!1 &2016526331989711048

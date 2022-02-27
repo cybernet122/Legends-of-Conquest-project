@@ -148,11 +148,11 @@ MonoBehaviour:
   currentMana: 100
   addXP: 1000
   dexterity: 20
-  defence: 10
+  defense: 10
   equippedWeaponName: 
   equippedArmorName: 
   weaponPower: 0
-  armorDefence: 0
+  armorDefense: 0
   turnSpeed: 10
   evasion: 5
   lifestealWeap: 0

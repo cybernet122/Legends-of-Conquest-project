@@ -110,7 +110,7 @@ public class PlayerStats : MonoBehaviour
                 playerLevel++;
                 if (playerLevel % 2 == 0)
                 {
-                    dexterity++;
+                    dexterity+=2;
                 }
                 else
                 {
@@ -169,7 +169,8 @@ public class PlayerStats : MonoBehaviour
     {
         if (GetComponent<Player>())
             return;
-        while(Player.instance.GetComponent<PlayerStats>().playerLevel < playerLevel)
+        int levelDifference = Player.instance.GetComponent<PlayerStats>().playerLevel - playerLevel;
+        for (int i = 0; i < levelDifference; i++)
         {
             AddXP(xpForNextLevel[playerLevel]);
         }

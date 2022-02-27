@@ -92,11 +92,9 @@ public class DialogController : MonoBehaviour
 
     private void ReturnFromMountains()
     {
-        if (GameManager.instance.ReturnScene() == 3)
+        if (Utilities.ReturnSceneName() == "Shop")
         {
             var shopkeeper = FindObjectOfType<ShopKeeper>();
-            if (Utilities.ReturnSceneName() != "Shop")
-                return;
             var dialogHandlers = shopkeeper.GetComponents<DialogHandler>();
             /*if (QuestManager.instance.CheckIfComplete("Speak to the Innkeeper") && dialogHandlers.Length > 1)
             {

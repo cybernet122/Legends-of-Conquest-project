@@ -45,7 +45,6 @@ public class AbilityInfoManager : MonoBehaviour
         {
             for (int i = 0; i < abilitiesAvailable.Length; i++)
             {
-                print(abilitiesAvailable[i].name);
                 if (charAvailableAbilities[o] == abilitiesAvailable[i].name)
                 {
                     abilitiesInfoPanel[o + 1].SetActive(true);

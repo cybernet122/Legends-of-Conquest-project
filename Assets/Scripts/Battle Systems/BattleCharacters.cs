@@ -53,7 +53,8 @@ public class BattleCharacters : MonoBehaviour
         currentHP -= damageToRecieve;
         BattleManager.instance.UpdateText();
         UpdateBattleStats();
-        StartCoroutine(PlayDamageRecievedAnimation());
+        if(damageToRecieve>0)
+            StartCoroutine(PlayDamageRecievedAnimation());
     }
 
     private void UpdateBattleStats()

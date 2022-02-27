@@ -14,6 +14,12 @@ public class TooltipSystem : MonoBehaviour
         instance = this;
         canvasGroup = GetComponent<CanvasGroup>();
     }
+
+    private void Update()
+    {
+        if (!GameManager.instance.gameMenuOpened && instance.tooltip.isActiveAndEnabled) { Hide(); }
+    }
+
     public static void Show(string content, string header = "")
     {
         instance.canvasGroup.LeanAlpha(1, 0.5f);
