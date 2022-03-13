@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class BattleManager : MonoBehaviour
 {
@@ -34,7 +36,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] GameObject UIButtonHolder,enemyTargetPanel,returnButton, useItemButton;
     [SerializeField] BattleMoves[] battleMovesList;
     [SerializeField] BattleTargetButtons[] targetButtons;
-    [SerializeField] BattleMagicButton magicButtonPrefab;
+    [SerializeField] BattleMagicButton[] magicButtons;
     [SerializeField] Animator fleeFade;
     int currentPlayerIndex;
     public GameObject magicPanel,itemPanel;
@@ -47,7 +49,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] CanvasGroup battleCanvasGroup;
     bool hasActivatedBorder = false;
     [SerializeField]GameObject menuBorder;
-    List<GameObject> magicButtons = new List<GameObject>();
+    //List<GameObject> magicButtons = new List<GameObject>();
     int buttonBorderIndex;
     public int xpRewardAmount, goldRewardAmount;
     public ItemsManager[] itemsReward;
@@ -59,7 +61,12 @@ public class BattleManager : MonoBehaviour
     [SerializeField] Camera cameraToResize;
     private int musicIndex;
     private List<BattleCharacters> queueToStun = new List<BattleCharacters>();
-    // Start is called before the first frame update
+    BattleMenuState battleMenuState = BattleMenuState.mainPanel;
+    public GameObject abilityChosen;
+    [SerializeField] Button[] useAndCloseButtons;
+    GameObject activeItemObject;
+    GameObject selectedTarget;
+
     void Start()
     {
         if (instance != null && instance != this)
@@ -97,77 +104,9 @@ public class BattleManager : MonoBehaviour
             }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        MenuBorderControl();
-        CheckPlayerButtonHolder();
         CheckForResize();
-    }
-
-    private void MenuBorderControl()
-    {
-        if (Input.GetButtonDown("Fire1") && isBattleActive)
-        {
-            if (!hasActivatedBorder)
-            {
-                hasActivatedBorder = true;
-                List<GameObject> menus = new List<GameObject>() { UIButtonHolder, magicPanel, enemyTargetPanel, characterChoicePanel };
-                for (int i = 0; i < menus.Count; i++)
-                {
-                    if (menus[i].activeInHierarchy)
-                    {
-                        CreateFirstButton(menus[i].transform.GetChild(0));
-                    }
-                }
-            }
-            else if (UIButtonHolder.activeInHierarchy)
-            {
-                //print(mainPanelButtons[buttonBorderIndex].name + " " + buttonBorderIndex);
-                mainPanelButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
-            }
-            else if (magicPanel.activeInHierarchy)
-            {
-                magicButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
-                //print(magicButtons[buttonBorderIndex].name);
-            }
-            else if (enemyTargetPanel.activeInHierarchy)
-            {
-                targetButtons[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
-                //print(targetButtons[buttonBorderIndex].name);
-            }
-            else if (characterChoicePanel.activeInHierarchy)
-            {
-                targetButton[buttonBorderIndex].GetComponentInChildren<Button>().onClick.Invoke();
-                //print(targetButton[buttonBorderIndex].name);
-            }
-            else if (itemPanel.activeInHierarchy)
-                useItemButton.GetComponent<Button>().onClick.Invoke();
-            else if (isRewardScreenOpen)
-                BattleRewardsHandler.instance.CloseRewardScreen();
-        }
-        else if (Input.GetMouseButtonDown(0) && isBattleActive && hasActivatedBorder)
-        {
-            hasActivatedBorder = false;
-            menuBorder.SetActive(false);
-            buttonBorderIndex = 0;
-        }
-        if (Input.GetButtonDown("Cancel") && isBattleActive)
-        {
-            ReturnButton();
-        }
-    }
-
-    private void CheckPlayerButtonHolder()
-    {
-        if (isBattleActive && waitingForTurn && !magicPanel.activeInHierarchy && !enemyTargetPanel.activeInHierarchy && !itemPanel.activeInHierarchy && !characterChoicePanel.activeInHierarchy)
-        {
-            UIButtonHolder.SetActive(true);
-        }
-        else
-        {
-            UIButtonHolder.SetActive(false);
-        }
     }
 
     public void StartBattle(string[] enemiesToSpawn)
@@ -234,8 +173,6 @@ public class BattleManager : MonoBehaviour
                 }
             }
         }
-/*        foreach(BattleCharacters enemy in enemies)
-            DifficultyModifier(enemy);*/
     }
 
     private void DifficultyModifier(BattleCharacters enemy)
@@ -330,12 +267,17 @@ public class BattleManager : MonoBehaviour
             transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, transform.position.z);
             //resize sprite renderer to fit camera
             StartCoroutine(ResizeBackground());
-
+            MenuManager.instance.UpdateStats();
+            GameManager.instance.UpdatePlayerStats();
             for (int i = 0; i < players.Count; i++)
             {
                 playerCanvas[i].SetActive(true);
             }
             battleScene.SetActive(true);
+            EventSystem.current.firstSelectedGameObject = mainPanelButtons[0];
+            EventSystem.current.SetSelectedGameObject(mainPanelButtons[0]);
+            mainPanelButtons[0].GetComponent<Button>().OnSelect(null);
+            MenuManager.instance.SwitchToBattleUI();
         }
         else
         {
@@ -392,7 +334,7 @@ public class BattleManager : MonoBehaviour
         if (cameraToResize)
             transform.position = new Vector3(cameraToResize.transform.position.x, cameraToResize.transform.position.y, transform.position.z);
         else
-            Debug.LogWarning("Couldn't find a camera to resize");
+            Debug.LogError("Couldn't find a camera to resize");
     }
 
     private void CheckForCamera()
@@ -402,6 +344,12 @@ public class BattleManager : MonoBehaviour
 
     private void NextTurn()
     {
+        if (battleMenuState != BattleMenuState.mainPanel)
+        {
+            battleMenuState = BattleMenuState.mainPanel;
+            EventSystem.current.SetSelectedGameObject(mainPanelButtons[0]);
+            mainPanelButtons[0].GetComponent<Button>().OnSelect(null);
+        }
         if (activeBattleCharacters.Count == 0)
         {
             FillActiveBattleCharacters();
@@ -418,8 +366,7 @@ public class BattleManager : MonoBehaviour
         if (activeBattleCharacters[0].IsPlayer() && !activeBattleCharacters[0].isDead)
         {
             waitingForTurn = true;
-            ReturnButton();
-            print("Retruning");
+            Utilities.SetSelectedAndHighlight(mainPanelButtons[0], mainPanelButtons[0].GetComponent<Button>());
             UpdateText();
             for (int i = 0; i < players.Count; i++)
             {
@@ -444,6 +391,7 @@ public class BattleManager : MonoBehaviour
         }
         if(currentTurn > 1)
             CheckIfAllDead();
+        CheckPlayerButtonHolder();
     }
 
     private void CheckIfAllDead()
@@ -472,8 +420,6 @@ public class BattleManager : MonoBehaviour
         else if (friendlies == 0 && Enemies > 0)
         {
             GameManager.instance.GameOver();
-            /*print("Defeat");
-            UpdatePlayerStats(battleCharacters,1);*/
         }
         else
         {
@@ -549,12 +495,6 @@ public class BattleManager : MonoBehaviour
                 });
             }
         }
-        /*characterSpeed.Sort(delegate (BattleCharacters x, BattleCharacters y)
-        {
-            if (x.speed == null || y.speed == null) return 0;
-            else return x.speed.CompareTo(y.speed);
-        });
-        characterSpeed.Reverse();*/
     }
 
     private void SortBySpeed()
@@ -637,34 +577,6 @@ public class BattleManager : MonoBehaviour
         attack = battleMovesList[x];
         StartCoroutine(DealDamageToCharacters(selectedPlayerToAttack,enemyAttacking, movePower, attack));
     }
-
-
-
-    /*public void IncreaseSpeed()
-    {
-        BattleCharacters playerSelected = activeBattleCharacters[0];
-        if (currentTurn == currentTurn + 2 && playerSelected.characterName == activeBattleCharacters[0].characterName && buffApplied)
-        {
-            playerSelected.speed -= 5;
-            print("Reseting Speed " + playerSelected);
-            buffApplied = false;
-            return;
-        }
-        else if (!buffApplied)
-        {
-            playerSelected.speed += 5;
-            buffApplied = true;
-            print("Increasing speed of " + playerSelected + " by " + playerSelected.speed);
-            if (!playerSelected.hasPlayed)
-            {
-                SortBySpeed();
-            }
-            buffApplied = true;
-            activeBattleCharacters.Remove(playerSelected);
-            waitingForTurn = false;
-            NextTurn();
-        }
-    }*/
 
     IEnumerator DealDamageToCharacters(BattleCharacters selectedCharacterToAttack,BattleCharacters characterAttacking, int movePower, BattleMoves attack)
     {
@@ -795,8 +707,8 @@ public class BattleManager : MonoBehaviour
         waitingForTurn = false;
         border[currentPlayerIndex].SetActive(false);
         enemyTargetPanel.SetActive(false);
-        print("Returning");
-        ReturnButton();
+        ClearRings();
+        returnButton.SetActive(false);
         Invoke("NextTurn",1f);
     }
 
@@ -894,7 +806,7 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < enemies.Count; i++)
         {
             if (!enemies[i].IsPlayer() && enemies[i].isDead)
-            {                
+            {
                 enemies.RemoveAt(i);
             }
         }
@@ -915,65 +827,16 @@ public class BattleManager : MonoBehaviour
                 targetButtons[i].button.gameObject.SetActive(false);
             }
         }
-        CreateFirstButton(targetButtons[0].transform);
-    }
+        battleMenuState = BattleMenuState.characterAttackPanel;
 
-    private void ReturnToMainPanel()
-    {
-        if (hasActivatedBorder)
-        {
-            print("test");
-            menuBorder.SetActive(false);
-            menuBorder.transform.parent = mainPanelButtons[0].transform;
-            menuBorder.transform.SetSiblingIndex(0);
-            menuBorder.transform.position = mainPanelButtons[0].transform.position;
-            menuBorder.SetActive(true);
-            buttonBorderIndex = 0;
-        }        
-    }
-
-    private void CreateFirstButton(Transform button)
-    {
-        if (hasActivatedBorder)
-        {
-            if (!menuBorder)
-                menuBorder = Instantiate(buttonBorderPrefab);
-            buttonBorderIndex = 0;
-            menuBorder.transform.parent = button;
-            menuBorder.transform.SetSiblingIndex(0);
-            menuBorder.transform.position = button.position;
-            menuBorder.SetActive(true);
-            print(menuBorder.transform.parent.name);
-        }
-    }
-
-    private void ReturnButton()
-    {
-        if (UIButtonHolder.activeInHierarchy)
-            return;
-        returnButton.SetActive(false);
-        if (enemyTargetPanel.activeInHierarchy)
-            enemyTargetPanel.SetActive(false);
-        if (magicPanel.activeInHierarchy)
-            magicPanel.SetActive(false);
-        if (characterChoicePanel.activeInHierarchy)
-            characterChoicePanel.SetActive(false);
-        if (itemPanel.activeInHierarchy)
-            itemPanel.SetActive(false);
-        ReturnToMainPanel();
-        print("Return to main panel.");
+        CheckPlayerButtonHolder();
     }
 
     public void OpenMagicPanel()
     {
-        var buttons = magicPanel.GetComponentsInChildren<BattleMagicButton>();
-        if (buttons.Length > 0)
+        for (int i = 0; i < magicButtons.Length; i++)
         {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                Destroy(buttons[i].gameObject); // Destroy previous buttons
-                magicButtons.Clear();
-            }
+            magicButtons[i].gameObject.SetActive(false);
         }
         magicPanel.SetActive(true);
         ReturnButtonPlacement();
@@ -985,39 +848,21 @@ public class BattleManager : MonoBehaviour
 
                 if (battleMovesList[i].moveName == activeBattleCharacters[0].AttackMovesAvailable()[x])
                 {
-                    var magicButton = Instantiate(magicButtonPrefab, magicPanel.transform);
-                    magicButton.spellCost = battleMovesList[i].manaCost;
-                    magicButton.spellCostText.text = magicButton.spellCost.ToString();
-                    magicButton.spellName = battleMovesList[i].moveName;
-                    magicButton.spellNameText.text = magicButton.spellName;
+                    magicButtons[x].gameObject.SetActive(true);
+                    magicButtons[x].spellCost = battleMovesList[i].manaCost;
+                    magicButtons[x].spellCostText.text = magicButtons[x].spellCost.ToString();
+                    magicButtons[x].spellName = battleMovesList[i].moveName;
+                    magicButtons[x].spellNameText.text = magicButtons[x].spellName;
                     if (activeBattleCharacters[0].currentMana < battleMovesList[i].manaCost)
                     {
-                        magicButton.GetComponentInChildren<Image>().color = new Color(1, 1, 1, 0.75f);
+                        magicButtons[x].GetComponent<Image>().color = new Color(1, 1, 1, 0.75f);
                     }
-                    magicButtons.Add(magicButton.gameObject);
                 }
             }
         }
-        CreateFirstButton(magicButtons[0].transform);
-        //Resize Magic panel for 4+ spells
-        /*int count = 0;
-
-        for (int i = 1; i <= activeBattleCharacters[0].AttackMovesAvailable().Length; i++)
-        {
-            if (i % 2 == 1)
-                count++;
-        }
-        
-        if (count > 2)
-        {
-            magicRect.offsetMax = new Vector2(magicRect.sizeDelta.x, -1080);
-            magicRect.offsetMax = new Vector2(magicRect.sizeDelta.x, -(-magicRect.sizeDelta.y - 140f * count) - (15 * count));
-        }
-        else
-        {
-            magicRect.offsetMax = new Vector2(magicRect.sizeDelta.x, -800);
-        }*/
-        
+        EventSystem.current.SetSelectedGameObject(magicButtons[0].gameObject);
+        battleMenuState = BattleMenuState.magicPanel;
+        CheckPlayerButtonHolder();
     }
 
     public BattleCharacters GetPlayer()
@@ -1069,6 +914,7 @@ public class BattleManager : MonoBehaviour
             activeBattleCharacters.RemoveAt(0);
             Invoke("NextTurn", 3f);
         }
+        CheckPlayerButtonHolder();
     }
 
     IEnumerator FadeAndExitBattle()
@@ -1091,7 +937,7 @@ public class BattleManager : MonoBehaviour
         foreach (ItemsManager item in Inventory.instance.GetItemList())
         {
             RectTransform itemSlot = Instantiate(itemSlotContainer, itemSlotContainerParent).GetComponent<RectTransform>();
-            ItemButton itemButton = itemSlot.GetComponentInChildren<ItemButton>();
+            ItemButton itemButton = itemSlot.GetComponent<ItemButton>();
             Image image = itemButton.itemsImage;
             image.sprite = item.itemImage;
             TextMeshProUGUI itemAmountText = itemButton.itemAmountText;
@@ -1102,6 +948,8 @@ public class BattleManager : MonoBehaviour
             itemButton.itemOnButton = item;
             items.Add(itemSlot.transform);
         }
+        if(itemSlotContainerParent.childCount == 0)        
+            Utilities.SetSelectedAndHighlight(returnButton, returnButton.GetComponent<Button>());        
     }
 
     public void SelectedItemToUse(ItemsManager item)
@@ -1130,7 +978,7 @@ public class BattleManager : MonoBehaviour
         Inventory.instance.RemoveItem(selectedItem);
         UpdateText();
         UseItemEndTurn();
-
+        returnButton.SetActive(false);
         UpdateItemsInInventory();
         selectedItem = null;
         itemName.text = "";
@@ -1160,10 +1008,14 @@ public class BattleManager : MonoBehaviour
                 menuBorder.transform.SetSiblingIndex(0);
                 menuBorder.transform.position = targetButton[0].transform.position;
             }
-            for (int i = 0; i < targetButton.Length; i++)
+            /*for (int i = 0; i < targetButton.Length; i++)
             {
                 targetButton[i].SetActive(false);
-            }
+            }*/
+            if (players.Count == 1)
+                characterChoicePanel.GetComponent<HorizontalLayoutGroup>().childControlWidth = false;
+            else
+                characterChoicePanel.GetComponent<HorizontalLayoutGroup>().childControlWidth = true;
             for (int i = 0; i < players.Count; i++)
             {
                 if (!players[i].isDead)
@@ -1174,8 +1026,15 @@ public class BattleManager : MonoBehaviour
                     bool activePlayherInHierarchy = activePlayer.gameObject.activeInHierarchy;
                     targetButton[i].transform.parent.gameObject.SetActive(activePlayherInHierarchy);
                 }
-            }
-            CreateFirstButton(targetButton[0].transform);
+                else if (players[i].isDead)
+                {
+                    PlayerStats activePlayer = GameManager.instance.GetPlayerStats()[i];
+                    targetButton[i].GetComponent<Button>().interactable = false;
+                    targetName[i].text = activePlayer.playerName;
+                }
+            }          
+            battleMenuState = BattleMenuState.itemCharacterChoicePanel;
+            Utilities.SetSelectedAndHighlight(targetButton[0], targetButton[0].GetComponent<Button>());
         }
     }
 
@@ -1183,206 +1042,29 @@ public class BattleManager : MonoBehaviour
     {
         itemPanel.SetActive(true);
         UpdateItemsInInventory();
+        battleMenuState = BattleMenuState.itemPanel;
+        ReturnButtonPlacement();
+        CheckPlayerButtonHolder();
     }
-
-    public void ButtonNavigation(int horizontal, int vertical)
-    {
-        if (menuBorder != null)
-        {
-            if(!itemPanel.activeInHierarchy && menuBorder.CompareTag("Item_Border"))
-            Destroy(menuBorder);
-        }
-        if (!menuBorder)
-        {
-            menuBorder = Instantiate(buttonBorderPrefab);
-        }
-        menuBorder.SetActive(false);
-        if (vertical != 0)
-            vertical *= -2;
-        if (UIButtonHolder.activeInHierarchy)
-        {
-            if (buttonBorderIndex + horizontal < 0)            
-                buttonBorderIndex = mainPanelButtons.Length - 1;            
-            else if (buttonBorderIndex + horizontal >= mainPanelButtons.Length)            
-                buttonBorderIndex = 0;            
-            else            
-                buttonBorderIndex += horizontal;            
-            if (buttonBorderIndex + vertical < 0)
-            {
-                if (buttonBorderIndex % 2 == 0)
-                    buttonBorderIndex = mainPanelButtons.Length - 2;
-                else
-                    buttonBorderIndex = mainPanelButtons.Length - 1;
-            }
-            else if (buttonBorderIndex + vertical >= mainPanelButtons.Length)
-            {
-                if (buttonBorderIndex % 2 == 0)
-                    buttonBorderIndex = 0;
-                else
-                    buttonBorderIndex = 1;
-            }
-            else            
-                buttonBorderIndex += vertical;            
-            if (!hasActivatedBorder)
-            {
-                buttonBorderIndex = 0;
-                hasActivatedBorder = true;
-            }
-            menuBorder.transform.parent = mainPanelButtons[buttonBorderIndex].transform;
-            menuBorder.transform.SetSiblingIndex(0);
-            menuBorder.transform.position = mainPanelButtons[buttonBorderIndex].transform.position;
-
-        }
-        else if (magicPanel.activeInHierarchy)
-        {
-            if (buttonBorderIndex + horizontal < 0)            
-                buttonBorderIndex = magicButtons.Count - 1;            
-            else if (buttonBorderIndex + horizontal >= magicButtons.Count)            
-                buttonBorderIndex = 0;            
-            else            
-                buttonBorderIndex += horizontal;            
-            if (buttonBorderIndex + vertical < 0)
-            {
-                if (buttonBorderIndex == 0 && magicButtons.Count % 2 == 0)
-                    buttonBorderIndex = magicButtons.Count - 2;
-                else
-                    buttonBorderIndex = magicButtons.Count - 1;
-            }
-            else if (buttonBorderIndex + vertical >= magicButtons.Count)
-            {
-                if (buttonBorderIndex % 2 == 0)
-                    buttonBorderIndex = 0;
-                else
-                    buttonBorderIndex = 1;
-            }
-            else            
-                buttonBorderIndex += vertical;            
-            if (!hasActivatedBorder)
-            {
-                buttonBorderIndex = 0;
-                hasActivatedBorder = true;
-            }
-            menuBorder.transform.parent = magicButtons[buttonBorderIndex].transform;
-            menuBorder.transform.SetSiblingIndex(0);
-            menuBorder.transform.position = magicButtons[buttonBorderIndex].transform.position;
-        }
-        else if (enemyTargetPanel.activeInHierarchy)
-        {
-            if (buttonBorderIndex + horizontal < 0)            
-                buttonBorderIndex = targetButtons.Length - 1;            
-            /*else if (buttonBorderIndex + horizontal >= targetButtons.Length) //backup for below condition
-            {
-                buttonBorderIndex = 0;
-            }*/
-            else if (!targetButtons[buttonBorderIndex + horizontal].activeBattleTarget)            
-                buttonBorderIndex = 0;            
-            else            
-                buttonBorderIndex += horizontal;            
-            if (buttonBorderIndex + vertical < 0)            
-                buttonBorderIndex = targetButtons.Length - 1;            
-            else if (buttonBorderIndex + vertical >= targetButtons.Length)
-            {
-                if (targetButtons.Length % 2 == 0)
-                    buttonBorderIndex = 0;
-                else
-                    buttonBorderIndex = 1;
-            }
-            else            
-                buttonBorderIndex += vertical;            
-            if (!hasActivatedBorder)
-            {
-                buttonBorderIndex = 0;
-                hasActivatedBorder = true;
-            }
-            if (!targetButtons[buttonBorderIndex].activeBattleTarget)
-            {
-                for (int i = targetButtons.Length - 1; i > 0; i--) // may be flawed
-                {
-                    if (targetButtons[i].activeBattleTarget)
-                    {
-                        buttonBorderIndex = i;
-                        break;
-                    }
-                }
-            }
-            menuBorder.transform.parent = targetButtons[buttonBorderIndex].transform;
-            menuBorder.transform.SetSiblingIndex(0);
-            menuBorder.transform.position = targetButtons[buttonBorderIndex].transform.position;
-        }
-        else if (itemPanel.activeInHierarchy && !characterChoicePanel.activeInHierarchy && items.Count > 0)
-        {           
-            if (buttonBorderIndex + horizontal < 0)            
-                buttonBorderIndex = items.Count - 1;            
-            else if (buttonBorderIndex + horizontal >= items.Count)            
-                buttonBorderIndex = 0;            
-            else            
-                buttonBorderIndex += horizontal;            
-            if (buttonBorderIndex + vertical < 0)
-            {
-                if (buttonBorderIndex == 0 && items.Count % 2 == 0)
-                    buttonBorderIndex = items.Count - 2;
-                else
-                    buttonBorderIndex = items.Count - 1;
-            }
-            else if (buttonBorderIndex + vertical >= items.Count)
-            {
-                if (buttonBorderIndex % 2 == 0)
-                    buttonBorderIndex = 0;
-                else
-                    buttonBorderIndex = 1;
-            }
-            else            
-                buttonBorderIndex += vertical;            
-            if (!hasActivatedBorder)
-            {
-                buttonBorderIndex = 0;
-                hasActivatedBorder = true;
-            }
-            if(items[buttonBorderIndex].GetComponentInChildren<ItemButton>().itemOnButton != null)
-                SelectedItemToUse(items[buttonBorderIndex].GetComponentInChildren<ItemButton>().itemOnButton);
-            if (menuBorder.name != itemBorderPrefab.name)
-            {
-                Destroy(menuBorder);
-                menuBorder = Instantiate(itemBorderPrefab, items[buttonBorderIndex].transform);
-            }
-            menuBorder.transform.SetSiblingIndex(0);
-            //menuBorder.transform.position = items[buttonBorderIndex].transform.position;
-        }
-        else if (characterChoicePanel.activeInHierarchy)
-        {
-            if (buttonBorderIndex + horizontal < 0)
-            {
-                var target = targetButton.Length - 1;
-                if(targetButton[target].activeInHierarchy)
-                    buttonBorderIndex = targetButton.Length - 1;
-            }
-            else if (buttonBorderIndex + horizontal >= targetButton.Length)            
-                buttonBorderIndex = 0;            
-            else
-            {
-                var target = buttonBorderIndex + horizontal;
-                if (targetButton[target].activeInHierarchy)
-                    buttonBorderIndex += horizontal;
-            }
-            if (!hasActivatedBorder)
-            {
-                buttonBorderIndex = 0;
-                hasActivatedBorder = true;
-            }
-            menuBorder.transform.parent = targetButton[buttonBorderIndex].transform;
-            menuBorder.transform.SetSiblingIndex(0);
-            menuBorder.transform.position = targetButton[buttonBorderIndex].transform.position;
-        }
-        menuBorder.SetActive(true);
-        print(buttonBorderIndex + " " + menuBorder.transform.parent.name);
-    }
-    //TODO fix stun for next turn
 
     private void ReturnButtonPlacement()
     {
-        var magicRect = magicPanel.GetComponent<RectTransform>();
+        RectTransform rect = UIButtonHolder.GetComponent<RectTransform>();
+        switch (battleMenuState)
+        {
+            case BattleMenuState.magicPanel:
+                rect = magicPanel.GetComponent<RectTransform>();
+                break;
+            case BattleMenuState.itemPanel:
+                rect = itemPanel.GetComponent<RectTransform>();
+                break;
+            case BattleMenuState.characterAttackPanel:
+                rect = enemyTargetPanel.GetComponent<RectTransform>();
+                break;
+        }
         var button = returnButton.GetComponent<RectTransform>();
-        button.transform.position = new Vector2(80, magicRect.rect.height + 24);        
+        button.position = new Vector2 (80, rect.rect.height + 24);
+        returnButton.SetActive(true);
     }
 
     public BattleCharacters[] ReturnPlayerPrefabs()
@@ -1400,5 +1082,260 @@ public class BattleManager : MonoBehaviour
             }
         }
         return 0;
+    }
+
+    //Battle Menu Navigation
+
+    private enum BattleMenuState
+    {
+        mainPanel,
+        characterAttackPanel,
+        magicPanel,
+        magicAttackCharacterPanel,
+        itemPanel,
+        itemUsePanel,
+        itemCharacterChoicePanel,
+    }
+
+    public void ChangeFocusToAttackPanel()
+    {
+        battleMenuState = BattleMenuState.characterAttackPanel;
+        var attackTarget = enemyTargetPanel.GetComponentInChildren<Button>().gameObject;
+        EventSystem.current.SetSelectedGameObject(attackTarget);
+    }
+    
+    public void ChangeFocusToMagicPanel()
+    {
+        battleMenuState = BattleMenuState.magicPanel;
+        EventSystem.current.SetSelectedGameObject(magicButtons[0].gameObject);
+    }
+    
+    public void ChangeFocusToMagicTargetPanel()
+    {
+        battleMenuState = BattleMenuState.magicAttackCharacterPanel;
+        var attackTarget = enemyTargetPanel.GetComponentInChildren<Button>().gameObject;
+        EventSystem.current.SetSelectedGameObject(attackTarget);
+    }
+
+    public void ChangeFocusToItemsPanel()
+    {
+        battleMenuState = BattleMenuState.itemPanel;
+        if (itemSlotContainerParent.childCount > 0) 
+        {
+            var firstItemObject = itemSlotContainerParent.GetChild(0).gameObject;
+            var firstItemButton = firstItemObject.GetComponent<Button>();
+            EventSystem.current.SetSelectedGameObject(firstItemObject);
+            firstItemButton.OnSelect(null);
+            firstItemButton.onClick.Invoke();
+        }
+    }
+
+    public void ChangeFocusToItemTargetPanel()
+    {
+        battleMenuState = BattleMenuState.itemCharacterChoicePanel;
+        foreach (Button button in useAndCloseButtons)
+        {
+            var navigation = button.navigation;
+            navigation.mode = Navigation.Mode.None;
+            button.navigation = navigation;
+        }
+    }
+    private void ChangeFocusToItemsUsePanel()
+    {
+        battleMenuState = BattleMenuState.itemUsePanel;
+        if (itemSlotContainerParent.childCount > 0)
+        {
+            DisableItemNavigation();
+            Utilities.SetSelectedAndHighlight(useAndCloseButtons[0].gameObject, useAndCloseButtons[0]);
+        }
+    }
+
+    public void NavigateToItemsUsePanel(InputAction.CallbackContext context)
+    {
+        if (battleMenuState == BattleMenuState.itemPanel && context.performed)
+        {
+            Invoke("ChangeFocusToItemsUsePanel", 0.1f);
+        }
+    }
+
+    public void CloseItemPanel()
+    {
+        itemPanel.SetActive(false);
+        battleMenuState = BattleMenuState.mainPanel;
+        Utilities.SetSelectedAndHighlight(mainPanelButtons[2], mainPanelButtons[2].GetComponent<Button>());
+        CheckPlayerButtonHolder();
+    }
+
+
+    public void DisableItemNavigation()
+    {
+        foreach (Transform item in itemSlotContainerParent)
+        {
+            var itemButton = item.GetComponent<Button>();
+            var navigation = itemButton.navigation;
+            navigation.mode = Navigation.Mode.None;
+            itemButton.navigation = navigation;
+        }
+        foreach (Button button in useAndCloseButtons)
+        {
+            var navigation = button.navigation;
+            navigation.mode = Navigation.Mode.Vertical;
+            button.navigation = navigation;
+        }
+    }
+
+    public void UnlockItemToNavigate()
+    {
+        foreach (Transform item in itemSlotContainerParent)
+        {
+            var itemButton = item.GetComponent<Button>();
+            var navigation = itemButton.navigation;
+            navigation.mode = Navigation.Mode.Automatic;
+            itemButton.navigation = navigation;
+        }
+        EventSystem.current.SetSelectedGameObject(activeItemObject);
+        foreach (Button button in useAndCloseButtons)
+        {
+            var navigation = button.navigation;
+            navigation.mode = Navigation.Mode.None;
+            button.navigation = navigation;
+        }
+    }
+
+    public void NavigateItems(InputAction.CallbackContext context)
+    {
+        if (context.canceled && battleMenuState == BattleMenuState.itemPanel)
+        {
+            var button = EventSystem.current.currentSelectedGameObject.GetComponent<ItemButton>();
+            if (button)
+            {
+                button.Press();
+                activeItemObject = button.gameObject;
+            }
+        }
+    }
+
+    public void NavigateTargets(InputAction.CallbackContext context)
+    {
+        if (context.started && enemyTargetPanel.activeInHierarchy)
+        {
+            HideRings();
+        }
+        if (context.canceled && enemyTargetPanel.activeInHierarchy)
+        {
+            ShowRing();
+        }
+    }
+
+    private void ShowRing()
+    {
+        var button = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
+        if (button.GetComponentInParent<BattleTargetButtons>())
+            button.GetComponentInParent<BattleTargetButtons>().OnSelect(null);
+    }
+
+    public void ShowRingsOnAll()
+    {
+        foreach(BattleCharacters enemy in enemies)
+        {
+            enemy.ShowRing();
+        }
+    }
+
+    public void HideAllRings()
+    {
+        foreach (BattleCharacters enemy in enemies)
+        {
+            enemy.HideRing();
+        }
+    }
+
+    private void HideRings()
+    {
+        foreach (BattleTargetButtons targetButton in targetButtons)
+        {
+            if (targetButton.gameObject != EventSystem.current.currentSelectedGameObject && targetButton.activeBattleTarget)
+                targetButton.OnDeselect(null);
+        }
+    }
+
+    private void ClearRings()
+    {
+        foreach(BattleTargetButtons targetButtons in targetButtons)
+        {
+            if(targetButtons.activeBattleTarget)
+                targetButtons.OnDeselect(null);
+        }
+    }
+
+    private void CheckPlayerButtonHolder()
+    {
+        if (isBattleActive && waitingForTurn && battleMenuState==BattleMenuState.mainPanel)
+        {
+            UIButtonHolder.SetActive(true);
+            returnButton.SetActive(false);
+        }
+        else
+        {
+            UIButtonHolder.SetActive(false);
+        }
+    }
+
+    public void ReturnToPreviousMenu(InputAction.CallbackContext context)
+    {
+        if (context.canceled && GameManager.instance.battleIsActive)
+        {
+            ReturnToPreviousMenu();
+        }
+    }
+
+    public void ReturnToPreviousMenu()
+    {
+        if (GameManager.instance.battleIsActive)
+        {
+            Button button;
+            switch (battleMenuState)
+            {
+                case BattleMenuState.characterAttackPanel:
+                    battleMenuState = BattleMenuState.mainPanel;
+                    enemyTargetPanel.SetActive(false);
+                    ClearRings();
+                    button = mainPanelButtons[0].GetComponent<Button>();
+                    Utilities.SetSelectedAndHighlight(mainPanelButtons[0], button);
+                    break;
+                case BattleMenuState.magicPanel:
+                    battleMenuState = BattleMenuState.mainPanel;
+                    magicPanel.SetActive(false);
+                    button = mainPanelButtons[1].GetComponent<Button>();
+                    Utilities.SetSelectedAndHighlight(mainPanelButtons[1], button);
+                    break;
+                case BattleMenuState.magicAttackCharacterPanel:
+                    battleMenuState = BattleMenuState.magicPanel;
+                    enemyTargetPanel.SetActive(false);
+                    ClearRings();
+                    OpenMagicPanel();
+                    button = abilityChosen.GetComponent<Button>();
+                    Utilities.SetSelectedAndHighlight(abilityChosen, button);
+                    break;
+                case BattleMenuState.itemPanel:
+                    battleMenuState = BattleMenuState.mainPanel;
+                    itemPanel.SetActive(false);
+                    button = mainPanelButtons[2].GetComponent<Button>();
+                    Utilities.SetSelectedAndHighlight(mainPanelButtons[2], button);
+                    break;
+                case BattleMenuState.itemUsePanel:
+                    battleMenuState = BattleMenuState.itemPanel;
+                    UnlockItemToNavigate();
+                    ChangeFocusToItemsPanel();
+                    break;
+                case BattleMenuState.itemCharacterChoicePanel:
+                    battleMenuState = BattleMenuState.itemUsePanel;
+                    characterChoicePanel.SetActive(false);
+                    ChangeFocusToItemsUsePanel();
+                    Utilities.SetSelectedAndHighlight(useAndCloseButtons[0].gameObject, useAndCloseButtons[0]);
+                    break;
+            }
+        }
+        CheckPlayerButtonHolder();
     }
 }

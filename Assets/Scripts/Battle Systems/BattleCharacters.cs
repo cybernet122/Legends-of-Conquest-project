@@ -10,6 +10,7 @@ public class BattleCharacters : MonoBehaviour
     [SerializeField] string[] attacksAvailable;
     [SerializeField] Slider hpSlider;
     [SerializeField] TextMeshProUGUI nameText,hpValue;
+    [SerializeField] GameObject selectionRing;
     public string characterName;
     public int currentHP, maxHP, currentMana, maxMana, dexterity, defense, weaponPower, armorDefense, speed;
     public float evasion;
@@ -177,5 +178,15 @@ public class BattleCharacters : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void ShowRing()
+    { 
+        selectionRing.SetActive(true);
+    }
+
+    public void HideRing()
+    {
+        selectionRing.SetActive(false);
     }
 }

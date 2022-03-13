@@ -40,12 +40,11 @@ public class PlayerStats : MonoBehaviour
         }
         currentHP = maxHP;
         currentMana = maxMana;
-    }
-
-    private void Awake()
-    {
         if (GetComponent<Player>())
-            playerName = PlayerPrefs.GetString("Players_name_");
+        {
+            if (PlayerPrefs.HasKey("Players_name_"))
+                playerName = PlayerPrefs.GetString("Players_name_");
+        }
     }
 
     private void OnDisable()

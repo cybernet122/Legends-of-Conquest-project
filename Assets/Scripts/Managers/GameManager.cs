@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         // Old battle Navigation
-        if (battleIsActive)
+        /*if (battleIsActive)
         {
             Player.instance.enableMovement = false;
             if (count)
@@ -44,9 +44,9 @@ public class GameManager : MonoBehaviour
                     BattleManager.instance.ButtonNavigation((int)Input.GetAxisRaw("Horizontal"), (int)Input.GetAxisRaw("Vertical"));
                 }
             }
-        }
+        }*/
         PurgeData();
-        if (dialogBoxOpened || gameMenuOpened || shopMenuOpened)
+        if (dialogBoxOpened || gameMenuOpened || shopMenuOpened || battleIsActive)
         {
             Player.instance.enableMovement = false;
         }

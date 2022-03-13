@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEngine;
 using System.Text.RegularExpressions;
 using TMPro;
+using UnityEngine.InputSystem;
+
 public class DialogController : MonoBehaviour
 {
     public static DialogController instance;
@@ -13,7 +15,6 @@ public class DialogController : MonoBehaviour
     [SerializeField] float dialogSkipDelay = 0.5f;
     [SerializeField] float typewriterDelay = 0.1f;
 /*    [SerializeField] Healer healer;*/
-    float dialogSkipTimer;
     string currentText;
     string questToMark;
     [SerializeField]bool markTheQuestComplete ,shouldMarkQuest;
@@ -21,10 +22,10 @@ public class DialogController : MonoBehaviour
     bool checkingSkip = false;
     public bool triggerOnEntry = false;
     public bool npcInRange = false;
-    public float count = 0;
+    private bool countFinished = true;
     private string npcName;
     [SerializeField] DialogHandler[] dialogHandler;
-    bool advance;
+    bool advance, finishCountDown, countStarted;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,14 +33,76 @@ public class DialogController : MonoBehaviour
         dialogBox.SetActive(false);
         Invoke("ReturnFromMountains",0.3f);
     }
+    private void Update()
+    {
+        if (!ShopManager.instance.shopMenu.activeInHierarchy && !MenuManager.instance.menu.activeInHierarchy && countFinished)
+        {
+            CheckForNPC();
+        }
+        if (!npcInRange)
+        {
+            if (markTheQuestComplete == true || questToMark != "" || shouldMarkQuest == true || triggerOnEntry == true)
+            {
+                markTheQuestComplete = false;
+                questToMark = "";
+                shouldMarkQuest = false;
+                triggerOnEntry = false;
+                dialogHandler = new DialogHandler[0];
+            }
+        }
+    }
+
+    public void StartDelay()
+    {
+        LeanTween.delayedCall(0.6f, () =>
+        {
+            countFinished = true;
+        });
+    }
+
+    public void AdvanceDialogue(InputAction.CallbackContext context)
+    {
+        if (!ShopManager.instance.shopMenu.activeInHierarchy && !MenuManager.instance.menu.activeInHierarchy && npcInRange && countFinished)
+        {
+            if (context.canceled)
+            {
+                if (!isTyping)
+                {
+                    advance = true;
+                    StartCoroutine(ProcessWindowDialog());
+                    countFinished = false;
+                    StartDelay();
+                    CountDownForSkip();
+                }
+                else
+                {
+                    if (!finishCountDown)
+                        CountDownForSkip();
+                    else
+                    {
+                        checkingSkip = true;
+                        finishCountDown = false;
+                    }
+                }
+
+            }
+        }
+    }
+
+    private void CountDownForSkip() //Time before you can skip
+    {
+        LeanTween.delayedCall(dialogSkipDelay, () =>
+        {
+            finishCountDown = true;
+        });
+    }
 
     IEnumerator ProcessWindowDialog()
     {
-        //dialogText.text = dialogSentences[currentSentence];
-
-        advance = Input.GetButtonUp("Fire1") || Input.GetButtonUp("Fire2");
+        //advance = Input.GetButtonUp("Fire1") || Input.GetButtonUp("Fire2");
         if (advance && !isTyping || triggerOnEntry)
         {
+            advance = false;
             dialogBox.SetActive(true);
             triggerOnEntry = false;
             GameManager.instance.dialogBoxOpened = true;
@@ -72,7 +135,6 @@ public class DialogController : MonoBehaviour
                 ReturnFromMountains();
                 currentSentence = 0;
                 dialogText.text = null;
-                count = 0;
             }
         }
         yield return new WaitForEndOfFrame();
@@ -117,7 +179,6 @@ public class DialogController : MonoBehaviour
                     Destroy(dialog);
                 }
                 dialogSentences = new string[0];
-                shopkeeper.CheckForShop();
             }
         }
     }
@@ -154,33 +215,6 @@ public class DialogController : MonoBehaviour
         currentSentence++;
     }
 
-    private void Update()
-    {
-        if (count <= 0.7f)
-            StartCoroutine(CountDown());
-        if (!ShopManager.instance.shopMenu.activeInHierarchy && !MenuManager.instance.menu.activeInHierarchy && count >= 0.7f)
-        {
-            CheckForNPC();
-        }
-        if (!npcInRange)
-        {
-            if (markTheQuestComplete == true || questToMark != "" || shouldMarkQuest == true || triggerOnEntry == true)
-            {
-                markTheQuestComplete = false;
-                questToMark = "";
-                shouldMarkQuest = false;
-                triggerOnEntry = false;
-                dialogHandler = new DialogHandler[0];
-            }
-        }
-    }
-
-    IEnumerator CountDown()
-    {
-        count = count + Time.deltaTime;
-        yield return new WaitForEndOfFrame();
-    }
-
     private void CheckForNPC()
     {
         if (npcInRange)
@@ -190,7 +224,7 @@ public class DialogController : MonoBehaviour
             {
                 currentSentence = 0;                
             }
-            CheckForSkip();
+            //CheckForSkip();
         }
         else
         {
@@ -200,19 +234,6 @@ public class DialogController : MonoBehaviour
         }
     }
 
-    private void CheckForSkip()
-    {
-        if (isTyping)
-        {
-            dialogSkipTimer += Time.deltaTime;
-            if (advance && dialogSkipTimer > dialogSkipDelay)
-            {
-                checkingSkip = true;
-                dialogSkipTimer = 0;
-            }
-        }
-        else { dialogSkipTimer = 0; }
-    }
 
     public void ActivateDialog(string[] newSentencesToUse,DialogHandler[] dialogues)
     {

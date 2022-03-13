@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public static class Utilities
@@ -35,5 +37,11 @@ public static class Utilities
     public static string ReturnPlayersName()
     {
         return PlayerPrefs.GetString("Players_Name_");
+    }
+
+    public static void SetSelectedAndHighlight(GameObject gameObject, Button button)
+    {
+        EventSystem.current.SetSelectedGameObject(gameObject);
+        button.OnSelect(null);
     }
 }

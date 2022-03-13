@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+
 public class Player : MonoBehaviour
 {
     public static Player instance;
@@ -13,7 +14,7 @@ public class Player : MonoBehaviour
     public bool enableMovement = true;
     PlayerStats player;
     public readonly string playersName = "Jimmy";
-    
+
     private void Start()
     {
         if (instance != null && instance != this)
@@ -28,8 +29,8 @@ public class Player : MonoBehaviour
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         player = GetComponent<PlayerStats>();
-        Invoke("RenamePlayer", 0.2f);
-    }
+        Invoke("RenamePlayer", 0.2f);         
+    }    
 
     private void RenamePlayer()
     {
@@ -40,7 +41,6 @@ public class Player : MonoBehaviour
             player.playerName = name;
         }
     }
-
 
     private void Update()
     {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class BattleTargetButtons : MonoBehaviour
+public class BattleTargetButtons : MonoBehaviour, IPointerEnterHandler, ISelectHandler, IPointerExitHandler, IDeselectHandler
 {
     public string moveName;
     public BattleCharacters activeBattleTarget;
@@ -19,5 +20,25 @@ public class BattleTargetButtons : MonoBehaviour
     public void Press()
     {
         BattleManager.instance.PlayerAttack(moveName,activeBattleTarget);
+    }
+
+    public void OnSelect(BaseEventData eventData)
+    {
+        activeBattleTarget.ShowRing();
+    }
+    
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        activeBattleTarget.ShowRing();
+    }
+
+    public void OnDeselect(BaseEventData eventData)
+    {
+        activeBattleTarget.HideRing();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        activeBattleTarget.HideRing();
     }
 }

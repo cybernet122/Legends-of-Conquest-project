@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class ShopManager : MonoBehaviour
 {
@@ -16,23 +18,40 @@ public class ShopManager : MonoBehaviour
     [SerializeField] ItemsManager selectedItem;
     [SerializeField] TextMeshProUGUI buyItemName, buyItemDescription, buyItemValue;
     [SerializeField] TextMeshProUGUI sellItemName, sellItemDescription, sellItemValue;
-    int salePriceReduction;
-    // Start is called before the first frame update
+    [SerializeField] GameObject[] mainShopButtons;
+    [SerializeField] Button[] buyAndSellButtons;
+    private GameObject activeItemGameObject;
+    public bool canOpenShop;
+    [SerializeField]float salePriceReductionInPercent;
+    private int salePriceReduced;
+    public ShopMenuState shopMenuState = ShopMenuState.mainPanel;
+    bool finishedCount = true;
+    private static LTDescr delay;
     void Start()
     {
         instance = this;
         shopMenu.SetActive(false);
-        buyPanel.SetActive(false);
         sellPanel.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        /*if (Input.GetKeyDown(KeyCode.I))
+        if (!finishedCount)
         {
-            UpdateItemsInShop(itemSlotBuyContainerParent, itemsForSale, false);
-        }*/
+            delay = LeanTween.delayedCall(0.7f, () =>
+            {
+                finishedCount = true;
+            });
+        }
+    }
+
+    public void OpenShopMenu(InputAction.CallbackContext context)
+    {
+        if (canOpenShop && context.canceled && shopMenuState == ShopMenuState.mainPanel && !shopMenu.activeInHierarchy && finishedCount
+            && !GameManager.instance.dialogBoxOpened && !GameManager.instance.gameMenuOpened)
+        {
+            OpenShopMenu();
+        }
     }
 
     public void OpenShopMenu()
@@ -40,15 +59,19 @@ public class ShopManager : MonoBehaviour
         shopMenu.SetActive(true);
         GameManager.instance.shopMenuOpened = true;
         currentGoldCoinText.text = "Gold coins: " + GameManager.instance.currentGoldCoins;
-        Invoke("OpenBuyPanel",.1f);
+        EventSystem.current.firstSelectedGameObject = mainShopButtons[0];
+        UpdateItemsInShop(itemSlotBuyContainerParent, itemsForSale, false);
+        Utilities.SetSelectedAndHighlight(mainShopButtons[0], mainShopButtons[0].GetComponent<Button>());
     }
 
     public void CloseShopMenu()
     {
         shopMenu.SetActive(false);
         EmptyText(0);
+        shopMenuState = ShopMenuState.mainPanel;
         GameManager.instance.shopMenuOpened = false;
-        DialogController.instance.count = 0;
+        DialogController.instance.StartDelay();
+        finishedCount = false;
     }
 
     public void OpenBuyPanel()
@@ -57,6 +80,8 @@ public class ShopManager : MonoBehaviour
         buyPanel.SetActive(true);
         sellPanel.SetActive(false);
         UpdateItemsInShop(itemSlotBuyContainerParent, itemsForSale,false);
+        Invoke("ChangeFocusToBuyBrowsePanel",0.2f);
+        Invoke("EnableItemToNavigate",0.2f);
     }
 
     public void OpenSellPanel()
@@ -65,6 +90,8 @@ public class ShopManager : MonoBehaviour
         buyPanel.SetActive(false);
         sellPanel.SetActive(true);
         UpdateItemsInShop(itemSlotSellContainerParent, Inventory.instance.GetItemList(), true);
+        Invoke("ChangeFocusToSellBrowsePanel", 0.2f);
+        Invoke("EnableItemToNavigate",0.2f);
     }
 
     public void EmptyText(int panel)
@@ -93,6 +120,14 @@ public class ShopManager : MonoBehaviour
             sellItemName.text = "";
             sellItemDescription.text = "";
             sellItemValue.text = "";
+            for (int i = 0; i < itemSlotBuyContainerParent.childCount; i++)
+            {
+                Destroy(itemSlotBuyContainerParent.GetChild(i).gameObject);
+            }
+            for (int i = 0; i < itemSlotSellContainerParent.childCount; i++)
+            {
+                Destroy(itemSlotSellContainerParent.GetChild(i).gameObject);
+            }
         }
     }
 
@@ -137,8 +172,8 @@ public class ShopManager : MonoBehaviour
         selectedItem = itemToSell;
         sellItemName.text = selectedItem.itemName;
         sellItemDescription.text = selectedItem.itemDescription;
-        salePriceReduction = (int)(selectedItem.valueInCoins * 0.75);
-        sellItemValue.text = "Value: " + salePriceReduction;
+        salePriceReduced = (int)(selectedItem.valueInCoins * (salePriceReductionInPercent / 100));
+        sellItemValue.text = "Value: " + salePriceReduced;
     }
 
     public void BuyItem()
@@ -158,14 +193,252 @@ public class ShopManager : MonoBehaviour
     {
         if (selectedItem)
         {
-            GameManager.instance.currentGoldCoins += (int)salePriceReduction;
+            GameManager.instance.currentGoldCoins += salePriceReduced;
             Inventory.instance.RemoveItem(selectedItem);
             currentGoldCoinText.text = "Gold Coins: " + GameManager.instance.currentGoldCoins;
             if (!selectedItem.isStackable || selectedItem.amount <= 0)
             {
                 EmptyText(1);
             }
-            UpdateItemsInShop(itemSlotSellContainerParent, Inventory.instance.GetItemList(),true);
+            selectedItem = null;
+            UpdateItemsInShop(itemSlotSellContainerParent, Inventory.instance.GetItemList(), true);
+            Invoke("SelectNextItemToSell",0.1f);
+        }
+    }
+
+    private void SelectNextItemToSell()
+    {
+        if (itemSlotSellContainerParent.childCount != 0)
+        {
+            var itemButton = itemSlotSellContainerParent.GetChild(0).GetComponent<ItemButton>();
+            selectedItem = itemButton.itemOnButton;
+            itemButton.Press();
+            itemButton.GetComponent<Button>().OnSelect(null);
+        }
+        else
+        {
+            ReturnToPrevious();
+            EmptyText(2);
+        }
+    }
+
+    //Shop Menu Navigation
+
+    public enum ShopMenuState
+    {
+        mainPanel,
+        buyBrowsePanel,
+        buyPanel,
+        sellBrowsePanel,
+        sellPanel
+    }
+
+    private void EnableMainButtons(int index)
+    {
+        foreach (GameObject menu in mainShopButtons)
+        {
+            var menuButton = menu.GetComponent<Button>();
+            var navigation = menuButton.navigation;
+            navigation.mode = Navigation.Mode.Automatic;
+            menuButton.navigation = navigation;
+        }
+        Utilities.SetSelectedAndHighlight(mainShopButtons[index], mainShopButtons[index].GetComponent<Button>());
+    }
+
+    private void DisableMainButtons(int index)
+    {
+        foreach (GameObject menu in mainShopButtons)
+        {
+            var menuButton = menu.GetComponent<Button>();
+            var navigation = menuButton.navigation;
+            navigation.mode = Navigation.Mode.None;
+            menuButton.navigation = navigation;
+        }
+        Invoke("HighlightButton",0.1f);
+    }
+
+    private void HighlightButton()
+    {
+        for (int i = 0; i < mainShopButtons.Length; i++)        
+            mainShopButtons[i].GetComponent<Button>().OnDeselect(null);        
+        if (buyPanel.activeInHierarchy)
+            mainShopButtons[0].GetComponent<Button>().OnSelect(null);
+        else
+            mainShopButtons[1].GetComponent<Button>().OnSelect(null);
+    }
+
+    public void ChangeFocusToBuyBrowsePanel()
+    {
+        shopMenuState = ShopMenuState.buyBrowsePanel;
+        DisableMainButtons(0);
+        if (itemSlotBuyContainerParent.childCount != 0)
+        {
+            var itemButton = itemSlotBuyContainerParent.GetChild(0).GetComponent<Button>();
+            Utilities.SetSelectedAndHighlight(itemButton.gameObject, itemButton);
+            itemButton.onClick.Invoke();
+        }
+    }
+
+    public void ChangeFocusToSellBrowsePanel()
+    {
+        shopMenuState = ShopMenuState.sellBrowsePanel;
+        DisableMainButtons(1);
+        if (itemSlotSellContainerParent.childCount != 0)
+        {
+            var itemSellButton = itemSlotSellContainerParent.GetChild(0).GetComponent<Button>();
+            Utilities.SetSelectedAndHighlight(itemSellButton.gameObject, itemSellButton);
+            itemSellButton.onClick.Invoke();
+        }
+    }
+
+    public void NavigateItems(InputAction.CallbackContext context)
+    {
+        if (context.canceled && shopMenu.activeInHierarchy)
+        {
+            if (buyPanel.activeInHierarchy || sellPanel.activeInHierarchy)
+            {
+                if (itemSlotBuyContainerParent.childCount != 0 || itemSlotSellContainerParent.childCount !=0)
+                {
+                    var button = EventSystem.current.currentSelectedGameObject.GetComponent<ItemButton>();
+                    if (button)
+                    {
+                        button.Press();
+                        selectedItem = button.itemOnButton;
+                    }
+                }
+            }
+        }
+    }
+
+    public void NavigateToBuyOrSell(InputAction.CallbackContext context)
+    {
+        if (shopMenu.activeInHierarchy)
+        {
+            if (shopMenuState == ShopMenuState.buyBrowsePanel && context.performed)
+            {
+                if (selectedItem)
+                {
+                    Invoke("SwitchToBuyPanel", 0.2f);
+                }
+            }
+            if (shopMenuState == ShopMenuState.sellBrowsePanel && context.performed)
+            {
+                if (selectedItem)
+                {
+                    Invoke("SwitchToSellPanel", 0.2f);
+                }
+            }
+        }
+    }
+
+    private void SwitchToBuyPanel()
+    {
+        shopMenuState = ShopMenuState.buyPanel;
+        activeItemGameObject = EventSystem.current.currentSelectedGameObject;
+        DisableItemNavigation(0);
+        Utilities.SetSelectedAndHighlight(buyAndSellButtons[0].gameObject, buyAndSellButtons[0]);
+        activeItemGameObject.GetComponent<Button>().OnSelect(null);
+    }
+
+    private void SwitchToSellPanel()
+    {
+        shopMenuState = ShopMenuState.sellPanel;
+        activeItemGameObject = EventSystem.current.currentSelectedGameObject;
+        DisableItemNavigation(1);
+        Utilities.SetSelectedAndHighlight(buyAndSellButtons[1].gameObject, buyAndSellButtons[1]);
+        activeItemGameObject.GetComponent<Button>().OnSelect(null);
+    }
+
+    private void DisableItemNavigation(int index)
+    {
+        foreach (Transform item in itemSlotBuyContainerParent)
+        {
+            var itemButton = item.GetComponent<Button>();
+            var itemNavigation = itemButton.navigation;
+            itemNavigation.mode = Navigation.Mode.None;
+            itemButton.navigation = itemNavigation;
+        }
+        foreach (Transform item in itemSlotSellContainerParent)
+        {
+            var itemButton = item.GetComponent<Button>();
+            var itemNavigation = itemButton.navigation;
+            itemNavigation.mode = Navigation.Mode.None;
+            itemButton.navigation = itemNavigation;
+        }
+    }
+
+    private void EnableItemToNavigate()
+    {
+        foreach (Transform item in itemSlotBuyContainerParent)
+        {
+            var itemButton = item.GetComponent<Button>();
+            var navigation = itemButton.navigation;
+            navigation.mode = Navigation.Mode.Automatic;
+            itemButton.navigation = navigation;
+        }
+        foreach (Transform item in itemSlotSellContainerParent)
+        {
+            var itemButton = item.GetComponent<Button>();
+            var navigation = itemButton.navigation;
+            navigation.mode = Navigation.Mode.Automatic;
+            itemButton.navigation = navigation;
+        }
+    }
+
+    public void ReturnToPrevious()
+    {
+        if (shopMenu.activeInHierarchy)
+            switch (shopMenuState)
+            {
+                case ShopMenuState.buyBrowsePanel:
+                    shopMenuState = ShopMenuState.mainPanel;
+                    EnableMainButtons(0);
+                    break;
+                case ShopMenuState.buyPanel:
+                    shopMenuState = ShopMenuState.buyBrowsePanel;
+                    EnableItemToNavigate();
+                    if (itemSlotBuyContainerParent.childCount != 0)
+                    {
+                        if (activeItemGameObject)
+                        {
+                            var itemBuyButton = activeItemGameObject;
+                            Utilities.SetSelectedAndHighlight(itemBuyButton, itemBuyButton.GetComponent<Button>());
+                        }
+                        else
+                        {
+                            var itemBuyButton = itemSlotBuyContainerParent.GetChild(0).gameObject;
+                            Utilities.SetSelectedAndHighlight(itemBuyButton, itemBuyButton.GetComponent<Button>());
+                        }
+                    }
+                    else
+                        ReturnToPrevious();
+                    break;
+                case ShopMenuState.sellBrowsePanel:
+                    shopMenuState = ShopMenuState.mainPanel;
+                    EnableMainButtons(1);
+                    break;
+                case ShopMenuState.sellPanel:
+                    shopMenuState = ShopMenuState.sellBrowsePanel;
+                    EnableItemToNavigate();
+                    if (itemSlotSellContainerParent.childCount != 0)
+                    {
+                        var itemSellButton = itemSlotSellContainerParent.GetChild(0).gameObject;
+                        Utilities.SetSelectedAndHighlight(itemSellButton, itemSellButton.GetComponent<Button>());
+                    }
+                    else
+                        ReturnToPrevious();
+                    break;
+                case ShopMenuState.mainPanel:
+                    CloseShopMenu();
+                    break;
+            }
+    }
+
+    public void ReturnToPrevious(InputAction.CallbackContext context)
+    {
+        if (context.canceled && !GameManager.instance.battleIsActive)
+        {
+            ReturnToPrevious();
         }
     }
 }

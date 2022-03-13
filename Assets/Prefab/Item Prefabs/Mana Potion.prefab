@@ -100,12 +100,12 @@ MonoBehaviour:
   itemName: Mana Potion
   itemDescription: This magical potion is said to return mana used for magic back
     to it's user, used among magicians.
-  valueInCoins: 15
+  valueInCoins: 16
   itemImage: {fileID: 21300000, guid: 92d7ce39ede8ff54a8231c75c112d3ba, type: 3}
   amountOfEffect: 20
   affectType: 1
   weaponDexterity: 0
-  armorDefence: 0
+  armorDefense: 0
   isStackable: 1
   amount: 1
   rememberPickup: 0

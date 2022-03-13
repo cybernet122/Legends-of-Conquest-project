@@ -4,38 +4,44 @@ using UnityEngine;
 
 public class ShopKeeper : MonoBehaviour
 {
-    private bool canOpenShop;
     [SerializeField] List<ItemsManager> shopKeeperItemsForSale;
+    bool shopInRange = false;
 
-    private void Update()
+    private void OnEnable()
     {
-        if (canOpenShop && Input.GetButtonDown("Fire1") && Player.instance.enableMovement &&
-            !ShopManager.instance.shopMenu.activeInHierarchy)
-        {
-            ShopManager.instance.OpenShopMenu();
-            ShopManager.instance.itemsForSale = shopKeeperItemsForSale;
-        }
-        else if(Input.GetButtonDown("Cancel") && ShopManager.instance.shopMenu.activeInHierarchy)
-        {
-            ShopManager.instance.CloseShopMenu();
-        }
+        MenuManager.CloseMenu += CheckForShop;
+    }
+    private void OnDisable()
+    {
+        MenuManager.CloseMenu += CheckForShop;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Player")
         {
+            shopInRange = true;
             CheckForShop();
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.tag == "Player")
+        {
+            shopInRange = true;
         }
     }
 
     public void CheckForShop()
     {
-        if (QuestManager.instance.CheckIfComplete("Return to the Innkeeper") || !GetComponent<DialogHandler>())
+        if ((QuestManager.instance.CheckIfComplete("Return to the Innkeeper") || !GetComponent<DialogHandler>()) && shopInRange)
         {
             /*                Destroy(GetComponent<DialogHandler>());
             */
-            canOpenShop = true;
+            ShopManager.instance.canOpenShop = true;
+            MenuManager.instance.SwitchToShopUI();
+            ShopManager.instance.itemsForSale = shopKeeperItemsForSale;
         }
     }
 
@@ -43,7 +49,10 @@ public class ShopKeeper : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            canOpenShop = false;
+            ShopManager.instance.canOpenShop = false;
+            MenuManager.instance.SwitchToUI();
+            ShopManager.instance.itemsForSale.Clear();
+            shopInRange = false;
         }
     }
 }

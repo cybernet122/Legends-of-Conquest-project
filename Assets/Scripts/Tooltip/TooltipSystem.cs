@@ -17,7 +17,11 @@ public class TooltipSystem : MonoBehaviour
 
     private void Update()
     {
-        if (!GameManager.instance.gameMenuOpened && instance.tooltip.isActiveAndEnabled) { Hide(); }
+        if (!GameManager.instance.gameMenuOpened && instance.tooltip.isActiveAndEnabled) 
+        {
+            if(!MenuManager.instance.GetInfoPanelActive() || !MenuManager.instance.GetStatPanelActive())
+                Hide();
+        }
     }
 
     public static void Show(string content, string header = "")
