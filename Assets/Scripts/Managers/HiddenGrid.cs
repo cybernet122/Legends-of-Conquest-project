@@ -31,7 +31,8 @@ public class HiddenGrid : MonoBehaviour
         }
         outsideGrid.HideMap();
         treasureChest.SetActive(true);
-        battleInstantiator.SetActive(true);
+        if (battleInstantiator != null)
+            battleInstantiator.SetActive(true);
     }
 
     public void HideHidden()
@@ -41,6 +42,7 @@ public class HiddenGrid : MonoBehaviour
             grid.SetActive(false);
         }
         treasureChest.SetActive(false);
-        battleInstantiator.SetActive(false);
+        if (battleInstantiator != null)
+            battleInstantiator.SetActive(false);
     }
 }

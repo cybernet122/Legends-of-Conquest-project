@@ -3,58 +3,60 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     [SerializeField] PlayerStats[] playerStats;
     public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive, count;
     public int currentGoldCoins;
+    public GameObject joystickControls;
     [SerializeField]SavingFade savingFade;
+    [SerializeField] GameObject player;
     string[] playerAssets;
     List<string> stringsToSave = new List<string>();
+    public bool newGame, enableMovement,continueGame = false;
+    [SerializeField]PlayerInput playerInput;
+    public bool loading =false;
     // Start is called before the first frame update
     void Start()
     {
-        if (instance != null && instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            instance = this;
-        }
+        if (instance != null && instance != this)        
+            Destroy(this.gameObject);        
+        else        
+            instance = this;        
         DontDestroyOnLoad(gameObject);
+        if(!savingFade)
         savingFade = FindObjectOfType<SavingFade>();
         count = true;
-        SortPlayerStats();
-        UpdatePlayerLevels();
+        LeanTween.delayedCall(0.1f, () =>
+        {
+            SortPlayerStats();
+            UpdatePlayerLevels();
+        });        
     }
 
     void Update()
     {
-        // Old battle Navigation
-        /*if (battleIsActive)
-        {
-            Player.instance.enableMovement = false;
-            if (count)
-            {
-                if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
-                {
-                    BattleManager.instance.ButtonNavigation((int)Input.GetAxisRaw("Horizontal"), (int)Input.GetAxisRaw("Vertical"));
-                }
-            }
-        }*/
         PurgeData();
-        if (dialogBoxOpened || gameMenuOpened || shopMenuOpened || battleIsActive)
+        if (loading || dialogBoxOpened || gameMenuOpened || shopMenuOpened || battleIsActive || SceneManager.GetActiveScene().name == "Main Menu" || SceneManager.GetActiveScene().name == "Loading Scene" || SceneManager.GetActiveScene().name == "GameOverScene" || SceneManager.GetActiveScene().name == "Treasure")
         {
-            Player.instance.enableMovement = false;
+            if (enableMovement != false)
+                enableMovement = false;
+            if(joystickControls && joystickControls.GetComponentInChildren<Image>().enabled)
+            DisableButtons();
         }
         else
         {
-            Player.instance.enableMovement = true;
+            if (enableMovement != true)
+                enableMovement = true;
+            if(joystickControls && !joystickControls.GetComponentInChildren<Image>().enabled)
+            EnableButtons();
         }
-        if (Input.GetKeyDown(KeyCode.F5))
+        /*if (Input.GetKeyDown(KeyCode.F5))
         {
             SaveData();
         }
@@ -65,11 +67,28 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             QuestManager.instance.PurgeQuestData();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha9))
+        }*/
+        /*if (Input.GetKeyDown(KeyCode.O))
         {
-            UpdatePlayerLevels();
-        }
+            var playerObject = Instantiate(player,SwitchActiveMap.instance.gameObject.transform);
+        }*/
+    }
+
+    private void EnableButtons()
+    {
+        for (int i = 0; i < joystickControls.transform.childCount; i++)        
+            joystickControls.transform.GetChild(i).GetComponent<Image>().enabled = true;        
+    }
+
+    private void DisableButtons()
+    {
+        for (int i = 0; i < joystickControls.transform.childCount; i++)        
+            joystickControls.transform.GetChild(i).GetComponent<Image>().enabled = false;        
+    }
+
+    private void OnDestroy()
+    {
+        CancelInvoke();
     }
 
     public PlayerStats[] GetPlayerStats()
@@ -87,22 +106,67 @@ public class GameManager : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneWasSwitched;
     }
 
+    private void FadeOut()
+    {
+        if (SceneManager.GetActiveScene().name != "Main Menu" && SceneManager.GetActiveScene().name != "Loading Scene")
+        {
+            MenuManager.instance.FadeOut(.5f);
+        }
+    }
+
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneWasSwitched;
+        FadeOut();
     }
 
     private void Awake()
     {
-        Invoke("CheckForBattleManager", 0.15f);
-        
+        Invoke("CheckForBattleManager", 0.15f);        
+    }
+
+    public void DestroyPlayer()
+    {
+        StartCoroutine(CreatePlayerAndSetBorders());
+    }
+
+    private IEnumerator CreatePlayerAndSetBorders()
+    {
+        Destroy(Player.instance.gameObject);
+        yield return new WaitForSeconds(0.1f);
+        var playerObject = Instantiate(player, SwitchActiveMap.instance.transform);
+        playerObject.GetComponent<Player>().playerInput = SwitchActiveMap.instance.GetComponent<PlayerInput>();
+        yield return new WaitForSeconds(0.1f);
+        FindObjectOfType<LevelManager>().SetLimit();
     }
 
     private void OnSceneWasSwitched(Scene scene, LoadSceneMode mode)
     {
         savingFade = FindObjectOfType<SavingFade>();
-        Invoke("SortPlayerStats", 0.1f);
-        Invoke("UpdatePlayerLevels", 0.5f);
+        Invoke("SortPlayerStats", 0.3f);
+        Invoke("UpdatePlayerLevels", 0.5f);        
+        Invoke("LoadSecondaryData", 0.5f);
+        LeanTween.delayedCall(0.15f, () =>
+        {
+            QuestManager.instance.MountainsQuest();
+            savingFade = SavingFade.instance;
+            if (scene.name != "Main Menu" && scene.name != "Loading Scene")
+                MenuManager.instance.SetFirstSelectedObject();
+            DialogController.instance.ReturnFromMountains();
+        });
+        if(SceneManager.GetActiveScene().name == "Bedroom" && newGame)
+        {
+            LeanTween.delayedCall(0.45f, () =>
+            {
+                if (newGame || continueGame)
+                {
+                    var spawnPoint = FindObjectOfType<SpawnPoint>();
+                    Player.instance.transform.position = spawnPoint.gameObject.transform.position;
+                    newGame = false;
+                    continueGame = false;
+                }
+            });
+        }
     }
 
     private void CheckForBattleManager()
@@ -128,9 +192,12 @@ public class GameManager : MonoBehaviour
             return;
         else
         {
-            var playerStats1 = playerStats[0];
-            playerStats = new PlayerStats[1];
-            playerStats[0] = playerStats1;
+            if (Utilities.ReturnSceneName() != "GameOverScene" && Utilities.ReturnSceneName() != "Loading Scene" && Utilities.ReturnSceneName() != "Main Menu")
+            {
+                var playerStats1 = playerStats[0];
+                playerStats = new PlayerStats[1];
+                playerStats[0] = playerStats1;
+            }
         }
     }
 
@@ -152,10 +219,9 @@ public class GameManager : MonoBehaviour
         savingFade.PlaySaveAnimation();
         SavePlayerPos();
         QuestManager.instance.SaveQuestData();
-        SavePlayerStats();
-        SaveItemInventory();
+        SaveSecondaryData();
         PlayerPrefs.SetString("Current_Scene", SceneManager.GetActiveScene().name);
-        
+        PlayerPrefs.SetInt("Gold_coins_", currentGoldCoins);
     }
 
     private static void SaveItemInventory()
@@ -185,10 +251,10 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < playerStats.Length; i++)
         {
-            if (playerStats[i].gameObject.activeInHierarchy)
+            /*if (playerStats[i].gameObject.activeInHierarchy)
                 PlayerPrefs.SetInt("Player_" + playerStats[i].name + "_active", 1);
             else
-                PlayerPrefs.SetInt("Player_" + playerStats[i].name + "_active", 0);
+                PlayerPrefs.SetInt("Player_" + playerStats[i].name + "_active", 0);*/
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_Level", playerStats[i].playerLevel);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_CurrentXP", playerStats[i].currentXP);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_CurrentHP", playerStats[i].currentHP);
@@ -197,8 +263,7 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_MaxMana", playerStats[i].maxMana);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_Dexterity", playerStats[i].dexterity);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_Defense", playerStats[i].defense);
-            PlayerPrefs.SetString("Player_" + playerStats[i].playerName + "_EquippedWeapon", playerStats[i].equippedWeaponName);
-            PlayerPrefs.SetString("Player_" + playerStats[i].playerName + "_EquippedArmor", playerStats[i].equippedArmorName);
+            SaveEquippedItems(i);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_WeaponPower", playerStats[i].weaponPower);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_ArmorDefense", playerStats[i].armorDefense);
             PlayerPrefs.SetInt("Player_" + playerStats[i].playerName + "_Speed", playerStats[i].turnSpeed);
@@ -208,7 +273,20 @@ public class GameManager : MonoBehaviour
             else
                 PlayerPrefs.SetInt("Player_lifesteal_", 0);
         }
-        PlayerPrefs.SetInt("Gold_Coins_", currentGoldCoins);
+    }
+
+    private void SaveEquippedItems(int i)
+    {
+        PlayerPrefs.SetString("Player_" + playerStats[i].playerName + "_EquippedWeapon", playerStats[i].equippedWeaponName);
+        PlayerPrefs.SetString("Player_" + playerStats[i].playerName + "_EquippedArmor", playerStats[i].equippedArmorName);
+    }
+
+    private void LoadEquippedItems(int i)
+    {
+        playerStats[i].equippedWeaponName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedWeapon");
+        playerStats[i].equippedWeapon = ItemsAssets.instance.GetItemsAsset(playerStats[i].equippedWeaponName);
+        playerStats[i].equippedArmorName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedArmor");
+        playerStats[i].equippedArmor = ItemsAssets.instance.GetItemsAsset(playerStats[i].equippedArmorName);
     }
 
     public void LoadData()
@@ -217,8 +295,9 @@ public class GameManager : MonoBehaviour
         {
             LoadPlayerPos();
             QuestManager.instance.LoadQuestData();
-            LoadPlayerStats();
+            Invoke("LoadPlayerStats",0.4f);
             LoadItemInventory();
+            currentGoldCoins = PlayerPrefs.GetInt("Gold_coins_");
         }
     }
 
@@ -249,10 +328,10 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < playerStats.Length; i++)
         {
-            if (PlayerPrefs.GetInt("Player_" + playerStats[i].name + "_active") == 0)
+            /*if (PlayerPrefs.GetInt("Player_" + playerStats[i].name + "_active") == 0)
                 playerStats[i].gameObject.SetActive(false);
             else
-                playerStats[i].gameObject.SetActive(true);
+                playerStats[i].gameObject.SetActive(true);*/
             playerStats[i].playerLevel = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Level");
             playerStats[i].currentXP = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_CurrentXP");
             playerStats[i].currentHP = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_CurrentHP");
@@ -261,10 +340,7 @@ public class GameManager : MonoBehaviour
             playerStats[i].maxMana = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_MaxMana");
             playerStats[i].dexterity = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Dexterity");
             playerStats[i].defense = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Defense");
-            playerStats[i].equippedWeaponName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedWeapon");
-            playerStats[i].equippedWeapon = ItemsAssets.instance.GetItemsAsset(playerStats[i].equippedWeaponName);
-            playerStats[i].equippedArmorName = PlayerPrefs.GetString("Player_" + playerStats[i].playerName + "_EquippedArmor");
-            playerStats[i].equippedArmor = ItemsAssets.instance.GetItemsAsset(playerStats[i].equippedArmorName);
+            LoadEquippedItems(i);
             playerStats[i].weaponPower = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_WeaponPower");
             playerStats[i].armorDefense = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_ArmorDefense");
             playerStats[i].turnSpeed = PlayerPrefs.GetInt("Player_" + playerStats[i].playerName + "_Speed");
@@ -274,7 +350,6 @@ public class GameManager : MonoBehaviour
             else
                 playerStats[i].lifestealWeap = false;
         }
-        GameManager.instance.currentGoldCoins = PlayerPrefs.GetInt("Gold_Coins_");
     }
 
     private static void LoadPlayerPos()
@@ -287,7 +362,7 @@ public class GameManager : MonoBehaviour
 
     private void PurgeData()
     {
-        if (Input.GetKeyDown(KeyCode.K))
+        if (Input.GetKeyDown(KeyCode.K) && SceneManager.GetActiveScene().name != "Main Menu")
         {
             PlayerPrefs.DeleteAll();
             Debug.Log("Purging Data");
@@ -307,11 +382,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-/*    public string ReturnScene()
-    {
-        return SceneManager.GetActiveScene().name;
-    }*/
-
     public void GameOver()
     {
         StartCoroutine(LoadGameOverScene());
@@ -319,6 +389,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator LoadGameOverScene()
     {
+        SwitchActiveMap.instance.SwitchToUI();
         MenuManager.instance.FadeImage();
         yield return new WaitForSeconds(1f);
         SceneManager.LoadScene("GameOverScene");    
@@ -331,12 +402,30 @@ public class GameManager : MonoBehaviour
 
     public void SaveSecondaryData()
     {
-        foreach (string data in stringsToSave)
-        {
-            PlayerPrefs.SetInt(data, 1);
-        }
-        stringsToSave.Clear();
+        foreach (string data in stringsToSave)        
+            PlayerPrefs.SetInt(data, 1);        
         SavePlayerStats();
         SaveItemInventory();
+    }
+    
+    public void LoadSecondaryData()
+    {
+        if (PlayerPrefs.HasKey("Player_Pos_X"))
+        {
+            foreach (string data in stringsToSave)
+                PlayerPrefs.GetInt(data, 1);
+            stringsToSave.Clear();
+            LoadPlayerStats();
+            LoadItemInventory();
+        }
+    }
+
+    public void MovePlayer(InputAction.CallbackContext context)
+    {
+        if (enableMovement)
+        {
+            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+            Player.instance.MovePlayer(input.x, input.y);
+        }
     }
 }

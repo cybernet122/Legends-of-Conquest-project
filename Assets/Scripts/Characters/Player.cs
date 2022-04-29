@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
 public class Player : MonoBehaviour
@@ -11,9 +13,11 @@ public class Player : MonoBehaviour
     Vector3 bottomLeftEdge, topRightEdge;
     Rigidbody2D playerRigidBody;
     Animator animator;
-    public bool enableMovement = true;
     PlayerStats player;
     public readonly string playersName = "Jimmy";
+    float horizontalSpeed, verticalSpeed;
+    public PlayerInput playerInput;
+    public static event UnityAction IncreaseHealingPotency;
 
     private void Start()
     {
@@ -29,8 +33,8 @@ public class Player : MonoBehaviour
         playerRigidBody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         player = GetComponent<PlayerStats>();
-        Invoke("RenamePlayer", 0.2f);         
-    }    
+        Invoke("RenamePlayer", 0.2f);
+    }
 
     private void RenamePlayer()
     {
@@ -42,31 +46,44 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void MovePlayer(float x,float y)
+    {
+        //Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+        horizontalSpeed = x;
+        verticalSpeed = y;
+    }
+
     private void Update()
     {
-        if (enableMovement)
+        if (GameManager.instance.enableMovement)
         {
-            float horizontalSpeed = Input.GetAxisRaw("Horizontal");
-            float verticalSpeed = Input.GetAxisRaw("Vertical");
-            playerRigidBody.velocity = new Vector2(horizontalSpeed * movementSpeed, verticalSpeed * movementSpeed);
-            animator.SetFloat("movementX", playerRigidBody.velocity.x);
-            animator.SetFloat("movementY", playerRigidBody.velocity.y);
-            if (horizontalSpeed == 1 || horizontalSpeed == -1 || verticalSpeed == 1 || verticalSpeed == -1)
-            {
-                animator.SetFloat("LastY", verticalSpeed);
-                animator.SetFloat("LastX", horizontalSpeed);
-            }
-            transform.position = new Vector3(
-                Mathf.Clamp(transform.position.x, bottomLeftEdge.x, topRightEdge.x),
-                Mathf.Clamp(transform.position.y, bottomLeftEdge.y, topRightEdge.y),
-                transform.position.z);
+            MovePlayer();
         }
         else
         {
-            playerRigidBody.velocity = new Vector2(0, 0);
+            horizontalSpeed = 0;
+            verticalSpeed = 0;
+            playerRigidBody.velocity = Vector2.zero;
             animator.SetFloat("movementX", 0);
             animator.SetFloat("movementY", 0);
         }
+    }
+
+    private void MovePlayer()
+    {
+        var velocity = new Vector2(horizontalSpeed * movementSpeed, verticalSpeed * movementSpeed);
+        playerRigidBody.velocity = velocity;
+        animator.SetFloat("movementX", playerRigidBody.velocity.x);
+        animator.SetFloat("movementY", playerRigidBody.velocity.y);
+        if (horizontalSpeed != 0 || verticalSpeed != 0) // Old Keyboard Values horizontalSpeed == 1 || horizontalSpeed == -1 || verticalSpeed == 1 || verticalSpeed == -1
+        {
+            animator.SetFloat("LastY", verticalSpeed);
+            animator.SetFloat("LastX", horizontalSpeed);
+        }
+        transform.position = new Vector3(
+            Mathf.Clamp(transform.position.x, bottomLeftEdge.x, topRightEdge.x),
+            Mathf.Clamp(transform.position.y, bottomLeftEdge.y, topRightEdge.y),
+            transform.position.z);
     }
 
     public void SetLimit(Vector3 bottomEdge, Vector3 topEdge)
@@ -75,9 +92,21 @@ public class Player : MonoBehaviour
         topRightEdge = topEdge;
     }
 
+    public void OpenMenu(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            MenuManager.instance.ToggleMenu();
+        }
+    }
 
     public PlayerStats ReturnPlayerStats()
     {
         return player;
+    }
+
+    public void Levelup()
+    {
+        IncreaseHealingPotency?.Invoke();
     }
 }

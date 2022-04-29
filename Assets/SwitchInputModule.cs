@@ -11,22 +11,31 @@ public class SwitchInputModule : MonoBehaviour
 
     public void SwitchToUI()
     {
-        UI.enabled = true;
-        ShopUI.enabled = false;
-        BattleUI.enabled = false;
+        if (!UI.isActiveAndEnabled)
+        {
+            BattleUI.enabled = false;
+            UI.enabled = true;
+            ShopUI.enabled = false;
+        }
     }
 
     public void SwitchToShopUI()
     {
-        UI.enabled = false;
-        ShopUI.enabled = true;
-        BattleUI.enabled = false;
+        if (!ShopUI.isActiveAndEnabled)
+        {
+            BattleUI.enabled = false;
+            UI.enabled = false;
+            ShopUI.enabled = true;
+        }
     }
 
     public void SwitchToBattleUI()
     {
-        UI.enabled = false;
-        ShopUI.enabled = false;
-        BattleUI.enabled = true;
+        if (!BattleUI.isActiveAndEnabled)
+        {
+            BattleUI.enabled = true;
+            ShopUI.enabled = false;
+            UI.enabled = false;
+        }
     }
 }

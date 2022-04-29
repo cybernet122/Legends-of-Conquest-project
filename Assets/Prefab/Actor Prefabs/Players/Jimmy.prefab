@@ -167,7 +167,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 10
   transitionName: 
-  enableMovement: 1
+  playerInput: {fileID: 0}
 --- !u!114 &1221741892
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,20 +187,20 @@ MonoBehaviour:
   currentXP: 0
   xpForNextLevel: 
   baseLevelXP: 100
-  hpToAdd: 10
-  maxHP: 65
-  currentHP: 65
-  maxMana: 40
-  currentMana: 40
+  hpToAdd: 8
+  maxHP: 85
+  currentHP: 85
+  maxMana: 70
+  currentMana: 70
   addXP: 1000
-  dexterity: 10
+  dexterity: 11
   defense: 16
   equippedWeaponName: 
   equippedArmorName: 
   weaponPower: 0
   armorDefense: 0
   turnSpeed: 9
-  evasion: 5
+  evasion: 6
   lifestealWeap: 0
   equippedWeapon: {fileID: 0}
   equippedArmor: {fileID: 0}

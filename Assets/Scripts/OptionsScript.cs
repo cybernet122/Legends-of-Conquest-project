@@ -6,59 +6,131 @@ using TMPro;
 using UnityEngine.SceneManagement;
 public class OptionsScript : MonoBehaviour
 {
-
+    [SerializeField] GameObject discardWarningPanel;
     [SerializeField] Slider sliderSFX, sliderMusic;
     [SerializeField] Slider sliderDifficulty;
     [SerializeField] TextMeshProUGUI difficultyText;
+    [SerializeField] Button[] saveAndReturnButtons;
+    float musicValue, sfxValue, diffValue;
     private int difficulty;
+    bool changedSettings;
     // Start is called before the first frame update
     void Start()
     {
-        if (PlayerPrefs.HasKey("Music_Volume_") && sliderMusic != null || sliderSFX != null)
+        if (discardWarningPanel != null && discardWarningPanel.activeInHierarchy)
+            discardWarningPanel.SetActive(false);
+        SetValuesOnStart();
+    }
+
+    private void OnEnable()
+    {
+        SaveValues();
+        changedSettings = false;
+    }
+
+    private void SaveValues()
+    {
+        if (sliderMusic && sliderSFX && sliderDifficulty)
         {
-            sliderMusic.value = PlayerPrefs.GetFloat("Music_Volume_");
-            sliderSFX.value = PlayerPrefs.GetFloat("SFX_Volume_");
-            UpdateVolume();
-            UpdateSFX();
+            musicValue = sliderMusic.value;
+            sfxValue = sliderSFX.value;
+            diffValue = sliderDifficulty.value;
         }
-        if (sliderDifficulty != null)
+    }
+
+    public void SetValuesOnStart()
+    {
+        if (PlayerPrefs.HasKey("Difficulty_") || PlayerPrefs.HasKey("Music_Volume_") || PlayerPrefs.HasKey("SFX_Volume_"))
         {
-            sliderDifficulty.value = PlayerPrefs.GetInt("Difficulty_");
-            UpdateDifficulty();
+            if(sliderMusic != null)
+                sliderMusic.value = PlayerPrefs.GetFloat("Music_Volume_");
+            if (sliderSFX != null)
+                sliderSFX.value = PlayerPrefs.GetFloat("SFX_Volume_");
+            if (sliderDifficulty != null)
+            {
+                sliderDifficulty.value = PlayerPrefs.GetInt("Difficulty_");
+                UpdateDifficulty();
+            }
         }
+        changedSettings = false;
+            var button = GetComponentInChildren<Button>();
+        if (button)        
+            Utilities.SetSelectedAndHighlight(button.gameObject, button);        
     }
 
     public void SaveButton()
     {
-        if (sliderMusic != null && sliderSFX != null)
+        if (sliderMusic != null && sliderSFX != null && sliderDifficulty != null)
         {
             PlayerPrefs.SetFloat("Music_Volume_", sliderMusic.value);
             PlayerPrefs.SetFloat("SFX_Volume_", sliderSFX.value);
+            PlayerPrefs.SetInt("Difficulty_", difficulty);
         }
-        PlayerPrefs.SetInt("Difficulty_", difficulty);
+        SaveValues();
+        changedSettings = false;
     }
 
-    public void ReturnToMainMenu()
+    public void ReturnButton()
     {
-        float musicValue = PlayerPrefs.GetFloat("Music_Volume_", sliderMusic.value);
-        float sfxValue = PlayerPrefs.GetFloat("SFX_Volume_", sliderSFX.value);
-        int diffValue = PlayerPrefs.GetInt("Difficulty_", difficulty);
-        if (musicValue != sliderMusic.value || sfxValue != sliderSFX.value || diffValue != difficulty)
-        {
-            Debug.LogWarning("Do you want to keep changes?");
-            //warn for save
-        }
-        SceneManager.LoadScene("Main Menu");
+        discardWarningPanel.SetActive(false);
+        sliderMusic.value = musicValue;
+        sliderSFX.value = sfxValue;
+        sliderDifficulty.value = diffValue;
+    }
 
+    public void OpenWarningPanel(bool returnToMainMenu)
+    {
+        if (changedSettings) //musicValue != sliderMusic.value || sfxValue != sliderSFX.value || diffValue != difficulty
+        {
+            discardWarningPanel.SetActive(true);
+            foreach(Button button in saveAndReturnButtons)
+            {
+                Navigation buttonNav = button.navigation;
+                buttonNav.mode = Navigation.Mode.None;
+                button.navigation = buttonNav;
+            }
+            var warningButton = discardWarningPanel.GetComponentInChildren<Button>();
+            Utilities.SetSelectedAndHighlight(warningButton.gameObject, warningButton);
+        }
+        else
+            ReturnToPreviousMenu(returnToMainMenu);
+    }
+
+    public void CloseWarningPanel()
+    {
+        discardWarningPanel.SetActive(false);
+        foreach (Button button in saveAndReturnButtons)
+        {
+            Navigation buttonNav = button.navigation;
+            buttonNav.mode = Navigation.Mode.Horizontal;
+            button.navigation = buttonNav;
+        }
+        Utilities.SetSelectedAndHighlight(saveAndReturnButtons[1].gameObject, saveAndReturnButtons[1]);
+    }
+
+    public void ReturnToMenu()
+    {
+        MenuManager.instance.ReturnToPrevious();
+    }
+
+    public void ReturnToPreviousMenu(bool returnToMainMenu)
+    {
+        changedSettings = false;
+        if (returnToMainMenu)
+            SceneManager.LoadScene("Main Menu");
+        else
+            ReturnToMenu();
     }
 
     public void UpdateVolume()
     {
+        changedSettings = true;
         AudioManager.instance.SetVolumeMusic(sliderMusic.value);
     }
 
     public void UpdateSFX()
     {
+        changedSettings = true;
         AudioManager.instance.SetVolumeSFX(sliderSFX.value);
     }
 
@@ -77,5 +149,6 @@ public class OptionsScript : MonoBehaviour
                 difficultyText.text = "Hard";
                 break;
         }
+        changedSettings = true;
     }
 }

@@ -41,4 +41,11 @@ public class CharacterDamageGUI : MonoBehaviour
             transform.position += new Vector3(jitterAmount, jitterAmount, 0f);
         }
     }
+
+    public void SetDamage(string text)
+    {
+        damageText.text = text;
+        float jitterAmount = Random.Range(-textVibration, +textVibration);
+        transform.position += new Vector3(jitterAmount, jitterAmount, 0f);
+    }
 }

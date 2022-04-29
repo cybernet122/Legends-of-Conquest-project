@@ -141,11 +141,11 @@ MonoBehaviour:
   currentXP: 0
   xpForNextLevel: 
   baseLevelXP: 100
-  hpToAdd: 10
+  hpToAdd: 5
   maxHP: 100
   currentHP: 100
-  maxMana: 15
-  currentMana: 15
+  maxMana: 60
+  currentMana: 60
   addXP: 1000
   dexterity: 12
   defense: 12

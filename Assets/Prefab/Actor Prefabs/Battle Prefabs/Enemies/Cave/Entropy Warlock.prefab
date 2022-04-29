@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 282830287449536884}
   - component: {fileID: 5959100406343309727}
   - component: {fileID: 5905923757090926606}
+  - component: {fileID: 6915932980174349930}
   m_Layer: 0
   m_Name: Entropy Warlock
   m_TagString: Untagged
@@ -105,12 +106,12 @@ MonoBehaviour:
   hpValue: {fileID: 3333081310185755859}
   selectionRing: {fileID: 2413939900384860506}
   characterName: Entropy Warlock
-  currentHP: 200
-  maxHP: 200
-  currentMana: 500
-  maxMana: 500
+  currentHP: 160
+  maxHP: 160
+  currentMana: 400
+  maxMana: 400
   dexterity: 5
-  defense: 7
+  defense: 10
   weaponPower: 30
   armorDefense: 0
   speed: 6
@@ -118,6 +119,25 @@ MonoBehaviour:
   lifestealWeap: 0
   isDead: 0
   hasPlayed: 0
+--- !u!95 &6915932980174349930
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1734643893977734945}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 859b6785a2d715043b1656cf21bed0d0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &800975926881502094
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -313,6 +333,103 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &6144580301652016412
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1162142267898111775}
+    m_Modifications:
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 512.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 770.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 48.999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 66.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 711098986797794790, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5398691201700665622, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
+      propertyPath: m_Name
+      value: Target Touch Button
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: aeb110f22eab94e4991e9602f519f130, type: 3}
 --- !u!1001 &9029284426509226068
 PrefabInstance:
   m_ObjectHideFlags: 0

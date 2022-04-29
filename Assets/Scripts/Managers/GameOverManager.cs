@@ -9,9 +9,6 @@ public class GameOverManager : MonoBehaviour
     void Start()
     {
         AudioManager.instance.PlayBackgroundMusic(6);
-        Player.instance.gameObject.SetActive(false);
-        MenuManager.instance.gameObject.SetActive(false);
-        BattleManager.instance.gameObject.SetActive(false);
     }
 
     public void QuitToMainMenu()
@@ -28,6 +25,9 @@ public class GameOverManager : MonoBehaviour
 
     private static void DestroyGameSession()
     {
+        var actionMap = FindObjectOfType<SwitchActiveMap>();
+        if (actionMap)
+            Destroy(actionMap.gameObject);
         Destroy(GameManager.instance.gameObject);
         Destroy(Player.instance.gameObject);
         Destroy(MenuManager.instance.gameObject);

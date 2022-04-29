@@ -12,7 +12,11 @@ public class QuestManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        instance = this;
+        if (instance != null && instance != this)
+            Destroy(this.gameObject);
+        else
+            instance = this;
+        DontDestroyOnLoad(gameObject);
         if (SceneManager.GetActiveScene().name == "Mountains")
         {
             MountainsQuest();
@@ -26,11 +30,11 @@ public class QuestManager : MonoBehaviour
             AdvanceQuest();
             print("skipping quest");
         }
-/*        if (Input.GetKeyDown(KeyCode.L))
-        {
-            LoadQuestData();
-            print("loading quests");
-        }*/
+        /*        if (Input.GetKeyDown(KeyCode.L))
+                {
+                    LoadQuestData();
+                    print("loading quests");
+                }*/
     }
 
     private void AdvanceQuest()
@@ -115,6 +119,11 @@ public class QuestManager : MonoBehaviour
         UpdateQuestObjects();
         if(questMarkersCompleted[questMarkersCompleted.Length-1])
             StartCoroutine(EndGame());
+        if (questToMark == "Look for the heroes located in the cave and join them")
+        {
+            GameManager.instance.UpdatePlayerStats();
+            GameManager.instance.UpdatePlayerLevels();
+        }
     }
 
     public void MarkQuestInComplete(string questToMark)
@@ -189,7 +198,6 @@ public class QuestManager : MonoBehaviour
 
                 if (battleInstantiators.Length <= 0)
                 {
-                    print("Quest Completed");
                     MarkQuestComplete("Kill the monsters in the mountains");
                 }
             }
@@ -205,10 +213,11 @@ public class QuestManager : MonoBehaviour
                 yield return null;
             }
         }
-        print("test");
         MenuManager.instance.FadeImage();
         yield return new WaitForSeconds(1);
         SceneManager.LoadScene("Treasure");
+        yield return new WaitForSeconds(0.4f);
+        MenuManager.instance.FadeOut(0.2f);
     }
 
     [ContextMenu("Purge Save Data")]

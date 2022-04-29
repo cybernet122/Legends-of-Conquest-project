@@ -29,7 +29,11 @@ public class DialogController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        instance = this;
+        if (instance != null && instance != this)
+            Destroy(this.gameObject);
+        else
+            instance = this;        
+        DontDestroyOnLoad(gameObject);
         dialogBox.SetActive(false);
         Invoke("ReturnFromMountains",0.3f);
     }
@@ -54,37 +58,45 @@ public class DialogController : MonoBehaviour
 
     public void StartDelay()
     {
-        LeanTween.delayedCall(0.6f, () =>
+        LeanTween.delayedCall(0.7f, () =>
         {
             countFinished = true;
         });
     }
 
-    public void AdvanceDialogue(InputAction.CallbackContext context)
+    public void SkipDialogueButton(InputAction.CallbackContext context)
     {
-        if (!ShopManager.instance.shopMenu.activeInHierarchy && !MenuManager.instance.menu.activeInHierarchy && npcInRange && countFinished)
+        if (context.performed)        
+            SkipDialogue();        
+    }
+
+    public void SkipDialogueTouch(InputAction.CallbackContext context)
+    {
+        if(dialogBox.activeInHierarchy && context.performed)
+        SkipDialogue();
+    }
+
+    public void SkipDialogue()
+    {    
+        if (!ShopManager.instance.shopMenu.activeInHierarchy && !MenuManager.instance.menu.activeInHierarchy && npcInRange && countFinished && dialogSentences.Length > 0)
         {
-            if (context.canceled)
+            if (!isTyping)
             {
-                if (!isTyping)
-                {
-                    advance = true;
-                    StartCoroutine(ProcessWindowDialog());
-                    countFinished = false;
-                    StartDelay();
+                advance = true;
+                StartCoroutine(ProcessWindowDialog());
+                countFinished = false;
+                StartDelay();
+                CountDownForSkip();
+            }
+            else
+            {
+                if (!finishCountDown)
                     CountDownForSkip();
-                }
                 else
                 {
-                    if (!finishCountDown)
-                        CountDownForSkip();
-                    else
-                    {
-                        checkingSkip = true;
-                        finishCountDown = false;
-                    }
+                    checkingSkip = true;
+                    finishCountDown = false;
                 }
-
             }
         }
     }
@@ -99,7 +111,6 @@ public class DialogController : MonoBehaviour
 
     IEnumerator ProcessWindowDialog()
     {
-        //advance = Input.GetButtonUp("Fire1") || Input.GetButtonUp("Fire2");
         if (advance && !isTyping || triggerOnEntry)
         {
             advance = false;
@@ -127,9 +138,9 @@ public class DialogController : MonoBehaviour
                         QuestManager.instance.MarkQuestInComplete(questToMark);
                     }
                 }
-                /*if(dialogHandler.Length > 1)*/
-                dialogHandler[dialogHandler.Length - 1].DestroyOnFinish();
-/*                string[] dialogSentences = new string[0];*/
+                if (dialogHandler.Length >= 1)
+                    dialogHandler[dialogHandler.Length - 1].DestroyOnFinish();
+                string[] dialogSentences = new string[0];
                 AdvanceDialogue();
                 MultipleDialogues();
                 ReturnFromMountains();
@@ -152,7 +163,7 @@ public class DialogController : MonoBehaviour
         }
     }
 
-    private void ReturnFromMountains()
+    public void ReturnFromMountains()
     {
         if (Utilities.ReturnSceneName() == "Shop")
         {
@@ -179,6 +190,7 @@ public class DialogController : MonoBehaviour
                     Destroy(dialog);
                 }
                 dialogSentences = new string[0];
+                shopkeeper.CheckForShop();
             }
         }
     }

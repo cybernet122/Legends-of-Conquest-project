@@ -119,6 +119,7 @@ public class PlayerStats : MonoBehaviour
                 currentHP = maxHP;
                 maxMana = Mathf.RoundToInt(maxMana * 1.08f);
                 currentMana = maxMana;
+                Player.instance.Levelup();
             }
         }
         if(currentXP >= xpForNextLevel[playerLevel])
@@ -135,8 +136,9 @@ public class PlayerStats : MonoBehaviour
             }
             maxHP = Mathf.RoundToInt(maxHP * 1.11f);
             currentHP = maxHP;
-            maxMana = Mathf.RoundToInt(maxMana * 1.08f);
+            maxMana = Mathf.RoundToInt(maxMana * 1.08f); 
             currentMana = maxMana;
+            Player.instance.Levelup();
         }
         MenuManager.instance.UpdateStats();
         MenuManager.instance.StatsMenuUpdate(0);

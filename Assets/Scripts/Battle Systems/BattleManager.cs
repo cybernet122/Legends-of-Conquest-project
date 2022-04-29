@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 public class BattleManager : MonoBehaviour
 {
@@ -24,14 +25,12 @@ public class BattleManager : MonoBehaviour
     [SerializeField] CharacterDamageGUI damageGUI;
     [SerializeField] TextMeshProUGUI currentTurnText;
     [SerializeField] GameObject[] playerCanvas;
-
     private List<BattleCharacters> activeBattleCharacters = new List<BattleCharacters>();
     private List<BattleCharacters> players = new List<BattleCharacters>();
     private List<BattleCharacters> enemies = new List<BattleCharacters>();
     private List<Transform> items = new List<Transform>();
-
+    private List<BattleCharacters> characterToStun = new List<BattleCharacters>();
     private int currentTurn = 1;
-    [SerializeField] List<BattleCharacters> characterToStun = new List<BattleCharacters>();
     [SerializeField] bool waitingForTurn;
     [SerializeField] GameObject UIButtonHolder,enemyTargetPanel,returnButton, useItemButton;
     [SerializeField] BattleMoves[] battleMovesList;
@@ -41,16 +40,13 @@ public class BattleManager : MonoBehaviour
     int currentPlayerIndex;
     public GameObject magicPanel,itemPanel;
     [SerializeField] ItemsManager selectedItem;
-    [SerializeField] GameObject itemSlotContainer,characterChoicePanel, buttonBorderPrefab, itemBorderPrefab, characterChoiceButtonPrefab;
+    [SerializeField] GameObject itemSlotContainer, characterChoicePanel;
     [SerializeField] GameObject[] targetButton,mainPanelButtons;
     [SerializeField] TextMeshProUGUI[] targetName;
     [SerializeField] Transform itemSlotContainerParent;
     [SerializeField] TextMeshProUGUI itemName, itemDescription;
     [SerializeField] CanvasGroup battleCanvasGroup;
-    bool hasActivatedBorder = false;
-    [SerializeField]GameObject menuBorder;
     //List<GameObject> magicButtons = new List<GameObject>();
-    int buttonBorderIndex;
     public int xpRewardAmount, goldRewardAmount;
     public ItemsManager[] itemsReward;
     public bool isRewardScreenOpen;
@@ -60,12 +56,11 @@ public class BattleManager : MonoBehaviour
     private int screenHeight, screenWidth;
     [SerializeField] Camera cameraToResize;
     private int musicIndex;
-    private List<BattleCharacters> queueToStun = new List<BattleCharacters>();
     BattleMenuState battleMenuState = BattleMenuState.mainPanel;
     public GameObject abilityChosen;
     [SerializeField] Button[] useAndCloseButtons;
     GameObject activeItemObject;
-    GameObject selectedTarget;
+    public static event UnityAction<string> MoveName;
 
     void Start()
     {
@@ -89,9 +84,7 @@ public class BattleManager : MonoBehaviour
             {
                 if (playerPrefabs[i].characterName == Player.instance.playersName)
                     playerPrefabs[i].characterName = PlayerPrefs.GetString("Players_name_");
-            }
-        if (Utilities.ReturnSceneName() != "GameOverScene")
-            musicIndex = FindObjectOfType<CamController>().GetMusicIndex();
+            }        
     }
 
     private void OnDisable()
@@ -146,7 +139,12 @@ public class BattleManager : MonoBehaviour
             sliderMana[i].value = players[i].currentMana;
             healthText[i].text = Mathf.Clamp(players[i].currentHP,0,players[i].maxHP).ToString() + " / " + players[i].maxHP.ToString();
             manaText[i].text = Mathf.Clamp(players[i].currentMana, 0, players[i].maxMana).ToString() + " / " + players[i].maxMana.ToString();
-        }
+        }/*
+        if (PlayerPrefs.HasKey("Players_name_"))
+        {
+            string playersName = PlayerPrefs.GetString("Players_name_");
+            playerNames[0].text = playersName;
+        }*/
         currentTurnText.text = "Current Turn: " + currentTurn;
     }
 
@@ -167,6 +165,8 @@ public class BattleManager : MonoBehaviour
                             enemiesPositions[i]
                             );
                         activeBattleCharacters.Add(newEnemy);
+                        if(newEnemy.characterName == "Elder Fire Dragon")
+                            activeBattleCharacters.Add(newEnemy);
                         enemies.Add(newEnemy);
                         DifficultyModifier(newEnemy);
                     }
@@ -207,7 +207,6 @@ public class BattleManager : MonoBehaviour
     private void AddingPlayers()
     {
         PlayerStats[] playerStats = GameManager.instance.GetPlayerStats();
-        int count = 1;
         for (int i = 0; i < playerStats.Length; i++)
         {
             if (playerStats[i].gameObject.activeInHierarchy)
@@ -228,12 +227,11 @@ public class BattleManager : MonoBehaviour
                     }
                 }
             }
-            count = i;
         }
-        count = 3 - count;
-        for (int i = 1; i <= count; i++)
+        for (int i = 0; i < playerNames.Length; i++)
         {
-            playerNames[i].transform.parent.gameObject.SetActive(false);
+            if(players.Count < i)
+                playerNames[i].transform.parent.gameObject.SetActive(false);
         }
     }
 
@@ -269,15 +267,22 @@ public class BattleManager : MonoBehaviour
             StartCoroutine(ResizeBackground());
             MenuManager.instance.UpdateStats();
             GameManager.instance.UpdatePlayerStats();
-            for (int i = 0; i < players.Count; i++)
+            LeanTween.delayedCall(0.5f, () =>
             {
-                playerCanvas[i].SetActive(true);
-            }
+                for (int i = players.Count; i > 0; i--)               
+                    playerCanvas[i - 1].SetActive(true);                
+            });
             battleScene.SetActive(true);
+            for (int i = 0; i < border.Length; i++)
+            {
+                border[i].SetActive(false);
+            }
             EventSystem.current.firstSelectedGameObject = mainPanelButtons[0];
             EventSystem.current.SetSelectedGameObject(mainPanelButtons[0]);
             mainPanelButtons[0].GetComponent<Button>().OnSelect(null);
-            MenuManager.instance.SwitchToBattleUI();
+            SwitchActiveMap.instance.SwitchToBattleUI();
+            if (Utilities.ReturnSceneName() != "GameOverScene")
+                musicIndex = FindObjectOfType<CamController>().GetMusicIndex();
         }
         else
         {
@@ -292,6 +297,7 @@ public class BattleManager : MonoBehaviour
                 if(enemiesPositions[x].transform.childCount >= 1)
                     Destroy(enemiesPositions[x].GetChild(0).gameObject);
             }
+            MenuManager.instance.ResetToggles();
             players.Clear();
             enemies.Clear();
             activeBattleCharacters.Clear();
@@ -353,13 +359,6 @@ public class BattleManager : MonoBehaviour
         if (activeBattleCharacters.Count == 0)
         {
             FillActiveBattleCharacters();
-            foreach (BattleCharacters battleCharacters in activeBattleCharacters)
-            {
-                if (!queueToStun.Contains(battleCharacters))
-                    battleCharacters.hasPlayed = false;
-                else
-                    print(battleCharacters + " lost turn.");
-            }
             currentTurn++;
             UpdateText();
         }        
@@ -382,14 +381,14 @@ public class BattleManager : MonoBehaviour
         {
             StartCoroutine(EnemyMoveCoroutine(activeBattleCharacters[0]));
             print("Current player's turn is " + activeBattleCharacters[0]);
-            activeBattleCharacters.RemoveAt(0);
+            //activeBattleCharacters.RemoveAt(0); // may break
         }
         else if (activeBattleCharacters[0].isDead)
         {
             activeBattleCharacters.RemoveAt(0);
             NextTurn();
         }
-        if(currentTurn > 1)
+        if(currentTurn >= 1)
             CheckIfAllDead();
         CheckPlayerButtonHolder();
     }
@@ -414,30 +413,38 @@ public class BattleManager : MonoBehaviour
             print("Victory");
             UpdatePlayerStats(battleCharacters, 0);
             DestroyInstantiator();
+            SwitchActiveMap.instance.SwitchToUI();
             BattleRewardsHandler.instance.OpenRewardScreen(xpRewardAmount, itemsReward, goldRewardAmount, true);
             QuestManager.instance.MountainsQuest();
         }
         else if (friendlies == 0 && Enemies > 0)
         {
-            GameManager.instance.GameOver();
+            SettingUpBattle();
+            LeanTween.delayedCall(0.2f, () =>
+            {
+                MenuManager.instance.ResetToggles();
+                GameManager.instance.GameOver();
+            });
         }
-        else
-        {
-            return;
-        }
+        else        
+            return;        
         battleScene.SetActive(false);
         battleCanvasGroup.alpha = 0;
         isBattleActive = false;
         players.Clear();
         enemies.Clear();
         activeBattleCharacters.Clear();
+        for (int i = 0; i < playerCanvas.Length; i++)
+        {
+            playerCanvas[i].SetActive(false);
+        }
         for (int i = 0; i < battleCharacters.Length; i++)
         {
             Destroy(battleCharacters[i].gameObject);
         }
         StopAllCoroutines();
         currentTurn = 1;
-        //AudioManager.instance.PlayBackgroundMusic(musicIndex);
+        AudioManager.instance.PlayBackgroundMusic(musicIndex);
     }
 
     private void DestroyInstantiator()
@@ -468,14 +475,17 @@ public class BattleManager : MonoBehaviour
         for (int i=0;i< battleCharacters.Length; i++)
         {
             activeBattleCharacters.Add(battleCharacters[i]);
-            /*if (characterToStun.Count > 1)
+            if(battleCharacters[i].characterName == "Elder Fire Dragon")
+            activeBattleCharacters.Add(battleCharacters[i]);
+
+            if (characterToStun.Count > 1)
             {
                 if (characterToStun.Contains(battleCharacters[i]))
                 {
                     activeBattleCharacters.Remove(battleCharacters[i]);
                     characterToStun.Remove(battleCharacters[i]);
                 }
-            }*/
+            }
         }
         SortBySpeed();
     }
@@ -556,6 +566,7 @@ public class BattleManager : MonoBehaviour
                 players.Add(battleCharacters[i].GetComponent<BattleCharacters>());
             }
         }
+        if(players.Count == 0) { return; }
         BattleCharacters selectedPlayerToAttack = players[Random.Range(0, players.Count)];
         enemyAttacking.hasPlayed = true;
         int selectedAttack = Random.Range(0, enemyAttacking.AttackMovesAvailable().Length);
@@ -575,20 +586,24 @@ public class BattleManager : MonoBehaviour
 
         }
         attack = battleMovesList[x];
-        StartCoroutine(DealDamageToCharacters(selectedPlayerToAttack,enemyAttacking, movePower, attack));
+        StartCoroutine(DealDamageToCharacters(selectedPlayerToAttack, enemyAttacking, movePower, attack));
     }
 
     IEnumerator DealDamageToCharacters(BattleCharacters selectedCharacterToAttack,BattleCharacters characterAttacking, int movePower, BattleMoves attack)
-    {
-        print(characterAttacking + " " + characterAttacking.characterName);
+    {        
+        print(characterAttacking.characterName + " attacking " + selectedCharacterToAttack.characterName);
         float attackPower = 0;
         if(attack.moveName == "Shockwave")
         {
-            attackPower = characterAttacking.dexterity * 0.75f + characterAttacking.weaponPower * 0.6f;
+            attackPower = characterAttacking.dexterity * 0.75f + characterAttacking.weaponPower * 0.65f;
+        }
+        else if(attack.moveName == "Enhanced Shockwave")
+        {
+            attackPower = characterAttacking.dexterity * 0.84f + characterAttacking.weaponPower * 0.75f;
         }
         else
         {
-            attackPower = characterAttacking.dexterity * 0.6f + characterAttacking.weaponPower * 0.8f;
+            attackPower = characterAttacking.dexterity * 0.62f + characterAttacking.weaponPower * 0.8f;
         }
         if (attack.moveName == "Tentacles")
         {
@@ -597,7 +612,7 @@ public class BattleManager : MonoBehaviour
                 foreach (BattleCharacters enemy in enemies)
                 {
                     int damage = (int)(attackPower / (enemy.defense + enemy.armorDefense) * movePower * Random.Range(0.9f, 1.1f));                    
-                    if(!Evade(enemy,characterAttacking))
+                    if(!Evade(enemy,characterAttacking) && !enemy.isDead)
                     {
                         enemy.TakeHpDamage(damage);
                         DamageText(damage, false, enemy.transform);
@@ -612,7 +627,7 @@ public class BattleManager : MonoBehaviour
                 foreach (BattleCharacters player in players)
                 {
                     int damage = (int)(attackPower / (player.defense + player.armorDefense) * movePower * Random.Range(0.9f, 1.1f));
-                    if (!Evade(player,characterAttacking))
+                    if (!Evade(player,characterAttacking) && !player.isDead)
                     {
                         player.TakeHpDamage(damage);
                         DamageText(damage, false, player.transform);
@@ -631,7 +646,7 @@ public class BattleManager : MonoBehaviour
             damageToGive = CriticalStrike(damageToGive, selectedCharacterToAttack.transform);
             Debug.Log(characterAttacking.characterName + " did " + damageToGive + " damage to " + selectedCharacterToAttack);
             yield return new WaitForSeconds(0.5f);
-            if (attack.moveName == "Shockwave" && characterAttacking.IsPlayer())
+            if ((attack.moveName == "Shockwave" || attack.moveName == "Enchanced Shockwave") && characterAttacking.IsPlayer())
             {
                 if (characterAttacking.lifestealWeap)
                 {
@@ -643,7 +658,7 @@ public class BattleManager : MonoBehaviour
             if (attack.moveName == "Blood drain")
             {
                 int heal = damageToGive / 2;
-                characterAttacking.AddHP(heal);
+                characterAttacking.AddHP(heal);                
                 print("Healed " + characterAttacking + " for " + heal);
             }
             selectedCharacterToAttack.TakeHpDamage(damageToGive);
@@ -686,9 +701,22 @@ public class BattleManager : MonoBehaviour
         CharacterDamageGUI damageUI = Instantiate(damageGUI, position.transform.position, transform.rotation);
         damageUI.SetDamage(damage, isCritical);
     }
+    
+    private void DamageText(string text,Transform position)
+    {
+        LeanTween.delayedCall(1f, () =>
+        {
+            CharacterDamageGUI damageUI = Instantiate(damageGUI, position.transform.position, transform.rotation);
+            damageUI.SetDamage(text);
+        });
+    }
 
     public void PlayerAttack(string moveName,BattleCharacters selectEnemyTarget)
     {
+        if (!waitingForTurn) { return; } 
+        waitingForTurn = false;
+        MoveName?.Invoke("");
+        CheckPlayerButtonHolder();
         BattleCharacters playerAttacking = activeBattleCharacters[0]; 
         int movePower = 0;
         var attack = new BattleMoves();
@@ -704,7 +732,6 @@ public class BattleManager : MonoBehaviour
             StartCoroutine(DealDamageToCharacters(selectEnemyTarget,playerAttacking, movePower, attack));
         activeBattleCharacters[0].hasPlayed = true;
         activeBattleCharacters.RemoveAt(0);
-        waitingForTurn = false;
         border[currentPlayerIndex].SetActive(false);
         enemyTargetPanel.SetActive(false);
         ClearRings();
@@ -745,10 +772,11 @@ public class BattleManager : MonoBehaviour
             if (rng > 0.5f)
             {
                 print("Succesfully stunned " + selectEnemyTarget.characterName);
+                DamageText("Stunned!",selectEnemyTarget.transform);
                 if (activeBattleCharacters.Contains(selectEnemyTarget))
                     activeBattleCharacters.Remove(selectEnemyTarget);
                 else
-                    queueToStun.Add(selectEnemyTarget);
+                    characterToStun.Add(selectEnemyTarget);
             }
         }
         else if(battleMovesList[i].moveName == "Tentacles")
@@ -757,20 +785,26 @@ public class BattleManager : MonoBehaviour
             {
                 foreach (BattleCharacters enemy in enemies)
                 {
-                    Instantiate(
-                    battleMovesList[i].effectToUse,
-                    enemy.transform.position,
-                    enemy.transform.rotation);
+                    if (!enemy.isDead)
+                    {
+                       Instantiate(
+                       battleMovesList[i].effectToUse,
+                       enemy.transform.position,
+                       enemy.transform.rotation);
+                    }
                 }
             }
             else
             {
                 foreach (BattleCharacters player in players)
                 {
-                    Instantiate(
-                    battleMovesList[i].effectToUse,
-                    player.transform.position,
-                    player.transform.rotation);
+                    if (!player.isDead)
+                    {
+                        Instantiate(
+                        battleMovesList[i].effectToUse,
+                        player.transform.position,
+                        player.transform.rotation);
+                    }
                 }
             }
         }
@@ -789,18 +823,22 @@ public class BattleManager : MonoBehaviour
     {
         for (int i = 0; i < enemies.Count; i++)
         {
+            enemies[i].HideRing();
             if (!enemies[i].IsPlayer() && enemies[i].isDead)
             {
                 enemies.RemoveAt(i);
             }
         }
         PlayerAttack("Tentacles", enemies[0]);
+        HideRings();
     }
 
     public void OpenTargetPanel(string moveName)
     {
+        if(moveName == "Tentacles") { return; }
         returnButton.GetComponent<RectTransform>().localPosition = new Vector3(-880f, -238, 0);
         enemyTargetPanel.SetActive(true);
+        MoveName?.Invoke(moveName);
         ReturnButtonPlacement();
         returnButton.SetActive(true);
         for (int i = 0; i < enemies.Count; i++)
@@ -816,8 +854,7 @@ public class BattleManager : MonoBehaviour
             {
                 targetButtons[i].button.gameObject.SetActive(true);
                 targetButtons[i].moveName = moveName;
-                targetButtons[i].activeBattleTarget = enemies[i];
-                targetButtons[i].targetName.text = enemies[i].characterName;
+                targetButtons[i].SetTargetName(enemies[i]);
             }
             else
             {
@@ -920,11 +957,12 @@ public class BattleManager : MonoBehaviour
     IEnumerator FadeAndExitBattle()
     {
         FadeTo(0,1);
+        SwitchActiveMap.instance.SwitchToUI();
         MenuManager.instance.FadeImage();
         yield return new WaitForSeconds(1f);
         SettingUpBattle();
         yield return new WaitForSeconds(0.7f);
-        MenuManager.instance.FadeOut();
+        MenuManager.instance.FadeOut(1.5f);
     }
 
     private void UpdateItemsInInventory()
@@ -961,8 +999,8 @@ public class BattleManager : MonoBehaviour
             itemDescription.text = item.itemDescription;
         else if (selectedItem.itemType == ItemsManager.ItemType.Armor)
             itemDescription.text = item.itemDescription;
-        else if (selectedItem.affectType == ItemsManager.AffectType.HP || selectedItem.affectType == ItemsManager.AffectType.Mana && selectedItem.itemType == ItemsManager.ItemType.Item)
-            itemDescription.text = item.itemDescription + "(Adds: " + selectedItem.amountOfEffect + " " + selectedItem.affectType + ")";
+        else if (selectedItem.affectType == ItemsManager.AffectType.HP || selectedItem.affectType == ItemsManager.AffectType.Mana)
+            itemDescription.text = item.itemDescription + "(Restores " + selectedItem.amountOfEffect + " " + selectedItem.affectType + ")";
         else itemDescription.text = item.itemDescription;
     }
 
@@ -976,6 +1014,7 @@ public class BattleManager : MonoBehaviour
             players[index].evasion = 11.5f;
         else players[index].evasion = 5f;
         Inventory.instance.RemoveItem(selectedItem);
+        AudioManager.instance.PlaySFX(0);
         UpdateText();
         UseItemEndTurn();
         returnButton.SetActive(false);
@@ -1001,18 +1040,12 @@ public class BattleManager : MonoBehaviour
         if (selectedItem)
         {
             characterChoicePanel.SetActive(true);
-            if (hasActivatedBorder && menuBorder.CompareTag("Item_Border"))
-            {
-                Destroy(menuBorder);
-                menuBorder = Instantiate(buttonBorderPrefab, targetButton[0].transform);
-                menuBorder.transform.SetSiblingIndex(0);
-                menuBorder.transform.position = targetButton[0].transform.position;
-            }
             /*for (int i = 0; i < targetButton.Length; i++)
             {
                 targetButton[i].SetActive(false);
             }*/
-            if (players.Count == 1)
+            bool solo = players.Count == 1;
+            if (solo)
                 characterChoicePanel.GetComponent<HorizontalLayoutGroup>().childControlWidth = false;
             else
                 characterChoicePanel.GetComponent<HorizontalLayoutGroup>().childControlWidth = true;
@@ -1023,8 +1056,8 @@ public class BattleManager : MonoBehaviour
                     PlayerStats activePlayer = GameManager.instance.GetPlayerStats()[i];
                     targetButton[i].SetActive(true);
                     targetName[i].text = activePlayer.playerName;
-                    bool activePlayherInHierarchy = activePlayer.gameObject.activeInHierarchy;
-                    targetButton[i].transform.parent.gameObject.SetActive(activePlayherInHierarchy);
+                    bool activePlayerInHierarchy = activePlayer.gameObject.activeInHierarchy;
+                    targetButton[i].transform.parent.gameObject.SetActive(activePlayerInHierarchy);
                 }
                 else if (players[i].isDead)
                 {
@@ -1032,7 +1065,7 @@ public class BattleManager : MonoBehaviour
                     targetButton[i].GetComponent<Button>().interactable = false;
                     targetName[i].text = activePlayer.playerName;
                 }
-            }          
+            }
             battleMenuState = BattleMenuState.itemCharacterChoicePanel;
             Utilities.SetSelectedAndHighlight(targetButton[0], targetButton[0].GetComponent<Button>());
         }
@@ -1102,6 +1135,7 @@ public class BattleManager : MonoBehaviour
         battleMenuState = BattleMenuState.characterAttackPanel;
         var attackTarget = enemyTargetPanel.GetComponentInChildren<Button>().gameObject;
         EventSystem.current.SetSelectedGameObject(attackTarget);
+        enemyTargetPanel.GetComponentInChildren<BattleTargetButtons>().OnSelect(null);
     }
     
     public void ChangeFocusToMagicPanel()
@@ -1115,6 +1149,7 @@ public class BattleManager : MonoBehaviour
         battleMenuState = BattleMenuState.magicAttackCharacterPanel;
         var attackTarget = enemyTargetPanel.GetComponentInChildren<Button>().gameObject;
         EventSystem.current.SetSelectedGameObject(attackTarget);
+        enemyTargetPanel.GetComponentInChildren<BattleTargetButtons>().OnSelect(null);
     }
 
     public void ChangeFocusToItemsPanel()
@@ -1299,6 +1334,7 @@ public class BattleManager : MonoBehaviour
                 case BattleMenuState.characterAttackPanel:
                     battleMenuState = BattleMenuState.mainPanel;
                     enemyTargetPanel.SetActive(false);
+                    MoveName?.Invoke("");
                     ClearRings();
                     button = mainPanelButtons[0].GetComponent<Button>();
                     Utilities.SetSelectedAndHighlight(mainPanelButtons[0], button);
@@ -1311,6 +1347,7 @@ public class BattleManager : MonoBehaviour
                     break;
                 case BattleMenuState.magicAttackCharacterPanel:
                     battleMenuState = BattleMenuState.magicPanel;
+                    MoveName?.Invoke("");
                     enemyTargetPanel.SetActive(false);
                     ClearRings();
                     OpenMagicPanel();

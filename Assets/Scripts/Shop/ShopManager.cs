@@ -25,11 +25,16 @@ public class ShopManager : MonoBehaviour
     [SerializeField]float salePriceReductionInPercent;
     private int salePriceReduced;
     public ShopMenuState shopMenuState = ShopMenuState.mainPanel;
-    bool finishedCount = true;
+    public bool finishedCount = true;
     private static LTDescr delay;
+    public int siblingIndex;
     void Start()
     {
-        instance = this;
+        if (instance != null && instance != this)
+            Destroy(this.gameObject);
+        else
+            instance = this;
+        DontDestroyOnLoad(gameObject);
         shopMenu.SetActive(false);
         sellPanel.SetActive(false);
     }
@@ -50,7 +55,7 @@ public class ShopManager : MonoBehaviour
         if (canOpenShop && context.canceled && shopMenuState == ShopMenuState.mainPanel && !shopMenu.activeInHierarchy && finishedCount
             && !GameManager.instance.dialogBoxOpened && !GameManager.instance.gameMenuOpened)
         {
-            OpenShopMenu();
+            OpenShopMenu(); 
         }
     }
 
@@ -58,7 +63,7 @@ public class ShopManager : MonoBehaviour
     {
         shopMenu.SetActive(true);
         GameManager.instance.shopMenuOpened = true;
-        currentGoldCoinText.text = "Gold coins: " + GameManager.instance.currentGoldCoins;
+        currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
         EventSystem.current.firstSelectedGameObject = mainShopButtons[0];
         UpdateItemsInShop(itemSlotBuyContainerParent, itemsForSale, false);
         Utilities.SetSelectedAndHighlight(mainShopButtons[0], mainShopButtons[0].GetComponent<Button>());
@@ -72,6 +77,7 @@ public class ShopManager : MonoBehaviour
         GameManager.instance.shopMenuOpened = false;
         DialogController.instance.StartDelay();
         finishedCount = false;
+        SwitchActiveMap.instance.SwitchToUI();
     }
 
     public void OpenBuyPanel()
@@ -155,21 +161,24 @@ public class ShopManager : MonoBehaviour
                 itemsAmountText.text = "";
             }
             itemSlot.GetComponent<ItemButton>().itemOnButton = item;
-            currentGoldCoinText.text = "Gold Coins: " + GameManager.instance.currentGoldCoins.ToString();
+            currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
         }
     }
 
     public void SelectedBuyItem(ItemsManager itemToBuy)
     {
-        selectedItem = itemToBuy;
+        selectedItem = itemToBuy;       
         buyItemName.text = selectedItem.itemName;
         buyItemDescription.text = selectedItem.itemDescription;
         buyItemValue.text = "Value: " + selectedItem.valueInCoins;
     }
 
-    public void SelectedSellItem(ItemsManager itemToSell)
+    public void SelectedSellItem(ItemsManager itemToSell, int index)
     {
         selectedItem = itemToSell;
+        siblingIndex = index;
+        if (!selectedItem)
+            selectedItem = ItemsAssets.instance.GetItemsAsset(itemToSell.itemName);
         sellItemName.text = selectedItem.itemName;
         sellItemDescription.text = selectedItem.itemDescription;
         salePriceReduced = (int)(selectedItem.valueInCoins * (salePriceReductionInPercent / 100));
@@ -184,7 +193,7 @@ public class ShopManager : MonoBehaviour
             {
                 GameManager.instance.currentGoldCoins -= selectedItem.valueInCoins;
                 Inventory.instance.AddItems(selectedItem, true);
-                currentGoldCoinText.text = "Gold Coins: " + GameManager.instance.currentGoldCoins;
+                currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
             }
         }
     }
@@ -195,27 +204,41 @@ public class ShopManager : MonoBehaviour
         {
             GameManager.instance.currentGoldCoins += salePriceReduced;
             Inventory.instance.RemoveItem(selectedItem);
-            currentGoldCoinText.text = "Gold Coins: " + GameManager.instance.currentGoldCoins;
+            currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
             if (!selectedItem.isStackable || selectedItem.amount <= 0)
             {
                 EmptyText(1);
+                selectedItem = null;
             }
-            selectedItem = null;
+            else if (selectedItem.amount > 0)
+            {
+                LeanTween.delayedCall(0.1f, () =>
+                Utilities.SetSelectedAndHighlight(itemSlotSellContainerParent.GetChild(siblingIndex).gameObject, itemSlotSellContainerParent.GetChild(siblingIndex).GetComponent<Button>())
+                );
+            }
             UpdateItemsInShop(itemSlotSellContainerParent, Inventory.instance.GetItemList(), true);
-            Invoke("SelectNextItemToSell",0.1f);
+            Invoke("SelectNextItemToSell", 0.1f);
+            if (shopMenuState == ShopMenuState.sellPanel)
+                ReturnToPrevious();
         }
     }
 
     private void SelectNextItemToSell()
     {
-        if (itemSlotSellContainerParent.childCount != 0)
+        if (itemSlotSellContainerParent.childCount != 0 && !selectedItem)
         {
-            var itemButton = itemSlotSellContainerParent.GetChild(0).GetComponent<ItemButton>();
+            Button button;
+            if (siblingIndex - 1 > 0)
+            button = itemSlotSellContainerParent.GetChild(siblingIndex - 1).GetComponent<Button>();
+            else
+            button = itemSlotSellContainerParent.GetChild(0).GetComponent<Button>();
+            button.OnSelect(null);
+            Utilities.SetSelectedAndHighlight(button.gameObject, button);
+            var itemButton = button.GetComponent<ItemButton>();
             selectedItem = itemButton.itemOnButton;
             itemButton.Press();
-            itemButton.GetComponent<Button>().OnSelect(null);
         }
-        else
+        else if(itemSlotSellContainerParent.childCount == 0)
         {
             ReturnToPrevious();
             EmptyText(2);

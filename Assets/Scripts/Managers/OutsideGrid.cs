@@ -30,7 +30,8 @@ public class OutsideGrid : MonoBehaviour
             grid.SetActive(true);
         }
         hiddenGrid.HideHidden();
-        battleInstantiator.SetActive(true);
+        if (battleInstantiator != null)
+            battleInstantiator.SetActive(true);
     }
 
     public void HideMap()
@@ -39,6 +40,7 @@ public class OutsideGrid : MonoBehaviour
         {
             grid.SetActive(false);
         }
-        battleInstantiator.SetActive(false);
+        if (battleInstantiator != null)
+            battleInstantiator.SetActive(false);
     }
 }

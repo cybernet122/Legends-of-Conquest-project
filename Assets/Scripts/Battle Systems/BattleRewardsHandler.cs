@@ -63,18 +63,13 @@ public class BattleRewardsHandler : MonoBehaviour
     public void CloseRewardScreen()
     {
         var playerStats = GameManager.instance.GetPlayerStats();
-        foreach (PlayerStats player in GameManager.instance.GetPlayerStats())
-        {
-            for (int i = 0; i < playerStats.Length; i++) {
-                PlayerStats.instance.AddXP(xpReward);                
-            }
-        }
-        foreach (ItemsManager itemRewarded in rewardItems)
-        {
-            Inventory.instance.AddItems(itemRewarded, false);
-        }
+        foreach (PlayerStats player in playerStats)        
+            player.AddXP(xpReward);        
+        foreach (ItemsManager itemRewarded in rewardItems)        
+            Inventory.instance.AddItems(itemRewarded, false);        
         rewardsScreen.SetActive(false);
         GameManager.instance.battleIsActive = false;
+        GameManager.instance.currentGoldCoins += goldReward;
         BattleManager.instance.isRewardScreenOpen = false;
         WipeRewards();
         if (markQuestComplete)

@@ -97,20 +97,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isPlayer: 1
   attacksAvailable:
+  - Enhanced Shockwave
   - Blood drain
   - Shadow
   hpSlider: {fileID: 0}
   nameText: {fileID: 0}
   hpValue: {fileID: 0}
+  selectionRing: {fileID: 0}
   characterName: Arthuras
   currentHP: 10
   maxHP: 10
   currentMana: 0
   maxMana: 0
   dexterity: 0
-  defence: 0
+  defense: 0
   weaponPower: 0
-  armorDefence: 0
+  armorDefense: 0
   speed: 4
+  evasion: 0
+  lifestealWeap: 0
   isDead: 0
   hasPlayed: 0

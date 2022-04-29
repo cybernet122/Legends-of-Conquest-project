@@ -8,7 +8,7 @@ public class QuestUpdate : MonoBehaviour
     public void PlayUpdateAnimation(string quest)
     {
         Animator questPanel = GetComponent<Animator>();
-        questText.text = "Quest update : " + quest;
+        questText.text = "Quest updated: " + quest;
         questPanel.Play("Quest Fade");
     }
 }

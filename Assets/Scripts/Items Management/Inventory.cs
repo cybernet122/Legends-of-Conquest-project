@@ -70,6 +70,11 @@ public class Inventory : MonoBehaviour
         }
         else
         {
+            foreach(ItemsManager itemInInventory in itemsList)
+            {
+                if (itemInInventory.itemName == item.itemName && itemInInventory.itemType == item.itemType)
+                    item = itemInInventory;
+            }
             itemsList.Remove(item);
         }
         MenuManager.instance.activeItem = null;

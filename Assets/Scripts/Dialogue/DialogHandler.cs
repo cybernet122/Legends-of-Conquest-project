@@ -9,6 +9,7 @@ public class DialogHandler : MonoBehaviour
     [SerializeField] bool markAsComplete, destroyOnFinish;
     [SerializeField] string checkIfComplete;
     [SerializeField] bool triggerOnEntry;
+    [SerializeField] float delayActivation;
     [SerializeField,TooltipAttribute("Remember if the object has been destroyed before(Useful on scene changes).")] 
     bool rememberDestruction;
     public string[] sentences;
@@ -18,21 +19,18 @@ public class DialogHandler : MonoBehaviour
     {
         if (other.CompareTag("Player") && other.GetComponent<Player>())
         {
-            DialogController.instance.ActivateDialog(sentences,GetComponents<DialogHandler>());
-
             canActivateBox = true;
-            //
             DialogController.instance.npcInRange = true;
-
-            if (shouldTriggerQuest)
-            {
-                DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);
-            }
-            //
+            DialogController.instance.ActivateDialog(sentences,GetComponents<DialogHandler>());
+            if (shouldTriggerQuest)            
+                DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);                        
             SpokeToSara();
             if (triggerOnEntry)
             {
-                DialogController.instance.triggerOnEntry = true;                
+                LeanTween.delayedCall(delayActivation, () =>
+                {
+                    DialogController.instance.triggerOnEntry = true;
+                });
             }
         }
     }
@@ -100,12 +98,10 @@ public class DialogHandler : MonoBehaviour
         if (destroyOnFinish)
         {
             DialogController.instance.npcInRange = false;
-            if (rememberDestruction)
-            {
-                PlayerPrefs.SetInt("Destroy_on_start"+ name, 1);
-            }
-            if (triggerOnEntry)
-                Destroy(gameObject, 0.3f);
+            if (rememberDestruction)            
+                PlayerPrefs.SetInt("Destroy_on_start"+ name, 1);            
+            if (triggerOnEntry)            
+                Destroy(gameObject, 0.3f);            
             Destroy(this,0.2f);
         }
         if (dialogueBubble != null)

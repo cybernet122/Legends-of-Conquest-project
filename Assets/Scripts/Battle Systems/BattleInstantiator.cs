@@ -13,9 +13,9 @@ public class BattleInstantiator : MonoBehaviour
 
     IEnumerator StartTheBattle()
     {
-        GameManager.instance.battleIsActive = true;
-
         MenuManager.instance.FadeImage();
+        yield return new WaitForSeconds(1);
+        GameManager.instance.battleIsActive = true;
         int rng = Random.Range(0, availableBattles.Length);
         BattleManager.instance.xpRewardAmount = availableBattles[rng].rewardXP;
         BattleManager.instance.itemsReward = availableBattles[rng].rewardItems;
@@ -25,14 +25,12 @@ public class BattleInstantiator : MonoBehaviour
         
         if (backgroundImage != null)
             BattleManager.instance.backgroundBattleImage.sprite = backgroundImage;
-        yield return new WaitForSeconds(1f);
-        MenuManager.instance.FadeOut();
+        MenuManager.instance.FadeOut(1.5f);
         BattleManager.instance.StartBattle(availableBattles[rng].enemies);
         BattleManager.instance.ChanceToFlee(canFlee, chanceToFlee);
         if(destroyOnVictory)
             BattleManager.instance.battleInstantiator = this;
         AudioManager.instance.PlayBackgroundMusic(battleMusic);
-
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

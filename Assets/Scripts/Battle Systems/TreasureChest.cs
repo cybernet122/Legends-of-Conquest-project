@@ -8,12 +8,21 @@ public class TreasureChest : MonoBehaviour
     private bool chestNotOpened= true;
     [SerializeField] BattleTypeManager[] availableItems;
 
+    private void Start()
+    {
+        if (PlayerPrefs.HasKey("Treasure_Chest_Opened_"))
+        {
+            if (PlayerPrefs.GetInt("Treasure_Chest_Opened_") == 1)
+                chestNotOpened = false;
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player") && chestNotOpened)
         {
             inRange = true;
+            MenuManager.instance.treasureChest = this;
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
@@ -21,22 +30,18 @@ public class TreasureChest : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             inRange = false;
+            MenuManager.instance.treasureChest = null;
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OpenChest()
     {
-        if(inRange && Input.GetButtonDown("Fire1") && chestNotOpened)
+        if (inRange && chestNotOpened)
         {
-            OpenChest();
+            chestNotOpened = false;
+            GameManager.instance.DataToSave("Treasure_Chest_Opened_");
+            int rng = Random.Range(0, availableItems.Length - 1);
+            BattleRewardsHandler.instance.OpenRewardScreen(availableItems[rng].rewardXP, availableItems[rng].rewardItems, availableItems[rng].rewardGold, false);
         }
-    }
-
-    private void OpenChest()
-    {
-        chestNotOpened = false;
-        int rng = Random.Range(0,availableItems.Length -1);
-        BattleRewardsHandler.instance.OpenRewardScreen(availableItems[rng].rewardXP, availableItems[rng].rewardItems, availableItems[rng].rewardGold, false);
     }
 }

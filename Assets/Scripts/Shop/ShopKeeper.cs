@@ -35,12 +35,12 @@ public class ShopKeeper : MonoBehaviour
 
     public void CheckForShop()
     {
-        if ((QuestManager.instance.CheckIfComplete("Return to the Innkeeper") || !GetComponent<DialogHandler>()) && shopInRange)
+        if (Utilities.ReturnSceneName() == "Shop" && (QuestManager.instance.CheckIfComplete("Return to the Innkeeper") || !GetComponent<DialogHandler>()) && shopInRange)
         {
             /*                Destroy(GetComponent<DialogHandler>());
             */
             ShopManager.instance.canOpenShop = true;
-            MenuManager.instance.SwitchToShopUI();
+            //SwitchActiveMap.instance.SwitchToShopUI();
             ShopManager.instance.itemsForSale = shopKeeperItemsForSale;
         }
     }
@@ -50,7 +50,7 @@ public class ShopKeeper : MonoBehaviour
         if (collision.tag == "Player")
         {
             ShopManager.instance.canOpenShop = false;
-            MenuManager.instance.SwitchToUI();
+            //SwitchActiveMap.instance.SwitchToUI();
             ShopManager.instance.itemsForSale.Clear();
             shopInRange = false;
         }

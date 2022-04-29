@@ -11,7 +11,11 @@ public class TooltipSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        instance = this;
+        if (instance != null && instance != this)
+            Destroy(this.gameObject);
+        else
+            instance = this;
+        DontDestroyOnLoad(gameObject);
         canvasGroup = GetComponent<CanvasGroup>();
     }
 

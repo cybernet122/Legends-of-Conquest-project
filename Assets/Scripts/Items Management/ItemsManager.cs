@@ -17,15 +17,43 @@ public class ItemsManager : MonoBehaviour
     public bool isStackable;
     public int amount;
     public bool rememberPickup;
+    SpriteRenderer image;
+    CircleCollider2D collider2d;
     // Start is called before the first frame update
     void Start()
     {
-        if(PlayerPrefs.HasKey("PickedUpItem_" + name))
+        image = GetComponent<SpriteRenderer>();
+        collider2d = GetComponent<CircleCollider2D>();
+        if (PlayerPrefs.HasKey("PickedUpItem_" + name))
         {
             if(PlayerPrefs.GetInt("PickedUpItem_" + name) == 1)
             {
-                this.gameObject.SetActive(false);
+                //gameObject.SetActive(false);
+                image.enabled = false;
+                collider2d.enabled = false;
             }
+        }
+        IncreasePotionPotency();
+    }
+
+    private void OnEnable()
+    {
+        Player.IncreaseHealingPotency += IncreasePotionPotency;
+    }
+
+    private void OnDisable()
+    {
+        Player.IncreaseHealingPotency -= IncreasePotionPotency;
+    }
+
+    public void IncreasePotionPotency()
+    {
+        if(itemName == "HP Potion")
+        {
+            var player = Player.instance.ReturnPlayerStats();
+            amountOfEffect = (int)(50 * 0.27 * player.playerLevel);
+            if (amountOfEffect < 50)
+                amountOfEffect = 50;
         }
     }
 
@@ -35,7 +63,9 @@ public class ItemsManager : MonoBehaviour
         if (inRange)
         {
             Inventory.instance.AddItems(this,false);
-            this.gameObject.SetActive(false);
+            //gameObject.SetActive(false);
+            image.enabled = false;
+            collider2d.enabled = false;
         }
     }
 
@@ -45,8 +75,8 @@ public class ItemsManager : MonoBehaviour
         {
             AudioManager.instance.PlaySFX(6);
             inRange = true;
-            GameManager.instance.DataToSave("PickedUpItem_" + name);
-
+            string stringToSave = "PickedUpItem_" + name;
+            GameManager.instance.DataToSave(stringToSave);
         }
     }
 

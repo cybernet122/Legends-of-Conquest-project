@@ -77,6 +77,7 @@ MonoBehaviour:
     - Dark Zubat
     - Lingering Ghost
     rewardXP: 1000
+    rewardGold: 0
     rewardItems:
     - {fileID: 557758462159751245, guid: 47c92bdbcea7c0443a56cf8f571462a7, type: 3}
     - {fileID: 557758462159751245, guid: 47c92bdbcea7c0443a56cf8f571462a7, type: 3}
@@ -85,12 +86,14 @@ MonoBehaviour:
     - Spying Eyeball
     - Devouring Slime
     rewardXP: 1500
+    rewardGold: 0
     rewardItems:
     - {fileID: 557758462159751245, guid: 47c92bdbcea7c0443a56cf8f571462a7, type: 3}
     - {fileID: 9025688944254745210, guid: efde63b31b2f54447922abc26f477381, type: 3}
   - enemies:
     - Man-eating Plant
     rewardXP: 1500
+    rewardGold: 0
     rewardItems:
     - {fileID: 557758462159751245, guid: 47c92bdbcea7c0443a56cf8f571462a7, type: 3}
     - {fileID: 9025688944254745210, guid: efde63b31b2f54447922abc26f477381, type: 3}
@@ -98,6 +101,7 @@ MonoBehaviour:
   activateOnEnter: 1
   timeBetweenBattles: 1
   chanceToFlee: 30
+  battleMusic: 0
   destroyOnVictory: 1
   canFlee: 1
   shouldCompleteQuest: 0

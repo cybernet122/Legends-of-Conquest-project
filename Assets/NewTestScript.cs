@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NewTestScript : MonoBehaviour
 {
-    private void OnEnable()
+    /*private void OnEnable()
     {
         TestScript.onHit += TakeDamage;
         TestScript.OnHit();
@@ -19,5 +19,5 @@ public class NewTestScript : MonoBehaviour
     {
         TestScript.onHit -= TakeDamage;
 
-    }
+    }*/
 }

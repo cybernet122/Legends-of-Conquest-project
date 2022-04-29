@@ -148,6 +148,7 @@ public class BattleCharacters : MonoBehaviour
         currentHP += amountOfEffect;
         if (currentHP > maxHP)
             currentHP = maxHP;
+        UpdateBattleStats();
     }
     private void AddMana(int amountOfEffect)
     {
@@ -189,4 +190,5 @@ public class BattleCharacters : MonoBehaviour
     {
         selectionRing.SetActive(false);
     }
+
 }

@@ -9,12 +9,18 @@ public class BattleTargetButtons : MonoBehaviour, IPointerEnterHandler, ISelectH
 {
     public string moveName;
     public BattleCharacters activeBattleTarget;
-    public TextMeshProUGUI targetName;
+    [SerializeField] TextMeshProUGUI targetName;
     public Button button;
     // Start is called before the first frame update
     void Start()
     {
-        targetName = GetComponentInChildren<TextMeshProUGUI>();
+        //targetName = GetComponentInChildren<TextMeshProUGUI>();
+    }
+
+    public void SetTargetName(BattleCharacters target)
+    {
+        activeBattleTarget = target;
+        targetName.text = target.characterName;
     }
 
     public void Press()
@@ -24,12 +30,14 @@ public class BattleTargetButtons : MonoBehaviour, IPointerEnterHandler, ISelectH
 
     public void OnSelect(BaseEventData eventData)
     {
-        activeBattleTarget.ShowRing();
+        if(!activeBattleTarget.isDead)
+            activeBattleTarget.ShowRing();
     }
     
     public void OnPointerEnter(PointerEventData eventData)
     {
-        activeBattleTarget.ShowRing();
+        if (!activeBattleTarget.isDead)
+            activeBattleTarget.ShowRing();
     }
 
     public void OnDeselect(BaseEventData eventData)

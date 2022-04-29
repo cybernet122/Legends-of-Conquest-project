@@ -51,7 +51,7 @@ public class AreaExit : MonoBehaviour
 
     IEnumerator LoadScene()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(1f);
         SceneManager.LoadScene(sceneToLoad);
     }
 }

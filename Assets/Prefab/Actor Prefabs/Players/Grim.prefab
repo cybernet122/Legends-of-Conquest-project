@@ -141,9 +141,9 @@ MonoBehaviour:
   currentXP: 0
   xpForNextLevel: 
   baseLevelXP: 100
-  hpToAdd: 10
-  maxHP: 60
-  currentHP: 60
+  hpToAdd: 6
+  maxHP: 65
+  currentHP: 65
   maxMana: 100
   currentMana: 100
   addXP: 1000

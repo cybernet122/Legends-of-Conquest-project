@@ -54,6 +54,12 @@ public class AudioManager : MonoBehaviour
 
     public void PlayBackgroundMusic(int musicToPlay)
     {
+        bool isMusicPlaying = false;
+        foreach (AudioSource music in backgroundMusic)
+            if (music.isPlaying)
+                isMusicPlaying = true;
+        if (GetMusicIndex() == musicToPlay && isMusicPlaying)
+            return;
         StopMusic();
         if(musicToPlay < backgroundMusic.Length)
         {            
