@@ -646,7 +646,7 @@ public class BattleManager : MonoBehaviour
             damageToGive = CriticalStrike(damageToGive, selectedCharacterToAttack.transform);
             Debug.Log(characterAttacking.characterName + " did " + damageToGive + " damage to " + selectedCharacterToAttack);
             yield return new WaitForSeconds(0.5f);
-            if ((attack.moveName == "Shockwave" || attack.moveName == "Enchanced Shockwave") && characterAttacking.IsPlayer())
+            if ((attack.moveName == "Shockwave" || attack.moveName == "Enhanced Shockwave") && characterAttacking.IsPlayer())
             {
                 if (characterAttacking.lifestealWeap)
                 {
