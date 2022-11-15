@@ -25,19 +25,11 @@ public class DialogueBubble : MonoBehaviour
             DialogHandler dialogueHandler = dialogueHandlers[0];
             for (int i = 0; i < dialogueHandlers.Length; i++)
             {
-                if (dialogueHandlers[i].isActiveAndEnabled)
-                {
-                    dialogueHandler = dialogueHandlers[i];
-                }
+                if (dialogueHandlers[i].isActiveAndEnabled)                
+                    dialogueHandler = dialogueHandlers[i];                
             }
-            var questToCheck = dialogueHandler.ReturnCheckIfCompleteQuest();
-            if (questToCheck != "")
-            {
-                if (QuestManager.instance.CheckIfComplete(questToCheck))
-                    SpawnBubble();
-            }
-            else
-                SpawnBubble();            
+            if (!dialogueHandler.triggerOnEntry)
+                SpawnBubble();
         }
         else
         {
@@ -45,5 +37,4 @@ public class DialogueBubble : MonoBehaviour
                 Destroy(dialogueBubble.gameObject);
         }
     }
-
 }

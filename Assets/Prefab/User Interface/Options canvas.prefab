@@ -3311,7 +3311,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4474080409954050841
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3522,17 +3522,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4474080409954050841}
     m_Modifications:
-    - target: {fileID: 212629687938665398, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 37.089813
+    - target: {fileID: 33135981422729985, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
+      propertyPath: m_fontSize
+      value: 31.05
       objectReference: {fileID: 0}
-    - target: {fileID: 212629688075619877, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -112.99994
-      objectReference: {fileID: 0}
-    - target: {fileID: 212629688280112945, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -43.001373
+    - target: {fileID: 212629688674568950, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
+      propertyPath: m_fontSize
+      value: 20.7
       objectReference: {fileID: 0}
     - target: {fileID: 212629688763773845, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
       propertyPath: m_Pivot.x
@@ -3622,21 +3618,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Controls
       objectReference: {fileID: 0}
-    - target: {fileID: 212629689035693141, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -78
-      objectReference: {fileID: 0}
-    - target: {fileID: 5047200310137144299, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: -113.5759
-      objectReference: {fileID: 0}
-    - target: {fileID: 5047200310137144299, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -0.000028789
-      objectReference: {fileID: 0}
-    - target: {fileID: 5047200310137144299, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 115.26
+    - target: {fileID: 212629688991133052, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}
+      propertyPath: m_fontSize
+      value: 20.75
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 92d1211ff1aeed3449b400fd7fc7bf09, type: 3}

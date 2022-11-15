@@ -19,24 +19,33 @@ public class CharacterDamageGUI : MonoBehaviour
         transform.position += new Vector3(0f, moveSpeed * Time.deltaTime);
     }
 
-    public void SetDamage(int damageAmount,bool isCritical)
+    public void SetDamage(int damageAmount,bool isCritical, bool heal)
     {
-        if(damageAmount == 0)
+        if (damageAmount == 0)
         {
+            damageText.color = Color.red;
             damageText.text = "Miss!";
             float jitterAmount = Random.Range(-textVibration, +textVibration);
             transform.position += new Vector3(jitterAmount, jitterAmount, 0f);
         }
         else if (isCritical)
         {
+            damageText.color = Color.red;
             damageText.text = "Critical Strike " + damageAmount.ToString() + "!";
             float jitterAmount = Random.Range(-textVibration, +textVibration);
             transform.position += new Vector3(jitterAmount, jitterAmount, 0f);
             lifeTime++;
-        }
-        else
+        }else
         {
+            damageText.color = Color.red;
             damageText.text = damageAmount.ToString();
+            float jitterAmount = Random.Range(-textVibration, +textVibration);
+            transform.position += new Vector3(jitterAmount, jitterAmount, 0f);
+        }
+        if (heal)
+        {
+            damageText.color = Color.green;
+            damageText.text = "+" + damageAmount.ToString();
             float jitterAmount = Random.Range(-textVibration, +textVibration);
             transform.position += new Vector3(jitterAmount, jitterAmount, 0f);
         }

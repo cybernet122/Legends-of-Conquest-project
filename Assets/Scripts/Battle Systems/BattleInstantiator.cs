@@ -8,8 +8,15 @@ public class BattleInstantiator : MonoBehaviour
     [SerializeField] bool activateOnEnter;
     [SerializeField] float timeBetweenBattles, chanceToFlee;
     [SerializeField] int battleMusic;
-    [SerializeField] bool destroyOnVictory,canFlee, shouldCompleteQuest;
+    [SerializeField] bool destroyOnVictory,canFlee, shouldCompleteQuest, rememberVictory;
     public string questToComplete;
+
+    private void Start()
+    {
+        if (PlayerPrefs.HasKey(name))
+            if (PlayerPrefs.GetInt(name) == 1)
+                Destroy(gameObject);        
+    }
 
     IEnumerator StartTheBattle()
     {
@@ -28,8 +35,11 @@ public class BattleInstantiator : MonoBehaviour
         MenuManager.instance.FadeOut(1.5f);
         BattleManager.instance.StartBattle(availableBattles[rng].enemies);
         BattleManager.instance.ChanceToFlee(canFlee, chanceToFlee);
-        if(destroyOnVictory)
+        if (destroyOnVictory)
+        {
             BattleManager.instance.battleInstantiator = this;
+            BattleManager.instance.battleInstantiatorRememberVictory = rememberVictory;
+        }
         AudioManager.instance.PlayBackgroundMusic(battleMusic);
     }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine.InputSystem;
@@ -26,6 +27,7 @@ public class DialogController : MonoBehaviour
     private string npcName;
     [SerializeField] DialogHandler[] dialogHandler;
     bool advance, finishCountDown, countStarted;
+    public static event UnityAction SpokeToHeroes;
     // Start is called before the first frame update
     void Start()
     {
@@ -144,6 +146,7 @@ public class DialogController : MonoBehaviour
                 AdvanceDialogue();
                 MultipleDialogues();
                 ReturnFromMountains();
+                SpokeToHeroes?.Invoke();
                 currentSentence = 0;
                 dialogText.text = null;
             }

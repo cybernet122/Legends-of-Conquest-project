@@ -16,11 +16,6 @@ public class AbilityInfoManager : MonoBehaviour
         Invoke("RenameAsset", 0.7f);
     }
 
-    void Update()
-    {
-        
-    }
-
     public void RenameAsset()
     {
         string name = PlayerPrefs.GetString("Players_name_");

@@ -22,6 +22,7 @@ public class ItemsAssets : MonoBehaviour
         {
             if(item.itemName == itemToGetName)
             {
+                item.IncreasePotionPotency();
                 return item;
             }
         }

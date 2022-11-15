@@ -30,12 +30,12 @@ public class OptionsScript : MonoBehaviour
 
     private void SaveValues()
     {
-        if (sliderMusic && sliderSFX && sliderDifficulty)
-        {
+        if (sliderMusic)
             musicValue = sliderMusic.value;
+        if(sliderSFX)
             sfxValue = sliderSFX.value;
+        if (sliderDifficulty)
             diffValue = sliderDifficulty.value;
-        }
     }
 
     public void SetValuesOnStart()
@@ -60,12 +60,12 @@ public class OptionsScript : MonoBehaviour
 
     public void SaveButton()
     {
-        if (sliderMusic != null && sliderSFX != null && sliderDifficulty != null)
-        {
+        if (sliderMusic != null)
             PlayerPrefs.SetFloat("Music_Volume_", sliderMusic.value);
+        if(sliderSFX != null)
             PlayerPrefs.SetFloat("SFX_Volume_", sliderSFX.value);
-            PlayerPrefs.SetInt("Difficulty_", difficulty);
-        }
+        if(sliderDifficulty != null)
+            PlayerPrefs.SetInt("Difficulty_", (int)sliderDifficulty.value);
         SaveValues();
         changedSettings = false;
     }
@@ -80,7 +80,7 @@ public class OptionsScript : MonoBehaviour
 
     public void OpenWarningPanel(bool returnToMainMenu)
     {
-        if (changedSettings) //musicValue != sliderMusic.value || sfxValue != sliderSFX.value || diffValue != difficulty
+        if (changedSettings)
         {
             discardWarningPanel.SetActive(true);
             foreach(Button button in saveAndReturnButtons)

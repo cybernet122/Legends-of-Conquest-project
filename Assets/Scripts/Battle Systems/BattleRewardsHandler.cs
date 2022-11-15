@@ -14,13 +14,15 @@ public class BattleRewardsHandler : MonoBehaviour
     public string questToComplete;
     private float count;
     bool startCount =false;
-    // Start is called before the first frame update
+
     void Start()
     {
-        instance = this;
+        if (instance != null && instance != this)
+            Destroy(this.gameObject);
+        else
+            instance = this;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (startCount && count <= 0.7f)
@@ -33,6 +35,11 @@ public class BattleRewardsHandler : MonoBehaviour
             startCount = false;
             count = 0;
         }
+    }
+
+    public bool RewardScreenOpen()
+    {
+        return rewardsScreen.activeInHierarchy;
     }
     
     public void OpenRewardScreen(int xpEarned,ItemsManager[] itemsEarned,int goldReward, bool fight)
@@ -54,19 +61,18 @@ public class BattleRewardsHandler : MonoBehaviour
                 itemsText.text = rewardItemText.itemName;
             else
                 itemsText.text += ", " + rewardItemText.itemName;
-        }        
-        rewardsScreen.SetActive(true);
-        if(fight)
+        }
         BattleManager.instance.isRewardScreenOpen = true;
+        rewardsScreen.SetActive(true);
     }
 
     public void CloseRewardScreen()
     {
         var playerStats = GameManager.instance.GetPlayerStats();
-        foreach (PlayerStats player in playerStats)        
-            player.AddXP(xpReward);        
-        foreach (ItemsManager itemRewarded in rewardItems)        
-            Inventory.instance.AddItems(itemRewarded, false);        
+        foreach (PlayerStats player in playerStats)
+            player.AddXP(xpReward);
+        foreach (ItemsManager itemRewarded in rewardItems)
+            Inventory.instance.AddItems(itemRewarded, false);
         rewardsScreen.SetActive(false);
         GameManager.instance.battleIsActive = false;
         GameManager.instance.currentGoldCoins += goldReward;

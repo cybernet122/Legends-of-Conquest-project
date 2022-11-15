@@ -18,8 +18,8 @@ public class ItemButton : MonoBehaviour
             MenuManager.instance.itemDescription.text = itemOnButton.itemDescription;
             if (itemOnButton.amountOfEffect != 0)
                 MenuManager.instance.itemDescription.text = itemOnButton.itemDescription + "(Restores " + itemOnButton.amountOfEffect + " " + itemOnButton.affectType + ")";
-            if (itemOnButton != null)
-                MenuManager.instance.activeItem = itemOnButton;
+            if (itemOnButton != null)            
+                MenuManager.instance.activeItem = itemOnButton;            
             else
             {
                 itemOnButton = ItemsAssets.instance.GetItemsAsset(itemOnButton.itemName);

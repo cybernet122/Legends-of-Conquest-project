@@ -19792,6 +19792,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 617312133c1a30742a4cd937c3ab034e, type: 3}
+--- !u!4 &679793775 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+  m_PrefabInstance: {fileID: 1134476484}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &686794573
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19955,7 +19960,8 @@ MonoBehaviour:
   - Wait a second I remember you, you must be the one that was injured, your friend
     brought you here, how are you feeling?
   - '#Jimmy'
-  - That's right, although I don't remember who brought me here, my name is %.
+  - That's right, although my memory fails me because of the injuries, the innkeeper
+    informed me about what happened, my name is %.
   - I was on my way to deal with your monster problem, is there anything you can
     tell me about your clashes with the monsters in the mountains?
   - '#Villager'
@@ -20159,7 +20165,7 @@ Transform:
   m_LocalScale: {x: 4, y: 4, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &725276025
 MonoBehaviour:
@@ -20507,6 +20513,63 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.1333334, y: 2.1333334}
   m_EdgeRadius: 0
+--- !u!1001 &1134476484
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2073317435}
+    m_Modifications:
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -6.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -19.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3567963339979080595, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_Name
+      value: Teleportation Scroll(Town)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
 --- !u!1001 &1144604649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21382,7 +21445,7 @@ Transform:
   - {fileID: 437679165}
   - {fileID: 1622765187}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1844190080 stripped
 Transform:
@@ -37842,6 +37905,7 @@ Transform:
   - {fileID: 1262524474}
   - {fileID: 336771016}
   - {fileID: 1144604650}
+  - {fileID: 679793775}
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -38069,7 +38133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2951406240066452118, guid: 2b87116367f2ce148b5e3614779cfab3, type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2951406240066452118, guid: 2b87116367f2ce148b5e3614779cfab3, type: 3}
       propertyPath: m_LocalScale.x
@@ -38182,8 +38246,8 @@ MonoBehaviour:
   - '#Jimmy'
   - Don't worry, I am merely repaying my debt.
   - '#Villager'
-  - I am relieved to hear that, in case you have trouble finding the way, follow
-    the road west and then head south, you can't miss it.
+  - Still, we are all grateful either way, in case you have trouble finding the way,
+    follow the road east and then head south, you can't miss it.
   - '#Jimmy'
   - Thanks, I better be on my way then.
 --- !u!61 &2951406240404265025
@@ -38221,27 +38285,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100115986554916017, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -50.000183
+      value: -50.00006
       objectReference: {fileID: 0}
     - target: {fileID: 100115986746343802, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -50.00067
+      value: -50.00055
       objectReference: {fileID: 0}
     - target: {fileID: 100115987887009100, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -50.000183
+      value: -50.00006
       objectReference: {fileID: 0}
     - target: {fileID: 100115988278195169, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -50.00067
+      value: -50.00055
       objectReference: {fileID: 0}
     - target: {fileID: 5332143280222178260, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_Name
       value: Main Parent Player+UI
       objectReference: {fileID: 0}
+    - target: {fileID: 7140656096714620773, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -8.468155
+      objectReference: {fileID: 0}
     - target: {fileID: 7460881615884140130, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_RootOrder
-      value: 12
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 7460881615884140130, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_LocalPosition.x

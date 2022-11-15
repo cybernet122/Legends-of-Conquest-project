@@ -55,12 +55,12 @@ public class PlayerStats : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.L))
+        /*if (Input.GetKeyDown(KeyCode.L))
         {
             AddXP(addXP);
         }
         if (Input.GetKeyDown(KeyCode.K))
-            AddHP(hpToAdd);
+            AddHP(hpToAdd);*/
     }
 
     public void AddXP(int amount)

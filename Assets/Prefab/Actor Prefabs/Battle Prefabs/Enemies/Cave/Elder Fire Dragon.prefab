@@ -112,9 +112,9 @@ MonoBehaviour:
   maxHP: 1000
   currentMana: 800
   maxMana: 800
-  dexterity: 16
+  dexterity: 13
   defense: 11
-  weaponPower: 60
+  weaponPower: 50
   armorDefense: 0
   speed: 9
   evasion: 0

@@ -239,6 +239,7 @@ MonoBehaviour:
   isPlayer: 0
   attacksAvailable:
   - Shockwave
+  - Blood drain
   hpSlider: {fileID: 344789720180678464}
   nameText: {fileID: 92655103503127769}
   hpValue: {fileID: 4167444658445421508}
@@ -248,9 +249,9 @@ MonoBehaviour:
   maxHP: 90
   currentMana: 20
   maxMana: 20
-  dexterity: 6
+  dexterity: 4
   defense: 12
-  weaponPower: 12
+  weaponPower: 8
   armorDefense: 0
   speed: 6
   evasion: 5
@@ -267,7 +268,7 @@ Animator:
   m_GameObject: {fileID: 4742137871710697490}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 655e20ea8db8a484d8bb20b051839d8d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

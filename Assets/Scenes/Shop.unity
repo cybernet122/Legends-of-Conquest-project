@@ -195,29 +195,29 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1482911620445687040, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
-      propertyPath: battleMovesList.Array.data[1].manaCost
-      value: 16
+    - target: {fileID: 100115986554916017, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50
       objectReference: {fileID: 0}
-    - target: {fileID: 1482911620445687040, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
-      propertyPath: battleMovesList.Array.data[1].movePower
-      value: 21
+    - target: {fileID: 100115986594711121, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -42.9375
       objectReference: {fileID: 0}
-    - target: {fileID: 1482911620445687040, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
-      propertyPath: battleMovesList.Array.data[2].movePower
-      value: 20
+    - target: {fileID: 100115986746343802, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50.00049
       objectReference: {fileID: 0}
-    - target: {fileID: 1482911620445687040, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
-      propertyPath: battleMovesList.Array.data[3].movePower
-      value: 14
+    - target: {fileID: 100115987887009100, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50
       objectReference: {fileID: 0}
-    - target: {fileID: 1482911620445687040, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
-      propertyPath: battleMovesList.Array.data[4].movePower
-      value: 12
+    - target: {fileID: 100115988020038089, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -42.9375
       objectReference: {fileID: 0}
-    - target: {fileID: 4082518648542941884, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -0.040039062
+    - target: {fileID: 100115988278195169, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50.00049
       objectReference: {fileID: 0}
     - target: {fileID: 5332143280222178260, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_Name
@@ -230,6 +230,10 @@ PrefabInstance:
     - target: {fileID: 6291325538246730601, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_LocalPosition.y
       value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7140656096714620773, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -8.46814
       objectReference: {fileID: 0}
     - target: {fileID: 7460881615884140130, guid: d2882a03e31c79c4f9fc7e8305a66d91, type: 3}
       propertyPath: m_RootOrder
@@ -558,6 +562,71 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogueBubble: {fileID: 6660400798585450001, guid: c8a8c84da5a64ad468892810e657d25e, type: 3}
+--- !u!1001 &543328733
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2121403616}
+    m_Modifications:
+    - target: {fileID: -2843131785171380630, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -11.48
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 399966715725400046, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3567963339979080595, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_Name
+      value: Teleportation Scroll
+      objectReference: {fileID: 0}
+    - target: {fileID: 8284708259437312723, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
 --- !u!1001 &603476279
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -903,6 +972,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e94bd12243047f04b81e332218fdd983, type: 3}
+--- !u!4 &2121403616 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6587783478848298858, guid: e94bd12243047f04b81e332218fdd983, type: 3}
+  m_PrefabInstance: {fileID: 2121403615}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1802254032774179515
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4792,13 +4866,21 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068744, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: shopKeeperItemsForSale.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068744, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: shopKeeperItemsForSale.Array.data[6]
+      value: 
+      objectReference: {fileID: 7337337511190735732, guid: bf1c485df45f88440abdb4741f6aff38, type: 3}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: destroyOnFinish
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.size
-      value: 21
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[1]
@@ -4815,69 +4897,102 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[5]
-      value: A stranger came here looking for someone to help you, I took you in
-        wounded and tended to your wounds, he left and I haven't seen him since.
+      value: Must have been a friend of yours that brought you here, he was basically
+        carrying you alone, you could barely stand.He was looking for someone to
+        help you,
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[6]
-      value: '#Jimmy'
+      value: ' I took you in wounded and our healer tended to your wounds, he left
+        and I haven''t seen him since.'
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[7]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[8]
       value: How long have I been unconcious for?
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[9]
+      value: '#Innkeeper'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[10]
       value: For about a week give or take, your wounds were quite serious but you
         healed faster than I expected,
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[10]
+      propertyPath: sentences.Array.data[11]
       value: you can thank Sara our healer, she should be somewhere around the village,I
         don't believe I cought your name though.
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[11]
+      propertyPath: sentences.Array.data[12]
       value: '#Jimmy'
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[12]
+      propertyPath: sentences.Array.data[13]
       value: Oh, my name is %, how can I repay your kindness? I don't have any coins
         with me.
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[13]
+      propertyPath: sentences.Array.data[14]
       value: '#Innkeeper'
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[14]
-      value: Well now that you mention it, there is something that you can do for
-        me. You see there are some monsters in the mountains that keep causing trouble,
+      propertyPath: sentences.Array.data[15]
+      value: Oh please, you don't owe me anything, you were a traveler in need, I
+        couldn't just leave you in the condition you were in.
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[15]
+      propertyPath: sentences.Array.data[16]
+      value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[17]
+      value: Please, there must be something I can help with, I can't leave you like
+        this.
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[18]
+      value: '#Innkeeper'
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[19]
+      value: Well now that you mention it, there is something that you can do for
+        me, if you are up to the task.
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[20]
+      value: You see there are some monsters in the mountains that keep causing trouble
+        to our little village...
+      objectReference: {fileID: 0}
+    - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[21]
       value: like attacking citizens, eating and destroying our crops. We have some
         defenses here but it's not enough to repel them for good.
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[16]
+      propertyPath: sentences.Array.data[22]
       value: You look like you can handle yourself, how about you help us out and
         I can reward you for your troubles?
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[17]
+      propertyPath: sentences.Array.data[23]
       value: '#Jimmy'
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[18]
-      value: Alright sure, just have my reward ready when I get back.
+      propertyPath: sentences.Array.data[24]
+      value: Very well, I will defeat those monsters for you.
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[19]
+      propertyPath: sentences.Array.data[25]
       value: '#Innkeeper'
       objectReference: {fileID: 0}
     - target: {fileID: 5901125954480068747, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
-      propertyPath: sentences.Array.data[20]
+      propertyPath: sentences.Array.data[26]
       value: Thank you, the road that leads to the mountains is just east of here
         you can't miss it.
       objectReference: {fileID: 0}
@@ -4916,6 +5031,16 @@ PrefabInstance:
     - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[10]
       value: '#Jimmy'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[13]
+      value: Many adventurers have come seeking to kill the dragon but only manage
+        to get themselves killed or severly wounded.
+      objectReference: {fileID: 0}
+    - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
+      propertyPath: sentences.Array.data[14]
+      value: They have told us that the cave the dragon resides in, holds unimaginable
+        wealth,
       objectReference: {fileID: 0}
     - target: {fileID: 7024877984999379398, guid: 307f7c6ddc6b0fb4290160affab041e4, type: 3}
       propertyPath: sentences.Array.data[16]

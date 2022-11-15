@@ -5,14 +5,15 @@ using UnityEngine;
 public class TreasureChest : MonoBehaviour
 {
     public bool inRange;
-    private bool chestNotOpened= true;
+    [SerializeField] bool chestNotOpened= true;
+    [SerializeField] string checkIfComplete;
     [SerializeField] BattleTypeManager[] availableItems;
 
     private void Start()
     {
-        if (PlayerPrefs.HasKey("Treasure_Chest_Opened_"))
+        if (PlayerPrefs.HasKey(name + "_Opened_"))
         {
-            if (PlayerPrefs.GetInt("Treasure_Chest_Opened_") == 1)
+            if (PlayerPrefs.GetInt(name + "_Opened_") == 1)
                 chestNotOpened = false;
         }
     }
@@ -38,8 +39,13 @@ public class TreasureChest : MonoBehaviour
     {
         if (inRange && chestNotOpened)
         {
+            if (checkIfComplete != string.Empty)
+            {
+                if (!QuestManager.instance.CheckIfComplete(checkIfComplete))
+                    return;
+            }
             chestNotOpened = false;
-            GameManager.instance.DataToSave("Treasure_Chest_Opened_");
+            GameManager.instance.DataToSave(name + "_Opened_");
             int rng = Random.Range(0, availableItems.Length - 1);
             BattleRewardsHandler.instance.OpenRewardScreen(availableItems[rng].rewardXP, availableItems[rng].rewardItems, availableItems[rng].rewardGold, false);
         }

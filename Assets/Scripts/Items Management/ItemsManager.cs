@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class ItemsManager : MonoBehaviour
 {
-    public enum ItemType { Item,Weapon,Armor}
+    public enum ItemType { Item, Weapon, Armor}
     public ItemType itemType;
     public string itemName, itemDescription;
     public int valueInCoins;
     public Sprite itemImage;
-    public enum AffectType { HP,Mana}
+    public enum AffectType { HP, Mana, Other}
     public int amountOfEffect;
     public AffectType affectType;
     public int weaponDexterity, armorDefense;
@@ -51,9 +51,12 @@ public class ItemsManager : MonoBehaviour
         if(itemName == "HP Potion")
         {
             var player = Player.instance.ReturnPlayerStats();
-            amountOfEffect = (int)(50 * 0.27 * player.playerLevel);
-            if (amountOfEffect < 50)
-                amountOfEffect = 50;
+            amountOfEffect = 60 + (player.playerLevel * 5);
+        }
+        if (itemName == "Mana Potion")
+        {
+            var player = Player.instance.ReturnPlayerStats();
+            amountOfEffect = 40 + (player.playerLevel * 2);
         }
     }
 
@@ -83,9 +86,7 @@ public class ItemsManager : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
-        {
             inRange = false;
-        }        
     }
 
     public void UseItem(int characterToUse)
@@ -94,22 +95,18 @@ public class ItemsManager : MonoBehaviour
         if (itemType == ItemType.Item)
         {
             if (affectType == AffectType.HP)
-            {
                 selectedCharacter.AddHP(amountOfEffect);
-            }
             else if (affectType == AffectType.Mana)
-            {
                 selectedCharacter.AddMana(amountOfEffect);
-            }
+            else if (affectType == AffectType.Other)
+                GameManager.instance.TeleportScroll();
         }
         else if (itemType == ItemType.Weapon)
         {
             if (selectedCharacter.equippedWeaponName != this.itemName)
             {
                 if (selectedCharacter.equippedWeaponName != "")
-                {
                     Inventory.instance.AddItems(selectedCharacter.equippedWeapon, false);
-                }
                 selectedCharacter.EquipWeapon(this);
             }
         }
@@ -118,9 +115,7 @@ public class ItemsManager : MonoBehaviour
             if (selectedCharacter.equippedArmorName != this.itemName)
             {
                 if (selectedCharacter.equippedArmorName != "")
-                {
                     Inventory.instance.AddItems(selectedCharacter.equippedArmor, false);
-                }
                 selectedCharacter.EquipArmor(this);
             }
         }

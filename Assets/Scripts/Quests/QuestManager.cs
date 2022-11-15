@@ -25,16 +25,11 @@ public class QuestManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        /*if (Input.GetKeyDown(KeyCode.P))
         {
             AdvanceQuest();
             print("skipping quest");
-        }
-        /*        if (Input.GetKeyDown(KeyCode.L))
-                {
-                    LoadQuestData();
-                    print("loading quests");
-                }*/
+        }*/
     }
 
     private void AdvanceQuest()
@@ -113,7 +108,9 @@ public class QuestManager : MonoBehaviour
         int questNumberToCheck = GetQuestNumber(questToMark);
         questMarkersCompleted[questNumberToCheck] = !questMarkersCompleted[questNumberToCheck];
         PlayerPrefs.SetInt("QuestMarker_" + questToMark , 1);
-        GameManager.instance.SaveData();
+        LeanTween.delayedCall(0.2f,() =>
+        GameManager.instance.SaveData()
+            );
         if(!questMarkersCompleted[questMarkersCompleted.Length-1])
             MenuManager.instance.UpdateQuest(GetCurrentQuest());
         UpdateQuestObjects();

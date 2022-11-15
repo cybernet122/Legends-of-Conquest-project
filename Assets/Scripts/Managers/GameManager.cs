@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] bool enableJoystick;
     public static GameManager instance;
     [SerializeField] PlayerStats[] playerStats;
     public bool gameMenuOpened, dialogBoxOpened, shopMenuOpened, battleIsActive, count;
@@ -32,6 +33,10 @@ public class GameManager : MonoBehaviour
         if(!savingFade)
         savingFade = FindObjectOfType<SavingFade>();
         count = true;
+        if (enableJoystick)
+            EnableButtons();
+        else
+            DisableButtons();
         LeanTween.delayedCall(0.1f, () =>
         {
             SortPlayerStats();
@@ -42,48 +47,37 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         PurgeData();
-        if (loading || dialogBoxOpened || gameMenuOpened || shopMenuOpened || battleIsActive || SceneManager.GetActiveScene().name == "Main Menu" || SceneManager.GetActiveScene().name == "Loading Scene" || SceneManager.GetActiveScene().name == "GameOverScene" || SceneManager.GetActiveScene().name == "Treasure")
+        bool condition = SceneManager.GetActiveScene().name == "Main Menu" || SceneManager.GetActiveScene().name == "Loading Scene" || SceneManager.GetActiveScene().name == "GameOverScene" || SceneManager.GetActiveScene().name == "Treasure" || SceneManager.GetActiveScene().name == "Options";
+        if ((loading || dialogBoxOpened || gameMenuOpened || shopMenuOpened || battleIsActive || condition))
         {
             if (enableMovement != false)
                 enableMovement = false;
-            if(joystickControls && joystickControls.GetComponentInChildren<Image>().enabled)
-            DisableButtons();
+                DisableButtons();            
         }
         else
         {
             if (enableMovement != true)
                 enableMovement = true;
-            if(joystickControls && !joystickControls.GetComponentInChildren<Image>().enabled)
-            EnableButtons();
+                EnableButtons();
         }
-        /*if (Input.GetKeyDown(KeyCode.F5))
-        {
-            SaveData();
-        }
-        if (Input.GetKeyDown(KeyCode.F6))
-        {
-            LoadData();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            QuestManager.instance.PurgeQuestData();
-        }*/
-        /*if (Input.GetKeyDown(KeyCode.O))
-        {
-            var playerObject = Instantiate(player,SwitchActiveMap.instance.gameObject.transform);
-        }*/
     }
 
     private void EnableButtons()
     {
-        for (int i = 0; i < joystickControls.transform.childCount; i++)        
-            joystickControls.transform.GetChild(i).GetComponent<Image>().enabled = true;        
+        if (enableJoystick && joystickControls && !joystickControls.GetComponentInChildren<Image>().enabled)
+        {
+            for (int i = 0; i < joystickControls.transform.childCount; i++)
+                joystickControls.transform.GetChild(i).GetComponent<Image>().enabled = true;
+        }
     }
 
     private void DisableButtons()
     {
-        for (int i = 0; i < joystickControls.transform.childCount; i++)        
-            joystickControls.transform.GetChild(i).GetComponent<Image>().enabled = false;        
+        if (joystickControls && joystickControls.GetComponentInChildren<Image>().enabled)
+        { 
+            for (int i = 0; i < joystickControls.transform.childCount; i++)        
+                joystickControls.transform.GetChild(i).GetComponent<Image>().enabled = false;
+        }
     }
 
     private void OnDestroy()
@@ -108,10 +102,8 @@ public class GameManager : MonoBehaviour
 
     private void FadeOut()
     {
-        if (SceneManager.GetActiveScene().name != "Main Menu" && SceneManager.GetActiveScene().name != "Loading Scene")
-        {
-            MenuManager.instance.FadeOut(.5f);
-        }
+        if (SceneManager.GetActiveScene().name != "Main Menu" && SceneManager.GetActiveScene().name != "Loading Scene")        
+            MenuManager.instance.FadeOut(.5f);        
     }
 
     private void OnDisable()
@@ -144,15 +136,17 @@ public class GameManager : MonoBehaviour
     {
         savingFade = FindObjectOfType<SavingFade>();
         Invoke("SortPlayerStats", 0.3f);
-        Invoke("UpdatePlayerLevels", 0.5f);        
-        Invoke("LoadSecondaryData", 0.5f);
+        Invoke("UpdatePlayerLevels", 0.5f);
+        if(scene.name != "Main Menu" && scene.name != "Loading Scene" && scene.name != "GameOverScene")
+        Invoke("LoadSecondaryData",0.5f);
         LeanTween.delayedCall(0.15f, () =>
         {
             QuestManager.instance.MountainsQuest();
             savingFade = SavingFade.instance;
             if (scene.name != "Main Menu" && scene.name != "Loading Scene")
-                MenuManager.instance.SetFirstSelectedObject();
+                MenuManager.instance.SetFirstSelectedObject(0);
             DialogController.instance.ReturnFromMountains();
+            Player.UpdatePotency();
         });
         if(SceneManager.GetActiveScene().name == "Bedroom" && newGame)
         {
@@ -167,6 +161,32 @@ public class GameManager : MonoBehaviour
                 }
             });
         }
+    }
+
+    public void TeleportScroll()
+    {
+        MenuManager.instance.ToggleMenu();
+        MenuManager.instance.FadeImage();
+        LeanTween.delayedCall(1f, () => {
+            SaveSecondaryData();
+            SceneManager.LoadScene("Town");
+            LeanTween.delayedCall(0.3f, () =>
+            {
+                var tpPoint = FindObjectsOfType<AreaEnter>();
+                foreach (AreaEnter point in tpPoint)
+                {
+                    if (point.transitionAreaName == "Town 1")
+                        TeleportToPoint(point);
+                    MenuManager.instance.ResetToggles();
+                    Player.instance.FaceDown();
+                }
+            });
+        });
+    }
+
+    private void TeleportToPoint(AreaEnter point)
+    {
+        Player.instance.transform.position = point.transform.position;
     }
 
     private void CheckForBattleManager()
@@ -224,6 +244,14 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("Gold_coins_", currentGoldCoins);
     }
 
+    public void SaveSecondaryData()
+    {
+        foreach (string data in stringsToSave)
+            PlayerPrefs.SetInt(data, 1);
+        SavePlayerStats();
+        SaveItemInventory();
+    }
+
     private static void SaveItemInventory()
     {
         PlayerPrefs.SetInt("Number_Of_Items", Inventory.instance.GetItemList().Count);
@@ -231,16 +259,14 @@ public class GameManager : MonoBehaviour
         {
             ItemsManager itemInInventory = Inventory.instance.GetItemList()[i];
             PlayerPrefs.SetString("Item_" + i + "_Name_", itemInInventory.itemName);
-
             if (itemInInventory.isStackable && itemInInventory.amount > 1)
                 PlayerPrefs.SetInt("Items_" + i + "_Amount_", itemInInventory.amount);
-
             else
                 PlayerPrefs.SetInt("Items_" + i + "_Amount_", 1);
         }
     }
 
-    private static void SavePlayerPos()
+    public static void SavePlayerPos()
     {
         PlayerPrefs.SetFloat("Player_Pos_X", Player.instance.transform.position.x);
         PlayerPrefs.SetFloat("Player_Pos_Y", Player.instance.transform.position.y);
@@ -362,12 +388,12 @@ public class GameManager : MonoBehaviour
 
     private void PurgeData()
     {
-        if (Input.GetKeyDown(KeyCode.K) && SceneManager.GetActiveScene().name != "Main Menu")
+        /*if (Input.GetKeyDown(KeyCode.K) && SceneManager.GetActiveScene().name != "Main Menu")
         {
             PlayerPrefs.DeleteAll();
             Debug.Log("Purging Data");
             QuestManager.instance.PurgeQuestData();
-        }
+        }*/
     }
 
     public void UpdatePlayerLevels()
@@ -399,14 +425,6 @@ public class GameManager : MonoBehaviour
     {
         stringsToSave.Add(stringToSave);
     }
-
-    public void SaveSecondaryData()
-    {
-        foreach (string data in stringsToSave)        
-            PlayerPrefs.SetInt(data, 1);        
-        SavePlayerStats();
-        SaveItemInventory();
-    }
     
     public void LoadSecondaryData()
     {
@@ -415,8 +433,9 @@ public class GameManager : MonoBehaviour
             foreach (string data in stringsToSave)
                 PlayerPrefs.GetInt(data, 1);
             stringsToSave.Clear();
-            LoadPlayerStats();
-            LoadItemInventory();
+            if (PlayerPrefs.HasKey("Player_" + playerStats[0].playerName + "_CurrentHP"))            
+                LoadPlayerStats();            
+            LoadItemInventory();                
         }
     }
 
@@ -425,6 +444,7 @@ public class GameManager : MonoBehaviour
         if (enableMovement)
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+            print(input.x + " " + input.y);
             Player.instance.MovePlayer(input.x, input.y);
         }
     }

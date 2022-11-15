@@ -31,8 +31,8 @@ public class BattleManager : MonoBehaviour
     private List<Transform> items = new List<Transform>();
     private List<BattleCharacters> characterToStun = new List<BattleCharacters>();
     private int currentTurn = 1;
-    [SerializeField] bool waitingForTurn;
-    [SerializeField] GameObject UIButtonHolder,enemyTargetPanel,returnButton, useItemButton;
+    [SerializeField] bool waitingForTurn, missOnPurpose;
+    [SerializeField] GameObject UIButtonHolder, enemyTargetPanel, returnButton, menuButton, useItemButton;
     [SerializeField] BattleMoves[] battleMovesList;
     [SerializeField] BattleTargetButtons[] targetButtons;
     [SerializeField] BattleMagicButton[] magicButtons;
@@ -46,11 +46,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] Transform itemSlotContainerParent;
     [SerializeField] TextMeshProUGUI itemName, itemDescription;
     [SerializeField] CanvasGroup battleCanvasGroup;
-    //List<GameObject> magicButtons = new List<GameObject>();
     public int xpRewardAmount, goldRewardAmount;
     public ItemsManager[] itemsReward;
-    public bool isRewardScreenOpen;
-    private bool canFlee;
+    public bool isRewardScreenOpen, battleInstantiatorRememberVictory;
+    private bool canFlee, missedAttack;
     private float percentToFlee;
     public BattleInstantiator battleInstantiator;
     private int screenHeight, screenWidth;
@@ -65,13 +64,9 @@ public class BattleManager : MonoBehaviour
     void Start()
     {
         if (instance != null && instance != this)
-        {
             Destroy(this.gameObject);
-        }
         else
-        {
             instance = this;
-        }
         DontDestroyOnLoad(gameObject);
         battleScene.SetActive(false);
         enemyTargetPanel.SetActive(false);
@@ -100,6 +95,9 @@ public class BattleManager : MonoBehaviour
     void Update()
     {
         CheckForResize();
+        /*if (Input.GetKeyDown(KeyCode.Keypad0))
+            foreach (BattleCharacters enemy in enemies)
+                enemy.currentHP = 1;*/
     }
 
     public void StartBattle(string[] enemiesToSpawn)
@@ -235,6 +233,11 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    public BattleCharacters[] GetPlayers()
+    {
+        return players.ToArray();
+    }
+
     private void ImportPlayerStats(PlayerStats[] playerStats, int i)
     {
         PlayerStats player = playerStats[i];
@@ -274,9 +277,7 @@ public class BattleManager : MonoBehaviour
             });
             battleScene.SetActive(true);
             for (int i = 0; i < border.Length; i++)
-            {
                 border[i].SetActive(false);
-            }
             EventSystem.current.firstSelectedGameObject = mainPanelButtons[0];
             EventSystem.current.SetSelectedGameObject(mainPanelButtons[0]);
             mainPanelButtons[0].GetComponent<Button>().OnSelect(null);
@@ -293,10 +294,8 @@ public class BattleManager : MonoBehaviour
                     Destroy(playersPositions[i].GetChild(0).gameObject);
             }
             for (int x = 0; x < enemiesPositions.Length; x++)
-            {
                 if(enemiesPositions[x].transform.childCount >= 1)
                     Destroy(enemiesPositions[x].GetChild(0).gameObject);
-            }
             MenuManager.instance.ResetToggles();
             players.Clear();
             enemies.Clear();
@@ -305,9 +304,7 @@ public class BattleManager : MonoBehaviour
             itemPanel.SetActive(false);
             battleScene.SetActive(false);
             for (int i = 0; i < border.Length; i++)
-            {
                 border[i].SetActive(false);
-            }
             AudioManager.instance.StopMusic();
         }
     }
@@ -341,6 +338,10 @@ public class BattleManager : MonoBehaviour
             transform.position = new Vector3(cameraToResize.transform.position.x, cameraToResize.transform.position.y, transform.position.z);
         else
             Debug.LogError("Couldn't find a camera to resize");
+        if (returnButton.activeInHierarchy)
+        {
+            ReturnButtonPlacement();
+        }
     }
 
     private void CheckForCamera()
@@ -380,8 +381,7 @@ public class BattleManager : MonoBehaviour
         else if (!activeBattleCharacters[0].IsPlayer() && !activeBattleCharacters[0].isDead)
         {
             StartCoroutine(EnemyMoveCoroutine(activeBattleCharacters[0]));
-            print("Current player's turn is " + activeBattleCharacters[0]);
-            //activeBattleCharacters.RemoveAt(0); // may break
+            print("Current turn is " + activeBattleCharacters[0]);
         }
         else if (activeBattleCharacters[0].isDead)
         {
@@ -400,13 +400,9 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < battleCharacters.Length; i++)
         {
             if(battleCharacters[i].IsPlayer() && !battleCharacters[i].isDead)
-            {
                 friendlies++;
-            }
             else if(!battleCharacters[i].IsPlayer() && !battleCharacters[i].isDead)
-            {
                 Enemies++;
-            }
         }
         if (friendlies > 0 && Enemies == 0)
         {
@@ -414,6 +410,7 @@ public class BattleManager : MonoBehaviour
             UpdatePlayerStats(battleCharacters, 0);
             DestroyInstantiator();
             SwitchActiveMap.instance.SwitchToUI();
+            print(BattleRewardsHandler.instance.name);
             BattleRewardsHandler.instance.OpenRewardScreen(xpRewardAmount, itemsReward, goldRewardAmount, true);
             QuestManager.instance.MountainsQuest();
         }
@@ -422,6 +419,7 @@ public class BattleManager : MonoBehaviour
             SettingUpBattle();
             LeanTween.delayedCall(0.2f, () =>
             {
+                GameManager.instance.SaveSecondaryData();
                 MenuManager.instance.ResetToggles();
                 GameManager.instance.GameOver();
             });
@@ -435,13 +433,9 @@ public class BattleManager : MonoBehaviour
         enemies.Clear();
         activeBattleCharacters.Clear();
         for (int i = 0; i < playerCanvas.Length; i++)
-        {
             playerCanvas[i].SetActive(false);
-        }
         for (int i = 0; i < battleCharacters.Length; i++)
-        {
             Destroy(battleCharacters[i].gameObject);
-        }
         StopAllCoroutines();
         currentTurn = 1;
         AudioManager.instance.PlayBackgroundMusic(musicIndex);
@@ -449,8 +443,12 @@ public class BattleManager : MonoBehaviour
 
     private void DestroyInstantiator()
     {
-        if(battleInstantiator != null)
-        Destroy(battleInstantiator.gameObject);
+        if (battleInstantiator != null)
+        {
+            if (battleInstantiatorRememberVictory)
+                PlayerPrefs.SetInt(battleInstantiator.name,1);
+            Destroy(battleInstantiator.gameObject);
+        }
     }
 
     private void UpdatePlayerStats(BattleCharacters[] battleCharacters,int index)
@@ -458,13 +456,9 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < battleCharacters.Length; i++)
         {
             if(index == 0 && battleCharacters[i].IsPlayer())
-            {
                 battleCharacters[i].ExitBattle(0);
-            }
             else if(index == 1 && battleCharacters[i].IsPlayer())
-            {
                 battleCharacters[i].ExitBattle(1);
-            }
         }
     }
 
@@ -562,9 +556,7 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < battleCharacters.Length; i++)
         {
             if (battleCharacters[i].IsPlayer() && !battleCharacters[i].isDead)
-            {
                 players.Add(battleCharacters[i].GetComponent<BattleCharacters>());
-            }
         }
         if(players.Count == 0) { return; }
         BattleCharacters selectedPlayerToAttack = players[Random.Range(0, players.Count)];
@@ -594,17 +586,11 @@ public class BattleManager : MonoBehaviour
         print(characterAttacking.characterName + " attacking " + selectedCharacterToAttack.characterName);
         float attackPower = 0;
         if(attack.moveName == "Shockwave")
-        {
             attackPower = characterAttacking.dexterity * 0.75f + characterAttacking.weaponPower * 0.65f;
-        }
         else if(attack.moveName == "Enhanced Shockwave")
-        {
             attackPower = characterAttacking.dexterity * 0.84f + characterAttacking.weaponPower * 0.75f;
-        }
         else
-        {
             attackPower = characterAttacking.dexterity * 0.62f + characterAttacking.weaponPower * 0.8f;
-        }
         if (attack.moveName == "Tentacles")
         {
             if (characterAttacking.IsPlayer())
@@ -615,7 +601,7 @@ public class BattleManager : MonoBehaviour
                     if(!Evade(enemy,characterAttacking) && !enemy.isDead)
                     {
                         enemy.TakeHpDamage(damage);
-                        DamageText(damage, false, enemy.transform);
+                        DamageText(damage, false, enemy.transform, false);
                         Debug.Log(characterAttacking.characterName + " did " + damage + " damage to " + selectedCharacterToAttack);
                     }
                 }
@@ -630,7 +616,7 @@ public class BattleManager : MonoBehaviour
                     if (!Evade(player,characterAttacking) && !player.isDead)
                     {
                         player.TakeHpDamage(damage);
-                        DamageText(damage, false, player.transform);
+                        DamageText(damage, false, player.transform, false);
                         Debug.Log(characterAttacking.characterName + " did " + damage + " damage to " + selectedCharacterToAttack);
                     }
                 }
@@ -643,22 +629,24 @@ public class BattleManager : MonoBehaviour
             float defenseAmount = selectedCharacterToAttack.defense + selectedCharacterToAttack.armorDefense;
             float damageAmount = (attackPower / defenseAmount) * movePower * Random.Range(0.9f, 1.1f);
             int damageToGive = (int)damageAmount;
-            damageToGive = CriticalStrike(damageToGive, selectedCharacterToAttack.transform);
+            damageToGive = CriticalStrike(characterAttacking,damageToGive, selectedCharacterToAttack.transform);
             Debug.Log(characterAttacking.characterName + " did " + damageToGive + " damage to " + selectedCharacterToAttack);
             yield return new WaitForSeconds(0.5f);
             if ((attack.moveName == "Shockwave" || attack.moveName == "Enhanced Shockwave") && characterAttacking.IsPlayer())
             {
                 if (characterAttacking.lifestealWeap)
                 {
-                    int heal = damageToGive / 2;
+                    int heal =(int)(damageToGive * 0.15f);
                     characterAttacking.AddHP(heal);
+                    DamageText(heal, false, characterAttacking.transform, true);
                     print("Player recieved " + heal + " from lifesteal");
                 } 
             }
             if (attack.moveName == "Blood drain")
             {
                 int heal = damageToGive / 2;
-                characterAttacking.AddHP(heal);                
+                characterAttacking.AddHP(heal);
+                DamageText(heal, false, characterAttacking.transform, true);
                 print("Healed " + characterAttacking + " for " + heal);
             }
             selectedCharacterToAttack.TakeHpDamage(damageToGive);
@@ -667,39 +655,72 @@ public class BattleManager : MonoBehaviour
 
     private bool Evade(BattleCharacters target,BattleCharacters characterAttacking)
     {
-        float chanceToHit = Random.Range(0f, 1f);        
-        if ((target.evasion / 100) < chanceToHit)
-        {            
-            return false;
-        }
+        float chanceToHit = Random.Range(0f, 1f);
+        if ((target.evasion / 100) < chanceToHit && !missOnPurpose)
+            return false;        
         else
         {
+            missedAttack = true;
+            UpdateText();
             Debug.Log(characterAttacking.characterName + " Missed!");
-            DamageText(0, false, target.transform);
+            DamageText(0, false, target.transform, false);
             return true;
         }
     }
 
-    private int CriticalStrike(int damage,Transform position)
+    private int CriticalStrike(BattleCharacters characterAttacking,int damage,Transform position)
     {
-        if (Random.value > 0.8f)
+        var difficulty = PlayerPrefs.GetInt("Difficulty_");
+        float rng = Random.value;
+        float threshold = 0.8f;
+        if (!characterAttacking.IsPlayer()) // if enemy
+        {
+            switch (difficulty)
+            {
+                case 1:
+                    threshold = 0.95f;
+                    break;
+                case 2:
+                    threshold = 0.9f;
+                    break;
+                case 3:
+                    threshold = 0.85f;
+                    break;
+            }
+        }
+        else     //if player
+        {
+            switch (difficulty)
+            {
+                case 1:
+                    threshold = 0.8f;
+                    break;
+                case 2:
+                    threshold = 0.85f;
+                    break;
+                case 3:
+                    threshold = 0.9f;
+                    break;
+            }
+        }
+        if (rng > threshold)
         {
             damage *= 2;
-            DamageText(damage, true, position);
+            DamageText(damage, true, position, false);
             return damage;
         }
         else
         {
-            DamageText(damage, false, position);
+            DamageText(damage, false, position, false);
             return damage;
         }
         
     }
 
-    private void DamageText(int damage,bool isCritical,Transform position)
+    private void DamageText(int amount,bool isCritical,Transform position, bool heal)
     {
         CharacterDamageGUI damageUI = Instantiate(damageGUI, position.transform.position, transform.rotation);
-        damageUI.SetDamage(damage, isCritical);
+        damageUI.SetDamage(amount, isCritical, heal);
     }
     
     private void DamageText(string text,Transform position)
@@ -769,15 +790,17 @@ public class BattleManager : MonoBehaviour
                         transform.position.z);
             }
             float rng = Random.Range(0, 1f);
-            if (rng > 0.5f)
+            if (rng > 0.5f && !missedAttack)
             {
                 print("Succesfully stunned " + selectEnemyTarget.characterName);
-                DamageText("Stunned!",selectEnemyTarget.transform);
+                DamageText("Stunned!", selectEnemyTarget.transform);
                 if (activeBattleCharacters.Contains(selectEnemyTarget))
                     activeBattleCharacters.Remove(selectEnemyTarget);
                 else
                     characterToStun.Add(selectEnemyTarget);
             }
+            else if (missedAttack)
+                missedAttack = false;
         }
         else if(battleMovesList[i].moveName == "Tentacles")
         {
@@ -825,12 +848,10 @@ public class BattleManager : MonoBehaviour
         {
             enemies[i].HideRing();
             if (!enemies[i].IsPlayer() && enemies[i].isDead)
-            {
                 enemies.RemoveAt(i);
-            }
         }
         PlayerAttack("Tentacles", enemies[0]);
-        HideRings();
+        HideAllRings();
     }
 
     public void OpenTargetPanel(string moveName)
@@ -841,13 +862,9 @@ public class BattleManager : MonoBehaviour
         MoveName?.Invoke(moveName);
         ReturnButtonPlacement();
         returnButton.SetActive(true);
-        for (int i = 0; i < enemies.Count; i++)
-        {
+        for (int i = 0; i < enemies.Count; i++)        
             if (!enemies[i].IsPlayer() && enemies[i].isDead)
-            {
                 enemies.RemoveAt(i);
-            }
-        }
         for (int i = 0; i < targetButtons.Length; i++)
         {
             if (enemies.Count > i)
@@ -871,10 +888,8 @@ public class BattleManager : MonoBehaviour
 
     public void OpenMagicPanel()
     {
-        for (int i = 0; i < magicButtons.Length; i++)
-        {
-            magicButtons[i].gameObject.SetActive(false);
-        }
+        for (int i = 0; i < magicButtons.Length; i++)        
+            magicButtons[i].gameObject.SetActive(false);        
         magicPanel.SetActive(true);
         ReturnButtonPlacement();
         returnButton.SetActive(true);
@@ -882,7 +897,6 @@ public class BattleManager : MonoBehaviour
         {          
             for (int x = 0; x < activeBattleCharacters[0].AttackMovesAvailable().Length; x++) 
             {
-
                 if (battleMovesList[i].moveName == activeBattleCharacters[0].AttackMovesAvailable()[x])
                 {
                     magicButtons[x].gameObject.SetActive(true);
@@ -908,11 +922,6 @@ public class BattleManager : MonoBehaviour
             return activeBattleCharacters[0];
         else
             return null;
-    }
-
-    public List<BattleCharacters> GetPlayers()
-    {
-        return players;
     }
 
     public void ChanceToFlee(bool flee,float chanceToFlee)
@@ -974,17 +983,20 @@ public class BattleManager : MonoBehaviour
         }
         foreach (ItemsManager item in Inventory.instance.GetItemList())
         {
-            RectTransform itemSlot = Instantiate(itemSlotContainer, itemSlotContainerParent).GetComponent<RectTransform>();
-            ItemButton itemButton = itemSlot.GetComponent<ItemButton>();
-            Image image = itemButton.itemsImage;
-            image.sprite = item.itemImage;
-            TextMeshProUGUI itemAmountText = itemButton.itemAmountText;
-            if (item.amount > 1)
-            { itemAmountText.text = item.amount.ToString(); }
-            else
-            { itemAmountText.text = ""; }
-            itemButton.itemOnButton = item;
-            items.Add(itemSlot.transform);
+            if (item.affectType != ItemsManager.AffectType.Other)
+            {
+                RectTransform itemSlot = Instantiate(itemSlotContainer, itemSlotContainerParent).GetComponent<RectTransform>();
+                ItemButton itemButton = itemSlot.GetComponent<ItemButton>();
+                Image image = itemButton.itemsImage;
+                image.sprite = item.itemImage;
+                TextMeshProUGUI itemAmountText = itemButton.itemAmountText;
+                if (item.amount > 1)
+                { itemAmountText.text = item.amount.ToString(); }
+                else
+                { itemAmountText.text = ""; }
+                itemButton.itemOnButton = item;
+                items.Add(itemSlot.transform);
+            }
         }
         if(itemSlotContainerParent.childCount == 0)        
             Utilities.SetSelectedAndHighlight(returnButton, returnButton.GetComponent<Button>());        
@@ -1085,9 +1097,6 @@ public class BattleManager : MonoBehaviour
         RectTransform rect = UIButtonHolder.GetComponent<RectTransform>();
         switch (battleMenuState)
         {
-            case BattleMenuState.magicPanel:
-                rect = magicPanel.GetComponent<RectTransform>();
-                break;
             case BattleMenuState.itemPanel:
                 rect = itemPanel.GetComponent<RectTransform>();
                 break;
@@ -1096,7 +1105,7 @@ public class BattleManager : MonoBehaviour
                 break;
         }
         var button = returnButton.GetComponent<RectTransform>();
-        button.position = new Vector2 (80, rect.rect.height + 24);
+        button.position = new Vector2 (60, rect.rect.height + 47);
         returnButton.SetActive(true);
     }
 
@@ -1107,13 +1116,9 @@ public class BattleManager : MonoBehaviour
 
     public int GetAbilityCost(string ability)
     {
-        foreach(BattleMoves battleMoves in battleMovesList)
-        {
-            if(battleMoves.moveName == ability)
-            {
+        foreach(BattleMoves battleMoves in battleMovesList)        
+            if(battleMoves.moveName == ability)            
                 return battleMoves.manaCost;
-            }
-        }
         return 0;
     }
 
@@ -1121,6 +1126,7 @@ public class BattleManager : MonoBehaviour
 
     private enum BattleMenuState
     {
+        mainPanelMenuOpened,
         mainPanel,
         characterAttackPanel,
         magicPanel,
@@ -1187,10 +1193,8 @@ public class BattleManager : MonoBehaviour
 
     public void NavigateToItemsUsePanel(InputAction.CallbackContext context)
     {
-        if (battleMenuState == BattleMenuState.itemPanel && context.performed)
-        {
-            Invoke("ChangeFocusToItemsUsePanel", 0.1f);
-        }
+        if (battleMenuState == BattleMenuState.itemPanel && context.performed)        
+            Invoke("ChangeFocusToItemsUsePanel", 0.1f);        
     }
 
     public void CloseItemPanel()
@@ -1237,6 +1241,45 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+
+    public void NavigateMenu(InputAction.CallbackContext context)
+    {
+        if (!EventSystem.current.currentSelectedGameObject && context.canceled && isBattleActive)
+        {
+            switch (battleMenuState)
+            {
+                case BattleMenuState.characterAttackPanel:
+                    var targetPanel = enemyTargetPanel.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject;
+                    EventSystem.current.SetSelectedGameObject(targetPanel);
+                    enemyTargetPanel.transform.GetChild(0).GetComponent<BattleTargetButtons>().OnSelect(null);
+                    break;
+                case BattleMenuState.itemCharacterChoicePanel:
+                    if(characterChoicePanel.transform.childCount > 0)
+                    EventSystem.current.SetSelectedGameObject(characterChoicePanel.transform.GetChild(0).gameObject);
+                    break;
+                case BattleMenuState.itemPanel:
+                    if(itemSlotContainerParent.transform.childCount > 0)
+                    EventSystem.current.SetSelectedGameObject(itemSlotContainerParent.transform.GetChild(0).gameObject);
+                    break;
+                case BattleMenuState.itemUsePanel:
+                    EventSystem.current.SetSelectedGameObject(useItemButton);
+                    break;
+                case BattleMenuState.magicAttackCharacterPanel:
+                    var magicTargetPanel = enemyTargetPanel.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject;
+                    EventSystem.current.SetSelectedGameObject(magicTargetPanel);
+                    enemyTargetPanel.transform.GetChild(0).GetComponent<BattleTargetButtons>().OnSelect(null);
+                    break;
+                case BattleMenuState.magicPanel:
+                    if (magicPanel.transform.childCount > 0)
+                        EventSystem.current.SetSelectedGameObject(magicPanel.transform.GetChild(0).gameObject);
+                    break;
+                case BattleMenuState.mainPanel:
+                        EventSystem.current.SetSelectedGameObject(mainPanelButtons[0]);
+                    break;
+            }
+        }
+    }
+
     public void NavigateItems(InputAction.CallbackContext context)
     {
         if (context.canceled && battleMenuState == BattleMenuState.itemPanel)
@@ -1253,36 +1296,34 @@ public class BattleManager : MonoBehaviour
     public void NavigateTargets(InputAction.CallbackContext context)
     {
         if (context.started && enemyTargetPanel.activeInHierarchy)
-        {
             HideRings();
-        }
         if (context.canceled && enemyTargetPanel.activeInHierarchy)
-        {
             ShowRing();
-        }
     }
 
     private void ShowRing()
     {
-        var button = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
-        if (button.GetComponentInParent<BattleTargetButtons>())
-            button.GetComponentInParent<BattleTargetButtons>().OnSelect(null);
+        if (EventSystem.current.currentSelectedGameObject)
+        {
+            var button = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
+            if (button.GetComponentInParent<BattleTargetButtons>())
+                button.GetComponentInParent<BattleTargetButtons>().OnSelect(null);
+        }
     }
 
     public void ShowRingsOnAll()
     {
-        foreach(BattleCharacters enemy in enemies)
-        {
-            enemy.ShowRing();
-        }
+        foreach(BattleCharacters enemy in enemies)        
+            enemy.ShowRing();        
     }
 
     public void HideAllRings()
     {
-        foreach (BattleCharacters enemy in enemies)
+        LeanTween.delayedCall(0.02f,() =>
         {
-            enemy.HideRing();
-        }
+            foreach (BattleCharacters enemy in enemies)
+                enemy.HideRing();
+        });
     }
 
     private void HideRings()
@@ -1297,31 +1338,52 @@ public class BattleManager : MonoBehaviour
     private void ClearRings()
     {
         foreach(BattleTargetButtons targetButtons in targetButtons)
-        {
             if(targetButtons.activeBattleTarget)
                 targetButtons.OnDeselect(null);
-        }
     }
 
     private void CheckPlayerButtonHolder()
     {
-        if (isBattleActive && waitingForTurn && battleMenuState==BattleMenuState.mainPanel)
+        if (isBattleActive && waitingForTurn && battleMenuState == BattleMenuState.mainPanel)
         {
             UIButtonHolder.SetActive(true);
+            menuButton.SetActive(true);
             returnButton.SetActive(false);
         }
         else
         {
             UIButtonHolder.SetActive(false);
+            menuButton.SetActive(false);
         }
     }
 
     public void ReturnToPreviousMenu(InputAction.CallbackContext context)
     {
-        if (context.canceled && GameManager.instance.battleIsActive)
+        if (context.canceled && GameManager.instance.battleIsActive)        
+            ReturnToPreviousMenu();        
+    }
+
+    public void OnCloseMenu()
+    {
+        SwitchActiveMap.instance.SwitchToBattleUI();
+        battleMenuState = BattleMenuState.mainPanel;
+        CheckPlayerButtonHolder();
+        LeanTween.delayedCall(0.05f, () =>
         {
-            ReturnToPreviousMenu();
-        }
+            EventSystem.current.SetSelectedGameObject(mainPanelButtons[0]);
+            Utilities.SetSelectedAndHighlight(mainPanelButtons[0], mainPanelButtons[0].GetComponent<Button>());
+        });
+    }
+
+    public void OnExitToMainMenu(float delay)
+    {
+        MenuManager.instance.FadeImage();
+        Invoke("SettingUpBattle",delay);
+    }
+
+    public void OpenMenu()
+    {
+        MenuManager.instance.OpenMenu();
     }
 
     public void ReturnToPreviousMenu()
@@ -1331,6 +1393,13 @@ public class BattleManager : MonoBehaviour
             Button button;
             switch (battleMenuState)
             {
+                case BattleMenuState.mainPanel:
+                    if (waitingForTurn)
+                    {
+                        battleMenuState = BattleMenuState.mainPanelMenuOpened;
+                        MenuManager.instance.OpenMenu();
+                    }
+                    break;
                 case BattleMenuState.characterAttackPanel:
                     battleMenuState = BattleMenuState.mainPanel;
                     enemyTargetPanel.SetActive(false);

@@ -17,6 +17,7 @@ public class LastScene : MonoBehaviour
     public void Press()
     {
         Utilities.LoadMainMenu();
+        PlayerPrefs.DeleteAll();
     }
 
     // Update is called once per frame

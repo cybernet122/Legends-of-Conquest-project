@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     float horizontalSpeed, verticalSpeed;
     public PlayerInput playerInput;
     public static event UnityAction IncreaseHealingPotency;
+    public static void UpdatePotency() => IncreaseHealingPotency?.Invoke();
 
     private void Start()
     {
@@ -53,6 +54,12 @@ public class Player : MonoBehaviour
         verticalSpeed = y;
     }
 
+    public void FaceDown()
+    {
+        animator.SetFloat("movementY", -1f);
+        animator.SetFloat("LastY", -1f);
+    }
+
     private void Update()
     {
         if (GameManager.instance.enableMovement)
@@ -72,10 +79,11 @@ public class Player : MonoBehaviour
     private void MovePlayer()
     {
         var velocity = new Vector2(horizontalSpeed * movementSpeed, verticalSpeed * movementSpeed);
+        
         playerRigidBody.velocity = velocity;
         animator.SetFloat("movementX", playerRigidBody.velocity.x);
         animator.SetFloat("movementY", playerRigidBody.velocity.y);
-        if (horizontalSpeed != 0 || verticalSpeed != 0) // Old Keyboard Values horizontalSpeed == 1 || horizontalSpeed == -1 || verticalSpeed == 1 || verticalSpeed == -1
+        if (horizontalSpeed != 0 || verticalSpeed != 0)
         {
             animator.SetFloat("LastY", verticalSpeed);
             animator.SetFloat("LastX", horizontalSpeed);

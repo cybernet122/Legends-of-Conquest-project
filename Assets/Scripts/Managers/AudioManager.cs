@@ -25,14 +25,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            StopMusic();
-        }
-    }
-
     public void StopMusic()
     {
         foreach (AudioSource music in backgroundMusic)

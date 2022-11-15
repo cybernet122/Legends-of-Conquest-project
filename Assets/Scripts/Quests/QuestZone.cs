@@ -12,11 +12,11 @@ public class QuestZone : MonoBehaviour
 
     private void Update()
     {
-        if(canMark && Input.GetButtonDown("Fire1"))
+        /*if(canMark && Input.GetButtonDown("Fire1"))
         {
             canMark = false;
             MarkTheQuest();
-        }
+        }*/
     }
 
     public void MarkTheQuest()

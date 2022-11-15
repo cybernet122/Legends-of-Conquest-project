@@ -141,14 +141,14 @@ MonoBehaviour:
   currentXP: 0
   xpForNextLevel: 
   baseLevelXP: 100
-  hpToAdd: 5
+  hpToAdd: 4
   maxHP: 100
   currentHP: 100
   maxMana: 60
   currentMana: 60
   addXP: 1000
   dexterity: 12
-  defense: 12
+  defense: 14
   equippedWeaponName: 
   equippedArmorName: 
   weaponPower: 0

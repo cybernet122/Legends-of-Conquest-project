@@ -104,7 +104,7 @@ MonoBehaviour:
   amountOfEffect: 0
   affectType: 0
   weaponDexterity: 0
-  armorDefense: 4
+  armorDefense: 3
   isStackable: 0
   amount: 1
   rememberPickup: 0

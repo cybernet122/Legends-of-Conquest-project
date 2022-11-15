@@ -14,13 +14,9 @@ public class SwitchActiveMap : MonoBehaviour
     void Start()
     {
         if (instance != null && instance != this)
-        {
             Destroy(this.gameObject);
-        }
         else
-        {
             instance = this;
-        }
         DontDestroyOnLoad(gameObject);
         playerInput = GetComponent<PlayerInput>();
         UI = playerInput.actions.FindActionMap("UI");

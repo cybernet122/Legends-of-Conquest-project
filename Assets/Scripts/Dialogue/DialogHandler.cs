@@ -8,7 +8,7 @@ public class DialogHandler : MonoBehaviour
     [SerializeField] string questToMark;
     [SerializeField] bool markAsComplete, destroyOnFinish;
     [SerializeField] string checkIfComplete;
-    [SerializeField] bool triggerOnEntry;
+    public bool triggerOnEntry;
     [SerializeField] float delayActivation;
     [SerializeField,TooltipAttribute("Remember if the object has been destroyed before(Useful on scene changes).")] 
     bool rememberDestruction;
@@ -51,22 +51,18 @@ public class DialogHandler : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        /*if(canActivateBox)
-        {
-            DialogController.instance.npcInRange = true;
-
-            if (shouldTriggerQuest)
-            {
-                DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);
-            }
-        }
-        else
-        { 
-            DialogController.instance.npcInRange = false;
-        }*/
+        if (checkIfComplete == "Look for the heroes located in the cave and join them")
+            DialogController.SpokeToHeroes += CheckIfSpokeToHeroes;
     }
+
+    private void OnDisable()
+    {
+        if (checkIfComplete == "Look for the heroes located in the cave and join them")
+            DialogController.SpokeToHeroes -= CheckIfSpokeToHeroes;
+    } 
+
     private void Start()
     {
         dialogueBubble = GetComponent<DialogueBubble>();
@@ -108,7 +104,12 @@ public class DialogHandler : MonoBehaviour
             dialogueBubble.CheckForDialogue();
     }
 
-
+    public void CheckIfSpokeToHeroes()
+    {
+        string quest = "Look for the heroes located in the cave and join them";
+        if (checkIfComplete == quest && QuestManager.instance.CheckIfComplete(quest))        
+            Destroy(gameObject);        
+    }
 
     public bool ReturnDestroy()
     {

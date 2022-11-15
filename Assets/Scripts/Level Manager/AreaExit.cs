@@ -13,6 +13,8 @@ public class AreaExit : MonoBehaviour
     private void Start()
     {
         /*areaEnter.transitionAreaName = transitionName;*/
+        GameManager.SavePlayerPos();
+        PlayerPrefs.SetString("Current_Scene", SceneManager.GetActiveScene().name);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

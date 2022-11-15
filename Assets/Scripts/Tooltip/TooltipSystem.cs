@@ -28,10 +28,10 @@ public class TooltipSystem : MonoBehaviour
         }
     }
 
-    public static void Show(string content, string header = "")
+    public static void Show(bool pointer,string content, string header = "")
     {
         instance.canvasGroup.LeanAlpha(1, 0.5f);
-        instance.tooltip.SetText(content, header);
+        instance.tooltip.SetText(pointer,content, header);
         instance.tooltip.gameObject.SetActive(true);
     }
 

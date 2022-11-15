@@ -556,8 +556,8 @@ MonoBehaviour:
   currentMana: 15
   maxMana: 15
   dexterity: 4
-  defense: 9
-  weaponPower: 7
+  defense: 11
+  weaponPower: 6
   armorDefense: 0
   speed: 5
   evasion: 5

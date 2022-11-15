@@ -10,10 +10,10 @@ public class QuestObject : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.G))
+        /*if (Input.GetKeyDown(KeyCode.G))
         {
             CheckForCompletion();
-        }
+        }*/
     }
 
     public void CheckForCompletion()
