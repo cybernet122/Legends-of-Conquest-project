@@ -40,40 +40,40 @@ public class SwitchActiveMap : MonoBehaviour
 
     public void SwitchToUI()
     {
-        if (!UI.enabled)
-        {
-            UI.Enable();
-            ShopUI.Disable();
-            BattleUI.Disable();
-            PlayerMap.Disable();
-            EventSystem.current.GetComponent<SwitchInputModule>().SwitchToUI();
-            print("Switching to UI");
-        }
+        UI.Enable();
+        ShopUI.Disable();
+        BattleUI.Disable();
+        PlayerMap.Disable();
+        EventSystem.current.GetComponent<SwitchInputModule>().SwitchToUI();
+        print("Switching to UI");
     }
 
     public void SwitchToShopUI()
     {
-        if (!ShopUI.enabled)
-        {
-            UI.Disable();
-            ShopUI.Enable();
-            BattleUI.Disable();
-            PlayerMap.Disable();
-            EventSystem.current.GetComponent<SwitchInputModule>().SwitchToShopUI();
-            print("Switching to ShopUI");
-        }
+        UI.Disable();
+        ShopUI.Enable();
+        BattleUI.Disable();
+        PlayerMap.Disable();
+        EventSystem.current.GetComponent<SwitchInputModule>().SwitchToShopUI();
+        print("Switching to ShopUI");
     }
 
     public void SwitchToBattleUI()
     {
-        if (!BattleUI.enabled)
-        {
-            UI.Disable();
-            ShopUI.Disable();
-            BattleUI.Enable();
-            PlayerMap.Disable();
-            EventSystem.current.GetComponent<SwitchInputModule>().SwitchToBattleUI();
-            print("Switching to BattleUI");
-        }
+        UI.Disable();
+        ShopUI.Disable();
+        BattleUI.Enable();
+        PlayerMap.Disable();
+        EventSystem.current.GetComponent<SwitchInputModule>().SwitchToBattleUI();
+        print("Switching to BattleUI");
+    }
+
+    public void SwitchToPlayer()
+    {
+        UI.Disable();
+        ShopUI.Disable();
+        BattleUI.Disable();
+        PlayerMap.Enable();
+        print("Switching to Player");
     }
 }

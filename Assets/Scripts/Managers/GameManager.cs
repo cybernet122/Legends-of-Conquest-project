@@ -137,14 +137,26 @@ public class GameManager : MonoBehaviour
         savingFade = FindObjectOfType<SavingFade>();
         Invoke("SortPlayerStats", 0.3f);
         Invoke("UpdatePlayerLevels", 0.5f);
-        if(scene.name != "Main Menu" && scene.name != "Loading Scene" && scene.name != "GameOverScene")
-        Invoke("LoadSecondaryData",0.5f);
+        if (scene.name != "Main Menu" && scene.name != "Loading Scene" && scene.name != "GameOverScene")
+            Invoke("LoadSecondaryData", 0.5f);
         LeanTween.delayedCall(0.15f, () =>
         {
             QuestManager.instance.MountainsQuest();
             savingFade = SavingFade.instance;
             if (scene.name != "Main Menu" && scene.name != "Loading Scene")
+            {
                 MenuManager.instance.SetFirstSelectedObject(0);
+                if (scene.name != "Main Menu" && scene.name != "Loading Scene" && scene.name != "Options" && scene.name != "Treasure" && scene.name != "GameOverScene")
+                {
+                    SwitchActiveMap.instance.SwitchToPlayer();
+                    HealthBarsUIManager.instance.HandleHealthBars(true);
+                }
+            }
+            else
+            {
+                print("test");
+                HealthBarsUIManager.instance.HandleHealthBars(false);
+            }
             DialogController.instance.ReturnFromMountains();
             Player.UpdatePotency();
         });
@@ -388,12 +400,12 @@ public class GameManager : MonoBehaviour
 
     private void PurgeData()
     {
-        /*if (Input.GetKeyDown(KeyCode.K) && SceneManager.GetActiveScene().name != "Main Menu")
+        if (Input.GetKeyDown(KeyCode.K) && SceneManager.GetActiveScene().name != "Main Menu")
         {
             PlayerPrefs.DeleteAll();
             Debug.Log("Purging Data");
             QuestManager.instance.PurgeQuestData();
-        }*/
+        }
     }
 
     public void UpdatePlayerLevels()
@@ -444,7 +456,6 @@ public class GameManager : MonoBehaviour
         if (enableMovement)
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
-            print(input.x + " " + input.y);
             Player.instance.MovePlayer(input.x, input.y);
         }
     }

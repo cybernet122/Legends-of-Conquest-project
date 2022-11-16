@@ -370,7 +370,18 @@
                 },
                 {
                     "name": "",
-                    "id": "04c57abc-17ba-41bf-8672-5e65e554038b",
+                    "id": "bacd62d5-cfcc-4e0e-a01a-0d484836fdb3",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d1d78fec-5cc3-4a6e-88bc-cb0b32a41285",
                     "path": "<Keyboard>/backspace",
                     "interactions": "",
                     "processors": "",
@@ -381,8 +392,8 @@
                 },
                 {
                     "name": "",
-                    "id": "bacd62d5-cfcc-4e0e-a01a-0d484836fdb3",
-                    "path": "<Gamepad>/buttonEast",
+                    "id": "96f33b13-163e-4d9a-8ac9-95c2e98fc70c",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -2148,6 +2159,17 @@
                     "name": "",
                     "id": "f2a8b6f5-ac57-488f-af8c-ee993928013b",
                     "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "37a8bc67-d22c-4ea8-adff-175629781072",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

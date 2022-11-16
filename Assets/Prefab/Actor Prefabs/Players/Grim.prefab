@@ -136,6 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerName: Grim
   characterImage: {fileID: -2150753145709587267, guid: 74f406e562f543a45b4be11c063757d1, type: 3}
+  characterIcon: {fileID: 21300000, guid: 5d4e77b10ea9f064a8eb37c8772a6427, type: 3}
   maxLevel: 50
   playerLevel: 1
   currentXP: 0

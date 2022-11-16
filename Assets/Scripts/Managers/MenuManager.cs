@@ -104,9 +104,7 @@ public class MenuManager : MonoBehaviour
         if (!ShopManager.instance.shopMenu.activeInHierarchy && ShopManager.instance.finishedCount && menuState == MenuState.mainPanels && !BattleRewardsHandler.instance.RewardScreenOpen() &&
                 !GameManager.instance.dialogBoxOpened && SceneManager.GetActiveScene().name != "Main Menu")
         {
-            if (SwitchActiveMap.instance.GetInputAction().name != "UI")
-                SwitchActiveMap.instance.SwitchToUI();
-            if (!menu.activeInHierarchy && closedMenu && !GameManager.instance.loading)
+            if (!GameManager.instance.loading && closedMenu)
             {
                 foreach (GameObject button in mainMenuButtons)
                     button.GetComponent<Button>().OnDeselect(null);
@@ -157,6 +155,11 @@ public class MenuManager : MonoBehaviour
         goldCoins.text = GameManager.instance.currentGoldCoins.ToString();
         menuState = MenuState.mainPanels;
         Invoke("CheckForShop", 0.1f);
+        if (!menu.activeInHierarchy)
+            SwitchActiveMap.instance.SwitchToPlayer();
+        else
+            SwitchActiveMap.instance.SwitchToUI();
+        print(toglMenu);
     }
 
     public void SetFirstSelectedObject(int num)
@@ -424,7 +427,6 @@ public class MenuManager : MonoBehaviour
         PlayerStats player = GameManager.instance.GetPlayerStats()[characterToUse];
         if (activeItem.itemName == player.equippedWeaponName || activeItem.itemName == player.equippedArmorName) { return; }
         activeItem.UseItem(characterToUse);
-        //OpenCharacterChoicePanel();
         Inventory.instance.RemoveItem(activeItem);
         AudioManager.instance.PlaySFX(0);
         itemDescription.text = string.Empty;
@@ -487,16 +489,6 @@ public class MenuManager : MonoBehaviour
                 activeItem = im;
             }
         }
-        /*
-        foreach (ItemsManager item in itemList)
-        {
-            if (ItemsAssets.instance.GetItemsAsset(item.itemName) != null)
-            {
-                item.itemName = itemList[0].itemName;
-                *//*var newItem = Instantiate(item);
-                activeItem = newItem;*//*
-            }
-        }*/
     }
 
     public void OptionsMenu()
@@ -742,11 +734,6 @@ public class MenuManager : MonoBehaviour
                 Invoke("SwitchToUsePanel",0.1f);
             }
         }
-        /*else if (menuState == MenuState.statPanel && context.performed)
-        {
-            print("test");
-            FocusOnStatInfoPanel();
-        }*/
     }
 
     private void SwitchToUsePanel()
@@ -821,19 +808,6 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    /*private void FocusOnStatInfoPanel()
-    {
-        for (int i = 0; i < statsButtons.Length; i++)
-        {
-            if (EventSystem.current.currentSelectedGameObject == statsButtons[i])            
-                InspectingStats?.Invoke(true);            
-            statsButtons[i].GetComponent<Button>().interactable = false;
-        }
-        var hpTextButton = hpText.GetComponent<Button>();
-        Utilities.SetSelectedAndHighlight(hpText.gameObject, hpTextButton);
-        hpTextButton.onClick.Invoke();
-    }*/
-
     private void EnableStatButtons()
     {
         for (int i = 0; i < statsButtons.Length; i++)
@@ -885,7 +859,7 @@ public class MenuManager : MonoBehaviour
                     ToggleMenu();
                     if (GameManager.instance.battleIsActive)
                         BattleManager.instance.OnCloseMenu();
-                    LeanTween.delayedCall(0.1f, () => closedMenu = true);
+                    LeanTween.delayedCall(0.15f, () => closedMenu = true);
                     break;
             }
         }

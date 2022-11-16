@@ -25,11 +25,11 @@ public class QuestManager : MonoBehaviour
 
     private void Update()
     {
-        /*if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             AdvanceQuest();
             print("skipping quest");
-        }*/
+        }
     }
 
     private void AdvanceQuest()

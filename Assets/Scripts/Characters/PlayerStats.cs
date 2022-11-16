@@ -5,7 +5,7 @@ public class PlayerStats : MonoBehaviour
 {
     public string playerName;
     public static PlayerStats instance;
-    public Sprite characterImage;
+    public Sprite characterImage, characterIcon;
     public int maxLevel = 50;
     public int playerLevel = 1;
     public int currentXP;
