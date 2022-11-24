@@ -273,7 +273,7 @@ public class BattleManager : MonoBehaviour
             LeanTween.delayedCall(0.5f, () =>
             {
                 for (int i = players.Count; i > 0; i--)               
-                    playerCanvas[i - 1].SetActive(true);                
+                    playerCanvas[i - 1].SetActive(true);
             });
             battleScene.SetActive(true);
             for (int i = 0; i < border.Length; i++)
@@ -338,10 +338,6 @@ public class BattleManager : MonoBehaviour
             transform.position = new Vector3(cameraToResize.transform.position.x, cameraToResize.transform.position.y, transform.position.z);
         else
             Debug.LogError("Couldn't find a camera to resize");
-        if (returnButton.activeInHierarchy)
-        {
-            ReturnButtonPlacement();
-        }
     }
 
     private void CheckForCamera()
@@ -432,6 +428,7 @@ public class BattleManager : MonoBehaviour
         players.Clear();
         enemies.Clear();
         activeBattleCharacters.Clear();
+        HealthBarsUIManager.instance.UpdateHealthBars();
         for (int i = 0; i < playerCanvas.Length; i++)
             playerCanvas[i].SetActive(false);
         for (int i = 0; i < battleCharacters.Length; i++)
@@ -857,10 +854,8 @@ public class BattleManager : MonoBehaviour
     public void OpenTargetPanel(string moveName)
     {
         if(moveName == "Tentacles") { return; }
-        returnButton.GetComponent<RectTransform>().localPosition = new Vector3(-880f, -238, 0);
         enemyTargetPanel.SetActive(true);
         MoveName?.Invoke(moveName);
-        ReturnButtonPlacement();
         returnButton.SetActive(true);
         for (int i = 0; i < enemies.Count; i++)        
             if (!enemies[i].IsPlayer() && enemies[i].isDead)
@@ -889,10 +884,8 @@ public class BattleManager : MonoBehaviour
     public void OpenMagicPanel()
     {
         for (int i = 0; i < magicButtons.Length; i++)        
-            magicButtons[i].gameObject.SetActive(false);        
-        magicPanel.SetActive(true);
-        ReturnButtonPlacement();
-        returnButton.SetActive(true);
+            magicButtons[i].gameObject.SetActive(false);
+        bool hasEnoughMana = false;
         for (int i = 0; i < battleMovesList.Length; i++)
         {          
             for (int x = 0; x < activeBattleCharacters[0].AttackMovesAvailable().Length; x++) 
@@ -905,12 +898,16 @@ public class BattleManager : MonoBehaviour
                     magicButtons[x].spellName = battleMovesList[i].moveName;
                     magicButtons[x].spellNameText.text = magicButtons[x].spellName;
                     if (activeBattleCharacters[0].currentMana < battleMovesList[i].manaCost)
-                    {
                         magicButtons[x].GetComponent<Image>().color = new Color(1, 1, 1, 0.75f);
-                    }
+                    else
+                        hasEnoughMana = true;
                 }
             }
         }
+        if (!hasEnoughMana)
+            return;
+        magicPanel.SetActive(true);
+        returnButton.SetActive(true);
         EventSystem.current.SetSelectedGameObject(magicButtons[0].gameObject);
         battleMenuState = BattleMenuState.magicPanel;
         CheckPlayerButtonHolder();
@@ -1088,25 +1085,8 @@ public class BattleManager : MonoBehaviour
         itemPanel.SetActive(true);
         UpdateItemsInInventory();
         battleMenuState = BattleMenuState.itemPanel;
-        ReturnButtonPlacement();
-        CheckPlayerButtonHolder();
-    }
-
-    private void ReturnButtonPlacement()
-    {
-        RectTransform rect = UIButtonHolder.GetComponent<RectTransform>();
-        switch (battleMenuState)
-        {
-            case BattleMenuState.itemPanel:
-                rect = itemPanel.GetComponent<RectTransform>();
-                break;
-            case BattleMenuState.characterAttackPanel:
-                rect = enemyTargetPanel.GetComponent<RectTransform>();
-                break;
-        }
-        var button = returnButton.GetComponent<RectTransform>();
-        button.position = new Vector2 (60, rect.rect.height + 47);
         returnButton.SetActive(true);
+        CheckPlayerButtonHolder();
     }
 
     public BattleCharacters[] ReturnPlayerPrefabs()
@@ -1390,6 +1370,11 @@ public class BattleManager : MonoBehaviour
     {
         if (GameManager.instance.battleIsActive)
         {
+            if (MenuManager.instance.menu.activeInHierarchy)
+            {
+                MenuManager.instance.ReturnToPrevious();
+                return;
+            }
             Button button;
             switch (battleMenuState)
             {

@@ -120,6 +120,7 @@ public class QuestManager : MonoBehaviour
         {
             GameManager.instance.UpdatePlayerStats();
             GameManager.instance.UpdatePlayerLevels();
+            HealthBarsUIManager.instance.UpdateHealthBars();
         }
     }
 

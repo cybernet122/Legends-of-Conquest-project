@@ -54,14 +54,12 @@ public class ShopManager : MonoBehaviour
     {
         if (canOpenShop && context.canceled && shopMenuState == ShopMenuState.mainPanel && !shopMenu.activeInHierarchy && finishedCount
             && !GameManager.instance.dialogBoxOpened && !GameManager.instance.gameMenuOpened)
-        {
-            print(!GameManager.instance.gameMenuOpened);
             OpenShopMenu(); 
-        }
     }
 
     public void OpenShopMenu()
     {
+        MenuManager.instance.HideInfoText();
         shopMenu.SetActive(true);
         GameManager.instance.shopMenuOpened = true;
         currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
@@ -79,6 +77,7 @@ public class ShopManager : MonoBehaviour
         DialogController.instance.StartDelay();
         finishedCount = false;
         SwitchActiveMap.instance.SwitchToUI();
+        MenuManager.instance.ShowInfoText("Interact with shop");
     }
 
     public void OpenBuyPanel()
@@ -172,6 +171,7 @@ public class ShopManager : MonoBehaviour
         buyItemName.text = selectedItem.itemName;
         buyItemDescription.text = selectedItem.itemDescription;
         buyItemValue.text = "Value: " + selectedItem.valueInCoins;
+        shopMenuState = ShopMenuState.buyBrowsePanel;
     }
 
     public void SelectedSellItem(ItemsManager itemToSell, int index)
@@ -184,6 +184,7 @@ public class ShopManager : MonoBehaviour
         sellItemDescription.text = selectedItem.itemDescription;
         salePriceReduced = (int)(selectedItem.valueInCoins * (salePriceReductionInPercent / 100));
         sellItemValue.text = "Value: " + salePriceReduced;
+        shopMenuState = ShopMenuState.sellBrowsePanel;
     }
 
     public void BuyItem()

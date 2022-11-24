@@ -24,6 +24,7 @@ public class TreasureChest : MonoBehaviour
         {
             inRange = true;
             MenuManager.instance.treasureChest = this;
+            MenuManager.instance.ShowInfoText("Interact with chest.");
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
@@ -32,6 +33,7 @@ public class TreasureChest : MonoBehaviour
         {
             inRange = false;
             MenuManager.instance.treasureChest = null;
+            MenuManager.instance.HideInfoText();
         }
     }
 

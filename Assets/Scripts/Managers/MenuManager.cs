@@ -34,6 +34,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] AbilityInfoManager abilityInfoManager;
     [SerializeField] GameObject[] mainMenuButtons;
     [SerializeField] SwitchInputModule eventSystem;
+    [SerializeField] TextMeshProUGUI infoText;
     private BattleCharacters[] players;
     public static MenuManager instance;
     public TextMeshProUGUI itemName, itemDescription;
@@ -48,8 +49,11 @@ public class MenuManager : MonoBehaviour
     public static event UnityAction<bool> InspectingStats;
     public TreasureChest treasureChest;
     private bool closedMenu = true;
+    private MainMenuManager mainMenuManager;
     public bool GetInfoPanelActive() { return charInfoList.activeInHierarchy; }
     public bool GetStatPanelActive() { return characterPanel.activeInHierarchy; }
+    public void GetMainMenuReference() { mainMenuManager = FindObjectOfType<MainMenuManager>(); }
+
 
     private void Start()
     {    
@@ -62,6 +66,8 @@ public class MenuManager : MonoBehaviour
         optionsPanel.SetActive(false);
         itemsCollection = FindObjectsOfType<ItemsManager>();
         fader = image.GetComponent<Animator>();
+        HideInfoText();
+        infoText.transform.SetSiblingIndex(1);
     }
 
     public void ResetToggles()
@@ -155,11 +161,6 @@ public class MenuManager : MonoBehaviour
         goldCoins.text = GameManager.instance.currentGoldCoins.ToString();
         menuState = MenuState.mainPanels;
         Invoke("CheckForShop", 0.1f);
-        if (!menu.activeInHierarchy)
-            SwitchActiveMap.instance.SwitchToPlayer();
-        else
-            SwitchActiveMap.instance.SwitchToUI();
-        print(toglMenu);
     }
 
     public void SetFirstSelectedObject(int num)
@@ -171,9 +172,9 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    public void Submit(InputAction.CallbackContext context)
+    public void Submit()
     {
-        if (ShopManager.instance.canOpenShop && context.canceled)
+        if (ShopManager.instance.canOpenShop)
             LeanTween.delayedCall(0.1f, () =>
             {
                 if (!menu.activeInHierarchy)
@@ -184,13 +185,19 @@ public class MenuManager : MonoBehaviour
                 }
             });
         else if (menu.activeInHierarchy)
-            MenuNavigation(context);        
-        else if (DialogController.instance.npcInRange && context.canceled)
+            MenuNavigation();
+        else if (DialogController.instance.npcInRange)
             DialogController.instance.SkipDialogue();
-        else if (treasureChest != null && context.canceled)
+        else if (treasureChest != null)
         {
             treasureChest.OpenChest();
         }
+    }
+
+    public void Submit(InputAction.CallbackContext context)
+    {
+        if(context.canceled)
+            Submit();
     }
 
     private void CheckForShop()
@@ -257,7 +264,8 @@ public class MenuManager : MonoBehaviour
     public void UpdateStats()
     {
         playerStats = GameManager.instance.GetPlayerStats();
-        players = BattleManager.instance.GetPlayers(); 
+        players = BattleManager.instance.GetPlayers();
+        HealthBarsUIManager.instance.UpdateHealthBars();
         if (!QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them"))
         {
             foreach (GameObject characterPanel in characterInfoPanel)
@@ -537,6 +545,18 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    public void ShowInfoText(string text)
+    {
+        infoText.text = text;
+        infoText.gameObject.SetActive(true);
+    }
+
+    public void HideInfoText()
+    {
+        infoText.text = string.Empty;
+        infoText.gameObject.SetActive(false);
+    }
+
     public void UpdateQuest(string quest)
     {
         questUpdate.PlayUpdateAnimation(quest);
@@ -726,9 +746,9 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    public void MenuNavigation(InputAction.CallbackContext context)
+    public void MenuNavigation(/*InputAction.CallbackContext context*/)
     {
-        if (menuState == MenuState.itemPanel && context.performed) {
+        if (menuState == MenuState.itemPanel/* && context.performed*/) {
             if (activeItem)
             {
                 Invoke("SwitchToUsePanel",0.1f);
@@ -820,7 +840,7 @@ public class MenuManager : MonoBehaviour
 
     public void ReturnToPrevious()
     {
-        if (!GameManager.instance.shopMenuOpened && SwitchActiveMap.instance.GetInputAction().name == "UI" && menu.activeInHierarchy)
+        if (!GameManager.instance.shopMenuOpened && menu.activeInHierarchy && (SwitchActiveMap.instance.GetInputAction().name == "UI" || SwitchActiveMap.instance.GetInputAction().name == "BattleUI"))
         {
             TooltipSystem.Hide();
             switch (menuState)
@@ -863,6 +883,8 @@ public class MenuManager : MonoBehaviour
                     break;
             }
         }
+        else if(Utilities.ReturnSceneName() == "Main Menu")            
+            mainMenuManager.Cancel();
     }
 
     public void ReturnToPrevious(InputAction.CallbackContext context)

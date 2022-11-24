@@ -33,13 +33,17 @@ public class HealthBarsUIManager : MonoBehaviour
             transform.GetChild(0).gameObject.SetActive(false);
         else
         {
-            playerStats = GameManager.instance.GetPlayerStats();
-            ShowHealthBars();
+            LeanTween.delayedCall(0.18f, () => 
+            { 
+                ShowHealthBars();
+            });
         }
     }
 
+    public void UpdateHealthBars() { ShowHealthBars(); }
     private void ShowHealthBars()
     {
+        playerStats = GameManager.instance.GetPlayerStats();
         transform.GetChild(0).gameObject.SetActive(true);
         for (int i = 0; i < playerStats.Length; i++)
         {

@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class AreaExit : MonoBehaviour
 {
-    [SerializeField] string sceneToLoad;
+    public string sceneToLoad;
     [SerializeField] string transitionName;
     [SerializeField] AreaEnter areaEnter;
     [SerializeField] string checkIfQuestIsComplete;
     [SerializeField] AreaEnter teleport;
+    public bool teleportAvailable;
 
     private void Start()
     {
@@ -21,24 +22,29 @@ public class AreaExit : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            if (checkIfQuestIsComplete != "")
+            ChangingArea();
+        }
+    }
+
+    public void ChangingArea()
+    {
+        if (checkIfQuestIsComplete != "")
+        {
+            if (!QuestManager.instance.CheckIfComplete(checkIfQuestIsComplete))
             {
-                if (!QuestManager.instance.CheckIfComplete(checkIfQuestIsComplete))
-                {
-                    return;
-                }
+                return;
             }
-            GameManager.instance.SaveSecondaryData();
-            if (!teleport)
-            {
-                Player.instance.transitionName = transitionName;
-                MenuManager.instance.FadeImage();
-                StartCoroutine(LoadScene());
-            }
-            else if (teleport)
-            {
-                StartCoroutine(Delay());
-            }
+        }
+        GameManager.instance.SaveSecondaryData();
+        if (!teleport)
+        {
+            Player.instance.transitionName = transitionName;
+            MenuManager.instance.FadeImage();
+            StartCoroutine(LoadScene());
+        }
+        else if (teleport)
+        {
+            StartCoroutine(Delay());
         }
     }
 
@@ -53,6 +59,7 @@ public class AreaExit : MonoBehaviour
 
     IEnumerator LoadScene()
     {
+        transform.GetChild(0).GetComponent<AreaInfoText>().StopCountdown();
         yield return new WaitForSeconds(1f);
         SceneManager.LoadScene(sceneToLoad);
     }

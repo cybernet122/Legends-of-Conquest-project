@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7159e3bfbcbf7d94d88e01b796867e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableJoystick: 1
   playerStats: []
   gameMenuOpened: 0
   dialogBoxOpened: 0
@@ -53,7 +54,14 @@ MonoBehaviour:
   battleIsActive: 0
   count: 0
   currentGoldCoins: 0
+  joystickControls: {fileID: 0}
   savingFade: {fileID: 0}
+  player: {fileID: 5153266398256871146, guid: cde83db4a779ca846ba452ce44d8ab1a, type: 3}
+  newGame: 0
+  enableMovement: 0
+  continueGame: 0
+  playerInput: {fileID: 0}
+  loading: 0
 --- !u!114 &6262681181205387145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,6 +95,7 @@ MonoBehaviour:
   - {fileID: 9025688944254745210, guid: efde63b31b2f54447922abc26f477381, type: 3}
   - {fileID: 8595877991382795252, guid: f6a180469d19d3d4f9bd3a33a62a10cb, type: 3}
   - {fileID: 2914606759385923366, guid: 5f4fa14c4cbf30a40a8ce1f4ed2b59aa, type: 3}
+  - {fileID: 7337337511190735732, guid: 05f6d32ac3ec30c488c1a58e39b93b1d, type: 3}
 --- !u!114 &1724019709
 MonoBehaviour:
   m_ObjectHideFlags: 0

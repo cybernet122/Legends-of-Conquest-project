@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     public bool newGame, enableMovement,continueGame = false;
     [SerializeField]PlayerInput playerInput;
     public bool loading =false;
+    SpawnPoint spawnPoint;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,6 +44,11 @@ public class GameManager : MonoBehaviour
             SortPlayerStats();
             UpdatePlayerLevels();
         });        
+        if(SceneManager.GetActiveScene().name != "Main Menu")
+        {
+            spawnPoint = FindObjectOfType<SpawnPoint>();
+            Player.instance.transform.position = spawnPoint.gameObject.transform.position;
+        }
     }
 
     void Update()
@@ -139,6 +146,8 @@ public class GameManager : MonoBehaviour
         Invoke("UpdatePlayerLevels", 0.5f);
         if (scene.name != "Main Menu" && scene.name != "Loading Scene" && scene.name != "GameOverScene")
             Invoke("LoadSecondaryData", 0.5f);
+        if (scene.name == "Main Menu")
+            LeanTween.delayedCall(0.15f, () => { MenuManager.instance.GetMainMenuReference(); });
         LeanTween.delayedCall(0.15f, () =>
         {
             QuestManager.instance.MountainsQuest();
@@ -146,17 +155,11 @@ public class GameManager : MonoBehaviour
             if (scene.name != "Main Menu" && scene.name != "Loading Scene")
             {
                 MenuManager.instance.SetFirstSelectedObject(0);
-                if (scene.name != "Main Menu" && scene.name != "Loading Scene" && scene.name != "Options" && scene.name != "Treasure" && scene.name != "GameOverScene")
-                {
-                    SwitchActiveMap.instance.SwitchToPlayer();
+                if (scene.name != "Options" && scene.name != "Treasure" && scene.name != "GameOverScene")
                     HealthBarsUIManager.instance.HandleHealthBars(true);
-                }
             }
             else
-            {
-                print("test");
                 HealthBarsUIManager.instance.HandleHealthBars(false);
-            }
             DialogController.instance.ReturnFromMountains();
             Player.UpdatePotency();
         });
@@ -164,13 +167,11 @@ public class GameManager : MonoBehaviour
         {
             LeanTween.delayedCall(0.45f, () =>
             {
-                if (newGame || continueGame)
-                {
-                    var spawnPoint = FindObjectOfType<SpawnPoint>();
-                    Player.instance.transform.position = spawnPoint.gameObject.transform.position;
-                    newGame = false;
-                    continueGame = false;
-                }
+                spawnPoint = FindObjectOfType<SpawnPoint>();
+                Player.instance.transform.position = spawnPoint.gameObject.transform.position;
+                SaveSecondaryData();
+                newGame = false;
+                continueGame = false;
             });
         }
     }
@@ -415,6 +416,7 @@ public class GameManager : MonoBehaviour
         {
             foreach (PlayerStats player in playerStats)
             {
+                print(player.playerName);
                 player.MatchPlayerLevel();
             }
         }

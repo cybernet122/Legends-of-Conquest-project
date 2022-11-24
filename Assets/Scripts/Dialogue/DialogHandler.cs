@@ -15,15 +15,19 @@ public class DialogHandler : MonoBehaviour
     public string[] sentences;
     bool canActivateBox;
     DialogueBubble dialogueBubble;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player") && other.GetComponent<Player>())
         {
             canActivateBox = true;
             DialogController.instance.npcInRange = true;
+            DialogController.instance.npcName = name;
             DialogController.instance.ActivateDialog(sentences,GetComponents<DialogHandler>());
             if (shouldTriggerQuest)            
-                DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);                        
+                DialogController.instance.ActivateQuestAtEnd(questToMark, markAsComplete);
+            if(!triggerOnEntry)
+                MenuManager.instance.ShowInfoText("Interact with " + name);
             SpokeToSara();
             if (triggerOnEntry)
             {
@@ -47,6 +51,7 @@ public class DialogHandler : MonoBehaviour
             canActivateBox = false;
             //
             DialogController.instance.npcInRange = false;
+            MenuManager.instance.HideInfoText();
             //
         }
     }

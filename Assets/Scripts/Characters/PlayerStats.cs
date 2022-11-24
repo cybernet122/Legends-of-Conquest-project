@@ -82,7 +82,6 @@ public class PlayerStats : MonoBehaviour
         {
             currentXP += amount;
         }
-        MenuManager.instance.UpdateStats();
         CheckForLevelUp();
     }
 
@@ -119,7 +118,7 @@ public class PlayerStats : MonoBehaviour
                 currentHP = maxHP;
                 maxMana = Mathf.RoundToInt(maxMana * 1.08f);
                 currentMana = maxMana;
-                Player.instance.Levelup();
+                Player.instance.IncreaseHealingForPots();
             }
         }
         if(currentXP >= xpForNextLevel[playerLevel])
@@ -138,7 +137,7 @@ public class PlayerStats : MonoBehaviour
             currentHP = maxHP;
             maxMana = Mathf.RoundToInt(maxMana * 1.08f); 
             currentMana = maxMana;
-            Player.instance.Levelup();
+            Player.instance.IncreaseHealingForPots();
         }
         MenuManager.instance.UpdateStats();
         MenuManager.instance.StatsMenuUpdate(0);
@@ -175,5 +174,6 @@ public class PlayerStats : MonoBehaviour
         {
             AddXP(xpForNextLevel[playerLevel]);
         }
+        HealthBarsUIManager.instance.UpdateHealthBars();
     }
 }

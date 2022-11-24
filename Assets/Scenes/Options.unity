@@ -274,6 +274,7 @@ MonoBehaviour:
   m_TrackedDeviceOrientationAction: {fileID: 1025543830046995696, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
 --- !u!114 &501958134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -812,6 +813,10 @@ PrefabInstance:
     - target: {fileID: 6385608644470306251, guid: 1d957a39f38874041b4c98444c8c4944, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8543142340099553423, guid: 1d957a39f38874041b4c98444c8c4944, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d957a39f38874041b4c98444c8c4944, type: 3}

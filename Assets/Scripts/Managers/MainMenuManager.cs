@@ -13,6 +13,8 @@ public class MainMenuManager : MonoBehaviour
     MenuState menuState = MenuState.mainMenu;
     Button[] buttons;
     TMP_InputField inputField;
+    [SerializeField] bool inputFieldSelected = false;
+    public void SetSelected(bool value) { inputFieldSelected = value; }
     
     private void Start()
     {
@@ -78,6 +80,7 @@ public class MainMenuManager : MonoBehaviour
             AudioManager.instance.SetVolumeSFX(sfxValue);
             GameManager.instance.newGame = true;
         });
+        optionsPanel.SetActive(false);
     }
 
     public void QuitGame()
@@ -109,6 +112,23 @@ public class MainMenuManager : MonoBehaviour
         menuState = MenuState.newGame;
         ToggleButtonNavigation(false);
         inputField.OnDeselect(null);
+        inputFieldSelected = true;
+    }
+
+    private void CloseNewGamePanel()
+    {
+        EventSystem.current.SetSelectedGameObject(newGameButton);
+        optionsPanel.SetActive(false);
+        menuState = MenuState.mainMenu;
+        ToggleButtonNavigation(true);
+    }
+
+    public void Cancel()
+    {
+        if (inputFieldSelected)
+            inputField.OnDeselect(null);
+        else
+            CloseNewGamePanel();
     }
 
     private void ToggleButtonNavigation(bool status)
@@ -134,24 +154,5 @@ public class MainMenuManager : MonoBehaviour
     {
         mainMenu,
         newGame
-    }
-
-    public void ReturnToPreviousMenu(InputAction.CallbackContext context)
-    {
-        if (context.canceled)
-        {
-            ReturnToPreviousMenu();
-        }
-    }
-    
-    public void ReturnToPreviousMenu()
-    {
-        if(menuState == MenuState.newGame)
-        {
-            optionsPanel.SetActive(false);
-            Utilities.SetSelectedAndHighlight(newGameButton, newGameButton.GetComponent<Button>());
-            menuState = MenuState.mainMenu;
-            ToggleButtonNavigation(true);
-        }
     }
 }

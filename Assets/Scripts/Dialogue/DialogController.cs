@@ -24,7 +24,7 @@ public class DialogController : MonoBehaviour
     public bool triggerOnEntry = false;
     public bool npcInRange = false;
     private bool countFinished = true;
-    private string npcName;
+    public string npcName;
     [SerializeField] DialogHandler[] dialogHandler;
     bool advance, finishCountDown, countStarted;
     public static event UnityAction SpokeToHeroes;
@@ -79,7 +79,7 @@ public class DialogController : MonoBehaviour
     }
 
     public void SkipDialogue()
-    {    
+    {
         if (!ShopManager.instance.shopMenu.activeInHierarchy && !MenuManager.instance.menu.activeInHierarchy && npcInRange && countFinished && dialogSentences.Length > 0)
         {
             if (!isTyping)
@@ -115,6 +115,7 @@ public class DialogController : MonoBehaviour
     {
         if (advance && !isTyping || triggerOnEntry)
         {
+            MenuManager.instance.HideInfoText();
             advance = false;
             dialogBox.SetActive(true);
             triggerOnEntry = false;
@@ -127,6 +128,8 @@ public class DialogController : MonoBehaviour
             else
             {
                 dialogBox.SetActive(false);
+                if(!dialogHandler[0].triggerOnEntry)
+                    MenuManager.instance.ShowInfoText("Interact with " + npcName);
                 GameManager.instance.dialogBoxOpened = false;
                 if (shouldMarkQuest)
                 {
@@ -239,13 +242,11 @@ public class DialogController : MonoBehaviour
             {
                 currentSentence = 0;                
             }
-            //CheckForSkip();
         }
         else
         {
             dialogBox.SetActive(false);
             currentSentence = 0;
-            
         }
     }
 

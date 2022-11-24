@@ -113,7 +113,7 @@ public class Player : MonoBehaviour
         return player;
     }
 
-    public void Levelup()
+    public void IncreaseHealingForPots()
     {
         IncreaseHealingPotency?.Invoke();
     }

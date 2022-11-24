@@ -8,10 +8,7 @@ public class AreaEnter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (transitionAreaName == Player.instance.transitionName /*&& !QuestManager.instance.CheckIfComplete("Speak to Innkeeper")*/)
-        {
+        if (transitionAreaName == Player.instance.transitionName)
             Player.instance.transform.position = transform.position;
-        }
     }
-
 }

@@ -80,6 +80,8 @@ public class ItemsManager : MonoBehaviour
             inRange = true;
             string stringToSave = "PickedUpItem_" + name;
             GameManager.instance.DataToSave(stringToSave);
+            MenuManager.instance.ShowInfoText("Picked up item " + itemName);
+            LeanTween.delayedCall(1.5f, () => { MenuManager.instance.HideInfoText(); });
         }
     }
 
