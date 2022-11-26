@@ -35,10 +35,7 @@ public class GameManager : MonoBehaviour
         if(!savingFade)
         savingFade = FindObjectOfType<SavingFade>();
         count = true;
-        if (enableJoystick)
-            EnableButtons();
-        else
-            DisableButtons();
+        DisableButtons();
         LeanTween.delayedCall(0.1f, () =>
         {
             SortPlayerStats();
@@ -263,6 +260,11 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt(data, 1);
         SavePlayerStats();
         SaveItemInventory();
+        if (PlayerPrefs.HasKey("Joystick_"))
+            if(PlayerPrefs.GetInt("Joystick_") == 1)
+            PlayerPrefs.SetInt("Joystick_", 1);
+        else
+            PlayerPrefs.SetInt("Joystick_", 0);
     }
 
     private static void SaveItemInventory()
@@ -413,13 +415,16 @@ public class GameManager : MonoBehaviour
     {
         bool condition = QuestManager.instance.CheckIfComplete("Look for the heroes located in the cave and join them");
         if (condition)
-        {
             foreach (PlayerStats player in playerStats)
-            {
-                print(player.playerName);
                 player.MatchPlayerLevel();
-            }
-        }
+    }
+
+    public void ToggleJoystickControls(bool condition)
+    {
+        if (condition)
+            enableJoystick = true;
+        else
+            enableJoystick = false;
     }
 
     public void GameOver()
@@ -449,7 +454,14 @@ public class GameManager : MonoBehaviour
             stringsToSave.Clear();
             if (PlayerPrefs.HasKey("Player_" + playerStats[0].playerName + "_CurrentHP"))            
                 LoadPlayerStats();            
-            LoadItemInventory();                
+            LoadItemInventory();
+            if (PlayerPrefs.HasKey("Joystick_"))
+            {
+                if (PlayerPrefs.GetInt("Joystick_") == 1)
+                    enableJoystick = true;
+                else
+                    enableJoystick = false;
+            }
         }
     }
 

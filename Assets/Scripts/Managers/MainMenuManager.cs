@@ -57,6 +57,7 @@ public class MainMenuManager : MonoBehaviour
             float musicValue = 0.24f;
             float sfxValue = 0.24f;
             string name = string.Empty;
+            int joystickActive = 0;
             if (PlayerPrefs.HasKey("Difficulty_"))
             {
                 difficulty = PlayerPrefs.GetInt("Difficulty_");
@@ -68,6 +69,13 @@ public class MainMenuManager : MonoBehaviour
             }
             if (PlayerPrefs.HasKey("Players_name_"))
                 name = PlayerPrefs.GetString("Players_name_");
+            if (PlayerPrefs.HasKey("Joystick_"))
+            {
+                if (PlayerPrefs.GetInt("Joystick_") == 1)
+                    joystickActive = 1;
+                else
+                    joystickActive = 0;
+            }
             PlayerPrefs.DeleteAll();
             Debug.Log("Purging Data");
             Inventory.instance.PurgeInventoryForLoad();
@@ -76,6 +84,7 @@ public class MainMenuManager : MonoBehaviour
             PlayerPrefs.SetFloat("Music_Volume_", musicValue);
             PlayerPrefs.SetFloat("SFX_Volume_", sfxValue);
             PlayerPrefs.SetString("Players_name_", name);
+            PlayerPrefs.SetInt("Joystick_", joystickActive);
             AudioManager.instance.SetVolumeMusic(musicValue);
             AudioManager.instance.SetVolumeSFX(sfxValue);
             GameManager.instance.newGame = true;

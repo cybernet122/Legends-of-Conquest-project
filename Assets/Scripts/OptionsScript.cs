@@ -40,22 +40,19 @@ public class OptionsScript : MonoBehaviour
 
     public void SetValuesOnStart()
     {
-        if (PlayerPrefs.HasKey("Difficulty_") || PlayerPrefs.HasKey("Music_Volume_") || PlayerPrefs.HasKey("SFX_Volume_"))
+        if (sliderMusic && PlayerPrefs.HasKey("Music_Volume_"))
+            sliderMusic.value = PlayerPrefs.GetFloat("Music_Volume_");
+        if (sliderSFX && PlayerPrefs.HasKey("SFX_Volume_"))
+            sliderSFX.value = PlayerPrefs.GetFloat("SFX_Volume_");
+        if (sliderDifficulty && PlayerPrefs.HasKey("Difficulty_"))
         {
-            if(sliderMusic != null)
-                sliderMusic.value = PlayerPrefs.GetFloat("Music_Volume_");
-            if (sliderSFX != null)
-                sliderSFX.value = PlayerPrefs.GetFloat("SFX_Volume_");
-            if (sliderDifficulty != null)
-            {
-                sliderDifficulty.value = PlayerPrefs.GetInt("Difficulty_");
-                UpdateDifficulty();
-            }
+            sliderDifficulty.value = PlayerPrefs.GetInt("Difficulty_");
+            UpdateDifficulty();
         }
         changedSettings = false;
-            var button = GetComponentInChildren<Button>();
+            /*var button = GetComponentInChildren<Button>();
         if (button)        
-            Utilities.SetSelectedAndHighlight(button.gameObject, button);        
+            Utilities.SetSelectedAndHighlight(button.gameObject, button);*/
     }
 
     public void SaveButton()
@@ -125,13 +122,13 @@ public class OptionsScript : MonoBehaviour
     public void UpdateVolume()
     {
         changedSettings = true;
-        AudioManager.instance.SetVolumeMusic(sliderMusic.value);
+        LeanTween.delayedCall(0.13f, () => { AudioManager.instance.SetVolumeMusic(sliderMusic.value); });
     }
 
     public void UpdateSFX()
     {
         changedSettings = true;
-        AudioManager.instance.SetVolumeSFX(sliderSFX.value);
+        LeanTween.delayedCall(0.13f, () => { AudioManager.instance.SetVolumeSFX(sliderSFX.value); });
     }
 
     public void UpdateDifficulty()

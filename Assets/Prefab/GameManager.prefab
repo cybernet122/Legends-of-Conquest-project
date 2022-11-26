@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7159e3bfbcbf7d94d88e01b796867e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableJoystick: 1
+  enableJoystick: 0
   playerStats: []
   gameMenuOpened: 0
   dialogBoxOpened: 0
