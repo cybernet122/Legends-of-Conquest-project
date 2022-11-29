@@ -60,12 +60,10 @@ public class ShopManager : MonoBehaviour
     public void OpenShopMenu()
     {
         MenuManager.instance.HideInfoText();
+        OpenBuyPanel();
+        currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
         shopMenu.SetActive(true);
         GameManager.instance.shopMenuOpened = true;
-        currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
-        EventSystem.current.firstSelectedGameObject = mainShopButtons[0];
-        UpdateItemsInShop(itemSlotBuyContainerParent, itemsForSale, false);
-        Utilities.SetSelectedAndHighlight(mainShopButtons[0], mainShopButtons[0].GetComponent<Button>());
     }
 
     public void CloseShopMenu()
@@ -127,13 +125,9 @@ public class ShopManager : MonoBehaviour
             sellItemDescription.text = "";
             sellItemValue.text = "";
             for (int i = 0; i < itemSlotBuyContainerParent.childCount; i++)
-            {
                 Destroy(itemSlotBuyContainerParent.GetChild(i).gameObject);
-            }
             for (int i = 0; i < itemSlotSellContainerParent.childCount; i++)
-            {
                 Destroy(itemSlotSellContainerParent.GetChild(i).gameObject);
-            }
         }
     }
 
@@ -157,9 +151,7 @@ public class ShopManager : MonoBehaviour
                     itemsAmountText.text = "";
             }
             else
-            {
                 itemsAmountText.text = "";
-            }
             itemSlot.GetComponent<ItemButton>().itemOnButton = item;
             currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
         }
@@ -197,6 +189,8 @@ public class ShopManager : MonoBehaviour
                 Inventory.instance.AddItems(selectedItem, true);
                 currentGoldCoinText.text = GameManager.instance.currentGoldCoins.ToString();
             }
+            else
+                MenuManager.instance.ShowInfoText("Not enough gold coins!",1f);
         }
     }
 
@@ -284,8 +278,8 @@ public class ShopManager : MonoBehaviour
 
     private void HighlightButton()
     {
-        for (int i = 0; i < mainShopButtons.Length; i++)        
-            mainShopButtons[i].GetComponent<Button>().OnDeselect(null);        
+        for (int i = 0; i < mainShopButtons.Length; i++)
+                mainShopButtons[i].GetComponent<Button>().OnDeselect(null);
         if (buyPanel.activeInHierarchy)
             mainShopButtons[0].GetComponent<Button>().OnSelect(null);
         else

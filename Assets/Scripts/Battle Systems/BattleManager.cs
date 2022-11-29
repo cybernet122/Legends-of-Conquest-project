@@ -306,6 +306,7 @@ public class BattleManager : MonoBehaviour
             for (int i = 0; i < border.Length; i++)
                 border[i].SetActive(false);
             AudioManager.instance.StopMusic();
+            SwitchActiveMap.instance.SwitchToUI();
         }
     }
 
@@ -1024,6 +1025,7 @@ public class BattleManager : MonoBehaviour
         else players[index].evasion = 5f;
         Inventory.instance.RemoveItem(selectedItem);
         AudioManager.instance.PlaySFX(0);
+        MenuManager.instance.ShowInfoText("Used " + selectedItem.itemName + ".", 1f);
         UpdateText();
         UseItemEndTurn();
         returnButton.SetActive(false);

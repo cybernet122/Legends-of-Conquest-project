@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
             SortPlayerStats();
             UpdatePlayerLevels();
         });        
-        if(SceneManager.GetActiveScene().name != "Main Menu")
+        if(SceneManager.GetActiveScene().name != "Main Menu" && SceneManager.GetActiveScene().name != "Loading Scene" && SceneManager.GetActiveScene().name != "GameOverScene" && SceneManager.GetActiveScene().name != "Treasure" && SceneManager.GetActiveScene().name == "Options")
         {
             spawnPoint = FindObjectOfType<SpawnPoint>();
             Player.instance.transform.position = spawnPoint.gameObject.transform.position;
@@ -147,20 +147,17 @@ public class GameManager : MonoBehaviour
             LeanTween.delayedCall(0.15f, () => { MenuManager.instance.GetMainMenuReference(); });
         LeanTween.delayedCall(0.15f, () =>
         {
+            HealthBarsUIManager.instance.UpdateHealthBars();
             QuestManager.instance.MountainsQuest();
             savingFade = SavingFade.instance;
             if (scene.name != "Main Menu" && scene.name != "Loading Scene")
-            {
                 MenuManager.instance.SetFirstSelectedObject(0);
-                if (scene.name != "Options" && scene.name != "Treasure" && scene.name != "GameOverScene")
-                    HealthBarsUIManager.instance.HandleHealthBars(true);
-            }
-            else
-                HealthBarsUIManager.instance.HandleHealthBars(false);
             DialogController.instance.ReturnFromMountains();
             Player.UpdatePotency();
         });
-        if(SceneManager.GetActiveScene().name == "Bedroom" && newGame)
+        if (scene.name == "Options")
+            Player.instance.transform.position = Vector3.zero;
+        if(scene.name == "Bedroom" && newGame)
         {
             LeanTween.delayedCall(0.45f, () =>
             {
@@ -227,6 +224,7 @@ public class GameManager : MonoBehaviour
                 var playerStats1 = playerStats[0];
                 playerStats = new PlayerStats[1];
                 playerStats[0] = playerStats1;
+                HealthBarsUIManager.instance.HandleHealthBars(true);
             }
         }
     }
@@ -403,12 +401,12 @@ public class GameManager : MonoBehaviour
 
     private void PurgeData()
     {
-        if (Input.GetKeyDown(KeyCode.K) && SceneManager.GetActiveScene().name != "Main Menu")
+        /*if (Input.GetKeyDown(KeyCode.K) && SceneManager.GetActiveScene().name != "Main Menu")
         {
             PlayerPrefs.DeleteAll();
             Debug.Log("Purging Data");
             QuestManager.instance.PurgeQuestData();
-        }
+        }*/
     }
 
     public void UpdatePlayerLevels()

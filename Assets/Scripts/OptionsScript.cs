@@ -6,14 +6,14 @@ using TMPro;
 using UnityEngine.SceneManagement;
 public class OptionsScript : MonoBehaviour
 {
-    [SerializeField] GameObject discardWarningPanel;
+    [SerializeField] GameObject discardWarningPanel, optionsPanel;
     [SerializeField] Slider sliderSFX, sliderMusic;
     [SerializeField] Slider sliderDifficulty;
     [SerializeField] TextMeshProUGUI difficultyText;
     [SerializeField] Button[] saveAndReturnButtons;
     float musicValue, sfxValue, diffValue;
     private int difficulty;
-    bool changedSettings;
+    public bool changedSettings;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +26,11 @@ public class OptionsScript : MonoBehaviour
     {
         SaveValues();
         changedSettings = false;
+    }
+
+    public void ClosePanel()
+    {
+        optionsPanel.SetActive(false);
     }
 
     private void SaveValues()
@@ -50,9 +55,6 @@ public class OptionsScript : MonoBehaviour
             UpdateDifficulty();
         }
         changedSettings = false;
-            /*var button = GetComponentInChildren<Button>();
-        if (button)        
-            Utilities.SetSelectedAndHighlight(button.gameObject, button);*/
     }
 
     public void SaveButton()
@@ -69,10 +71,14 @@ public class OptionsScript : MonoBehaviour
 
     public void ReturnButton()
     {
+        changedSettings = false;
         discardWarningPanel.SetActive(false);
-        sliderMusic.value = musicValue;
-        sliderSFX.value = sfxValue;
-        sliderDifficulty.value = diffValue;
+        if(PlayerPrefs.HasKey("Music_Volume_"))
+            sliderMusic.value = PlayerPrefs.GetFloat("Music_Volume_");
+        if(PlayerPrefs.HasKey("SFX_Volume_"))
+            sliderSFX.value = PlayerPrefs.GetFloat("SFX_Volume_");
+        if(PlayerPrefs.HasKey("Difficulty_"))
+            sliderDifficulty.value = PlayerPrefs.GetInt("Difficulty_");
     }
 
     public void OpenWarningPanel(bool returnToMainMenu)

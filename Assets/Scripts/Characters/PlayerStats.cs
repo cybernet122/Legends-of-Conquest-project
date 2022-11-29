@@ -173,7 +173,7 @@ public class PlayerStats : MonoBehaviour
         for (int i = 0; i < levelDifference; i++)
         {
             AddXP(xpForNextLevel[playerLevel]);
-        }
+        }        
         HealthBarsUIManager.instance.UpdateHealthBars();
     }
 }

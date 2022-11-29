@@ -31,7 +31,7 @@ public class SwitchActiveMap : MonoBehaviour
                 switchInputModule = EventSystem.current.GetComponent<SwitchInputModule>();
     }
 
-    public InputActionMap GetInputAction()
+    public InputActionMap GetActiveInputAction()
     {
         InputActionMap[] inputActions = new InputActionMap[] { UI, ShopUI, BattleUI, PlayerMap };
         for (int i = 0; i < inputActions.Length; i++)

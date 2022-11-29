@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AreaInfoText : MonoBehaviour
+public class InfoText : MonoBehaviour
 {
     AreaExit areaExit;
     LTDescr countdownToTeleport;

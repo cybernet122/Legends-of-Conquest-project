@@ -25,11 +25,11 @@ public class QuestManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        /*if (Input.GetKeyDown(KeyCode.P))
         {
             AdvanceQuest();
             print("skipping quest");
-        }
+        }*/
     }
 
     private void AdvanceQuest()
@@ -118,6 +118,7 @@ public class QuestManager : MonoBehaviour
             StartCoroutine(EndGame());
         if (questToMark == "Look for the heroes located in the cave and join them")
         {
+            MenuManager.instance.ShowInfoText("Party size increased!");
             GameManager.instance.UpdatePlayerStats();
             GameManager.instance.UpdatePlayerLevels();
             HealthBarsUIManager.instance.UpdateHealthBars();

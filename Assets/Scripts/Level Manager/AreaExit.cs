@@ -10,6 +10,7 @@ public class AreaExit : MonoBehaviour
     [SerializeField] string checkIfQuestIsComplete;
     [SerializeField] AreaEnter teleport;
     public bool teleportAvailable;
+    public string GetQuestRequired() { return checkIfQuestIsComplete; }
 
     private void Start()
     {
@@ -59,7 +60,7 @@ public class AreaExit : MonoBehaviour
 
     IEnumerator LoadScene()
     {
-        transform.GetChild(0).GetComponent<AreaInfoText>().StopCountdown();
+        transform.GetChild(0).GetComponent<InfoText>().StopCountdown();
         yield return new WaitForSeconds(1f);
         SceneManager.LoadScene(sceneToLoad);
     }

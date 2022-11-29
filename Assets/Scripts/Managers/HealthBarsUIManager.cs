@@ -21,7 +21,6 @@ public class HealthBarsUIManager : MonoBehaviour
             instance = this;
         DontDestroyOnLoad(gameObject);
     }
-
     private void Awake()
     {
         transform.GetChild(0).gameObject.SetActive(false);
@@ -32,17 +31,18 @@ public class HealthBarsUIManager : MonoBehaviour
         if (!activate)
             transform.GetChild(0).gameObject.SetActive(false);
         else
-        {
-            LeanTween.delayedCall(0.18f, () => 
-            { 
-                ShowHealthBars();
-            });
-        }
+            Invoke("ShowHealthBars",0.07f);
     }
 
     public void UpdateHealthBars() { ShowHealthBars(); }
     private void ShowHealthBars()
     {
+        var sceneName = Utilities.ReturnSceneName();
+        if (sceneName == "Main Menu" || sceneName == "Loading Scene" || sceneName == "GameOverScene" || sceneName == "Treasure" || sceneName == "Options")
+        {
+            transform.GetChild(0).gameObject.SetActive(false);
+            return;
+        }
         playerStats = GameManager.instance.GetPlayerStats();
         transform.GetChild(0).gameObject.SetActive(true);
         for (int i = 0; i < playerStats.Length; i++)

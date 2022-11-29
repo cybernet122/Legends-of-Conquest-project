@@ -929,8 +929,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -267}
-  m_SizeDelta: {x: 1443.8518, y: 345.5055}
+  m_AnchoredPosition: {x: 0, y: -308.7845}
+  m_SizeDelta: {x: 1443.8518, y: 429.0745}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &179378328
 MonoBehaviour:
@@ -954,7 +954,10 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Congratulations,
 
-    The treasure is yours!'
+    You have reached the end of this adventure.
+
+    The
+    treasure is yours!'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a1fabacdc37ca904c85798fd58b18239, type: 2}
   m_sharedMaterial: {fileID: 5447570534603817214, guid: a1fabacdc37ca904c85798fd58b18239, type: 2}
@@ -981,8 +984,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 90
-  m_fontSizeBase: 90
+  m_fontSize: 57.58
+  m_fontSizeBase: 57.58
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -991,8 +994,8 @@ MonoBehaviour:
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
+  m_characterSpacing: -10.2
+  m_wordSpacing: 16.8
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
